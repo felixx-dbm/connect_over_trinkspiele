@@ -27,7 +27,10 @@ export async function signUp(data: {
     ({ data: signUpData, error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
-      options: { data: { username: data.username.trim(), birth_date: data.dob } },
+      options: {
+          data: { username: data.username.trim(), birth_date: data.dob },
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/auth/callback`,
+        },
     }));
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
