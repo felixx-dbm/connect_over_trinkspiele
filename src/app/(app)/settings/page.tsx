@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Trash2, Edit3, User, Mail, MapPin } from "lucide-react";
+import { ArrowLeft, Trash2, User, Mail, MapPin } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/actions/auth";
+import EditAccountButton from "./EditAccountButton";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
@@ -30,13 +31,7 @@ export default async function SettingsPage() {
       <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 mb-5">
         <div className="flex items-center justify-between mb-3">
           <p className="text-xs text-zinc-500 uppercase tracking-widest">Account</p>
-          <Link
-            href="/profile"
-            className="flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300 transition-colors cursor-pointer"
-          >
-            <Edit3 size={12} />
-            Edit Profile
-          </Link>
+          <EditAccountButton username={profile?.username ?? ""} city={profile?.city ?? ""} />
         </div>
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-3">

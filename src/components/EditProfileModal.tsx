@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { X, AlertCircle, Check } from "lucide-react";
 import { updateProfile } from "@/app/actions/profile";
 
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export default function EditProfileModal({ initialUsername, initialCity, onClose }: Props) {
+  const router = useRouter();
   const [username, setUsername] = useState(initialUsername);
   const [city, setCity] = useState(initialCity);
   const [loading, setLoading] = useState(false);
@@ -30,6 +32,7 @@ export default function EditProfileModal({ initialUsername, initialCity, onClose
     setLoading(false);
     if (result.error) { setError(result.error); return; }
     setSaved(true);
+    router.refresh();
     closeTimerRef.current = setTimeout(onClose, 800);
   };
 

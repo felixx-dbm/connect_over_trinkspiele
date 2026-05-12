@@ -29,5 +29,6 @@ export async function updateProfile(username: string, city: string): Promise<{ e
   }
 
   revalidatePath("/profile");
+  revalidatePath("/settings");
   return {};
 }

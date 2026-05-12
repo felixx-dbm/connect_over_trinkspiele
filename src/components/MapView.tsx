@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { Loader2, Swords, Users, AlertCircle, RefreshCw } from "lucide-react";
+import { Loader2, Swords, Users, AlertCircle, RefreshCw, ChevronUp, ChevronDown, MapPin, Navigation } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
@@ -77,6 +77,12 @@ function RecenterOnce({ lat, lng }: { lat: number; lng: number }) {
 
 const REFRESH_INTERVAL_MS = 30_000;
 
+const GAME_ICONS: Record<string, string> = {
+  beer_pong: "🏓",
+  flunky_ball: "⚽",
+  freestyle: "🎲",
+};
+
 export default function MapView({ filter }: { filter: string }) {
   const router = useRouter();
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -86,6 +92,7 @@ export default function MapView({ filter }: { filter: string }) {
   const [accepting, setAccepting] = useState<string | null>(null);
   const [acceptError, setAcceptError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
+  const [listOpen, setListOpen] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
   const fetchChallenges = useCallback((loc: { lat: number; lng: number }) => {
@@ -291,6 +298,107 @@ export default function MapView({ filter }: { filter: string }) {
           </span>
         </div>
       )}
+
+      {/* Match list bottom sheet */}
+      <div
+        className="absolute left-0 right-0 bottom-0 z-[1001] transition-transform duration-300 ease-in-out"
+        style={{ transform: listOpen ? "translateY(0)" : "translateY(calc(100% - 56px))" }}
+      >
+        {/* Sheet handle / toggle bar */}
+        <button
+          onClick={() => setListOpen((v) => !v)}
+          className="w-full bg-zinc-900/95 backdrop-blur border-t border-zinc-800 px-4 py-3 flex items-center justify-between cursor-pointer"
+          style={{ position: "relative", zIndex: 1 }}
+        >
+          <div className="flex items-center gap-2">
+            <Swords size={14} className="text-amber-400" />
+            <span className="text-zinc-200 text-sm font-semibold">
+              {filteredMatches.length + externalQueue.length === 0
+                ? "No battles nearby"
+                : `${filteredMatches.length + externalQueue.length} battle${filteredMatches.length + externalQueue.length !== 1 ? "s" : ""} nearby`}
+            </span>
+            {filteredMatches.filter((m) => m.is_own).length > 0 && (
+              <span className="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full">
+                {filteredMatches.filter((m) => m.is_own).length} yours
+              </span>
+            )}
+          </div>
+          {listOpen ? <ChevronDown size={16} className="text-zinc-500" /> : <ChevronUp size={16} className="text-zinc-500" />}
+        </button>
+
+        {/* Sheet content */}
+        {listOpen && (
+          <div className="bg-zinc-950 border-t border-zinc-800 max-h-[55vh] overflow-y-auto">
+            {/* Own challenges */}
+            {filteredMatches.filter((m) => m.is_own).length > 0 && (
+              <div className="px-4 pt-4 pb-2">
+                <p className="text-[10px] text-indigo-400 uppercase tracking-widest mb-2">Your Challenges</p>
+                <div className="flex flex-col gap-2">
+                  {filteredMatches.filter((m) => m.is_own).map((m) => (
+                    <button
+                      key={m.id}
+                      onClick={() => router.push(`/matches/${m.id}`)}
+                      className="flex items-center gap-3 bg-zinc-900 border border-indigo-500/20 rounded-xl p-3 text-left cursor-pointer hover:border-indigo-500/40 transition-colors w-full"
+                    >
+                      <span className="text-xl flex-shrink-0">{GAME_ICONS[m.game_type_name] ?? "🎮"}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-indigo-300 text-sm font-semibold capitalize">
+                          {m.game_type_name.replace(/_/g, " ")}
+                        </p>
+                        <p className="text-zinc-600 text-xs flex items-center gap-1 mt-0.5">
+                          <Navigation size={9} />
+                          Waiting for opponent
+                        </p>
+                      </div>
+                      <span className="text-xs text-indigo-400 font-medium flex-shrink-0">View →</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Nearby battles */}
+            {filteredMatches.filter((m) => !m.is_own).length > 0 && (
+              <div className="px-4 pt-3 pb-2">
+                <p className="text-[10px] text-amber-400 uppercase tracking-widest mb-2">Nearby Battles</p>
+                <div className="flex flex-col gap-2">
+                  {filteredMatches.filter((m) => !m.is_own).map((m) => (
+                    <div
+                      key={m.id}
+                      className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 rounded-xl p-3"
+                    >
+                      <span className="text-xl flex-shrink-0">{GAME_ICONS[m.game_type_name] ?? "🎮"}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-zinc-200 text-sm font-semibold">{m.challenger_username}</p>
+                        <p className="text-zinc-500 text-xs capitalize flex items-center gap-1 mt-0.5">
+                          <MapPin size={9} />
+                          {m.game_type_name.replace(/_/g, " ")} · {Math.round(m.distance_m)}m
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => accept(m.id)}
+                        disabled={accepting !== null}
+                        className="flex-shrink-0 h-8 px-3 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-zinc-950 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center gap-1"
+                      >
+                        {accepting === m.id ? <Loader2 size={11} className="animate-spin" /> : <Swords size={11} />}
+                        Accept
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {filteredMatches.length === 0 && (
+              <div className="px-4 py-8 text-center">
+                <p className="text-zinc-600 text-sm">No battles match your filter</p>
+              </div>
+            )}
+
+            <div className="h-4" />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
