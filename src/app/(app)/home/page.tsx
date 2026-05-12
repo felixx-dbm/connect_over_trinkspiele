@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Bell, Swords, Trophy, TrendingUp, Clock, ChevronRight, Flame, Users } from "lucide-react";
+import { Bell, Swords, Trophy, TrendingUp, Clock, ChevronRight, Flame, Users, MapPin } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import type { MatchRow } from "@/lib/types";
 
@@ -11,7 +11,7 @@ export default async function HomePage() {
   if (!user) redirect("/login");
 
   const [{ data: profile }, { data: recentMatches }, { data: activeMatch }] = await Promise.all([
-    supabase.from("users").select("username, wins, losses").eq("id", user.id).single(),
+    supabase.from("users").select("username, wins, losses, city").eq("id", user.id).single(),
     supabase
       .from("matches")
       .select("id, status, mode, created_at, winner_id, game_types(name), opponent:opponent_id(username), challenger:challenger_id(username)")
@@ -27,6 +27,10 @@ export default async function HomePage() {
       .maybeSingle(),
   ]);
 
+  const hour = new Date().getHours();
+  const greeting = hour < 5 ? "Good night," : hour < 12 ? "Good morning," : hour < 17 ? "Good afternoon," : hour < 21 ? "Good evening," : "Good night,";
+
+  const hasCity = !!profile?.city;
   const wins = profile?.wins ?? 0;
   const losses = profile?.losses ?? 0;
   const winRate = (wins + losses) > 0 ? Math.round((wins / (wins + losses)) * 100) : 0;
@@ -45,15 +49,15 @@ export default async function HomePage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <p className="text-zinc-500 text-sm mb-0.5">Good evening,</p>
+          <p className="text-zinc-500 text-sm mb-0.5">{greeting}</p>
           <h1 className="font-display text-2xl text-zinc-100">
             {profile?.username?.toUpperCase() ?? "PLAYER"}
           </h1>
         </div>
         <div className="flex items-center gap-3">
-          <button className="relative w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center hover:border-zinc-700 transition-colors cursor-pointer">
+          <div className="relative w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center opacity-40" title="Notifications coming soon">
             <Bell size={18} className="text-zinc-400" />
-          </button>
+          </div>
           <Link href="/profile">
             <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center font-display text-zinc-950 text-sm cursor-pointer">
               {initials}
@@ -117,6 +121,23 @@ export default async function HomePage() {
             Go to match
           </Link>
         </div>
+      )}
+
+      {/* City nudge for new users */}
+      {!hasCity && (
+        <Link
+          href="/profile"
+          className="flex items-center gap-3 bg-amber-500/5 border border-amber-500/20 rounded-2xl p-4 mb-6 hover:bg-amber-500/10 transition-colors cursor-pointer"
+        >
+          <div className="w-9 h-9 rounded-full bg-amber-500/15 flex items-center justify-center flex-shrink-0">
+            <MapPin size={16} className="text-amber-400" />
+          </div>
+          <div className="flex-1">
+            <p className="text-zinc-200 text-sm font-medium">Set your city</p>
+            <p className="text-zinc-500 text-xs">Appear on the local leaderboard</p>
+          </div>
+          <ChevronRight size={14} className="text-zinc-600" />
+        </Link>
       )}
 
       {/* Quick actions */}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, Navigation, Users, Globe, ChevronRight, Loader2 } from "lucide-react";
+import { ArrowLeft, Navigation, Globe, ChevronRight, Loader2, Lock } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -10,9 +10,8 @@ import { fuzzCoords } from "@/lib/geo";
 type GameType = { id: string; name: string };
 
 const MODE_CONFIG = [
-  { id: "solo", name: "Solo", desc: "You vs a random opponent nearby", Icon: Navigation, geoRequired: true },
-  { id: "crew", name: "Crew Battle", desc: "Challenge a specific crew", Icon: Users, geoRequired: false },
-  { id: "regional", name: "Open Challenge", desc: "Post publicly on the map", Icon: Globe, geoRequired: true },
+  { id: "solo", name: "Solo Battle", desc: "Matched with a random opponent nearby", Icon: Navigation, geoRequired: true },
+  { id: "regional", name: "Open Challenge", desc: "Post publicly on the map for anyone to accept", Icon: Globe, geoRequired: true },
 ] as const;
 
 const GAME_ICONS: Record<string, string> = {
@@ -25,7 +24,8 @@ export default function NewMatchPage() {
   const router = useRouter();
   const [gameTypes, setGameTypes] = useState<GameType[]>([]);
   const [gameTypeId, setGameTypeId] = useState<string | null>(null);
-  const [mode, setMode] = useState<"solo" | "crew" | "regional" | null>(null);
+  const [mode, setMode] = useState<"solo" | "regional" | null>(null);
+  const [radiusKm, setRadiusKm] = useState(5);
   const [finding, setFinding] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [timedOut, setTimedOut] = useState(false);
@@ -81,9 +81,8 @@ export default function NewMatchPage() {
     }
 
     if (mode === "solo") {
-      // Poll matchmaking every 5 s
       const poll = async () => {
-        const params = new URLSearchParams({ game_type_id: gameTypeId! });
+        const params = new URLSearchParams({ game_type_id: gameTypeId!, radius: String(radiusKm) });
         if (coords) {
           params.set("lat", String(coords.lat));
           params.set("lng", String(coords.lng));
@@ -100,7 +99,6 @@ export default function NewMatchPage() {
       await poll();
       pollRef.current = setInterval(poll, 5000);
     } else {
-      // Regional / crew — create open match directly
       const supabase = createClient();
       const { data: match, error: matchError } = await supabase
         .from("matches")
@@ -121,7 +119,6 @@ export default function NewMatchPage() {
     }
   };
 
-  // Stop polling on unmount
   useEffect(() => () => { if (pollRef.current) clearInterval(pollRef.current); }, []);
 
   return (
@@ -139,6 +136,13 @@ export default function NewMatchPage() {
       <div className="mb-7">
         <p className="text-xs text-zinc-500 uppercase tracking-widest mb-3">1. Choose Game</p>
         <div className="flex flex-col gap-2">
+          {gameTypes.length === 0 && (
+            <>
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-16 bg-zinc-900 border border-zinc-800 rounded-2xl animate-pulse" />
+              ))}
+            </>
+          )}
           {gameTypes.map((g) => (
             <button
               key={g.id}
@@ -152,7 +156,7 @@ export default function NewMatchPage() {
               <span className="text-2xl select-none">{GAME_ICONS[g.name] ?? "🎮"}</span>
               <div className="flex-1">
                 <p className={`font-semibold text-sm ${gameTypeId === g.id ? "text-amber-300" : "text-zinc-200"}`}>
-                  {g.name.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+                  {g.name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
                 </p>
               </div>
               {gameTypeId === g.id && (
@@ -185,9 +189,7 @@ export default function NewMatchPage() {
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <p className={`font-semibold text-sm ${mode === m.id ? "text-amber-300" : "text-zinc-200"}`}>{m.name}</p>
-                  {m.geoRequired && (
-                    <span className="text-[10px] bg-zinc-800 text-zinc-500 px-1.5 py-0.5 rounded-full border border-zinc-700">GPS</span>
-                  )}
+                  <span className="text-[10px] bg-zinc-800 text-zinc-500 px-1.5 py-0.5 rounded-full border border-zinc-700">GPS</span>
                 </div>
                 <p className="text-zinc-500 text-xs">{m.desc}</p>
               </div>
@@ -198,8 +200,46 @@ export default function NewMatchPage() {
               )}
             </button>
           ))}
+
+          {/* Crew battles — coming soon */}
+          <div className="flex items-center gap-4 p-4 rounded-2xl border border-zinc-800/50 bg-zinc-900/40 opacity-60 cursor-not-allowed select-none">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-zinc-800">
+              <Lock size={16} className="text-zinc-600" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <p className="font-semibold text-sm text-zinc-500">Crew Battle</p>
+                <span className="text-[10px] bg-amber-500/10 text-amber-600 px-1.5 py-0.5 rounded-full border border-amber-500/20 font-medium">Soon</span>
+              </div>
+              <p className="text-zinc-600 text-xs">Challenge another crew to an organized battle</p>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Radius slider (solo only) */}
+      {mode === "solo" && (
+        <div className="mb-6 bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs text-zinc-400 font-medium">Search Radius</p>
+            <span className="text-sm font-display text-amber-400">{radiusKm} km</span>
+          </div>
+          <input
+            type="range"
+            min={1}
+            max={30}
+            step={1}
+            value={radiusKm}
+            onChange={(e) => setRadiusKm(Number(e.target.value))}
+            className="w-full accent-amber-500 cursor-pointer"
+          />
+          <div className="flex justify-between text-zinc-700 text-xs mt-1">
+            <span>1 km</span>
+            <span>30 km</span>
+          </div>
+          <p className="text-zinc-600 text-xs mt-2">Wider radius = more potential opponents</p>
+        </div>
+      )}
 
       {selectedMode?.geoRequired && (
         <div className="bg-blue-500/5 border border-blue-500/20 rounded-xl p-3 mb-6 flex items-start gap-3">
@@ -218,27 +258,38 @@ export default function NewMatchPage() {
 
       {timedOut && (
         <div className="bg-zinc-900 border border-zinc-700 rounded-2xl p-6 mb-4 text-center">
-          <p className="text-zinc-300 font-semibold mb-1">No one nearby right now</p>
-          <p className="text-zinc-500 text-sm mt-1">Try a different game type, or post an Open Challenge so others can find you on the map.</p>
-          <button
-            onClick={() => setTimedOut(false)}
-            className="mt-4 text-sm text-amber-400 hover:text-amber-300 underline cursor-pointer transition-colors"
-          >
-            Try again
-          </button>
+          <p className="text-zinc-300 font-semibold mb-1">No one found in {radiusKm} km</p>
+          <p className="text-zinc-500 text-sm mt-1">Try a wider radius, a different game type, or post an Open Challenge on the map.</p>
+          <div className="flex flex-col gap-2 mt-4">
+            <button
+              onClick={() => {
+                setTimedOut(false);
+                setRadiusKm((r) => Math.min(r + 10, 30));
+              }}
+              className="text-sm text-amber-400 hover:text-amber-300 underline cursor-pointer transition-colors"
+            >
+              Increase radius to {Math.min(radiusKm + 10, 30)} km &amp; retry
+            </button>
+            <button
+              onClick={() => setTimedOut(false)}
+              className="text-sm text-zinc-600 hover:text-zinc-400 cursor-pointer transition-colors"
+            >
+              Try again
+            </button>
+          </div>
         </div>
       )}
 
       {finding && mode === "solo" && (
         <div className="bg-zinc-900 border border-amber-500/20 rounded-2xl p-6 mb-4 text-center">
           <Loader2 size={32} className="text-amber-400 animate-spin mx-auto mb-3" />
-          <p className="text-zinc-200 font-semibold">Finding opponent…</p>
+          <p className="text-zinc-200 font-semibold">Searching within {radiusKm} km…</p>
           <p className="text-zinc-500 text-sm mt-1">
             {elapsed < 30
-              ? "Checking nearby players every 5s"
+              ? "Checking for nearby players every 5 s"
               : elapsed < 60
-              ? "No one nearby yet — still searching…"
-              : `Still searching · ${120 - elapsed}s before timeout`}
+              ? "No one found yet — still looking…"
+              : `Still searching · ${120 - elapsed}s remaining`}
           </p>
           {elapsed >= 30 && (
             <div className="mt-3 w-full bg-zinc-800 rounded-full h-1">
@@ -256,7 +307,7 @@ export default function NewMatchPage() {
             }}
             className="mt-4 text-sm text-zinc-500 hover:text-zinc-300 underline cursor-pointer transition-colors"
           >
-            Cancel
+            Cancel search
           </button>
         </div>
       )}
@@ -271,7 +322,7 @@ export default function NewMatchPage() {
               : "bg-zinc-800 text-zinc-600 cursor-not-allowed"
           }`}
         >
-          {mode === "solo" ? "Find Opponent" : mode === "crew" ? "Send Challenge" : "Post to Map"}
+          {mode === "solo" ? "Find Opponent" : "Post to Map"}
           <ChevronRight size={18} />
         </button>
       )}

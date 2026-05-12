@@ -32,7 +32,20 @@
       "Bash(git add *)",
       "Bash(git remote *)",
       "Bash(git push *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(npm ls *)",
+      "Bash(node *)",
+      "Bash(jobs)",
+      "Bash(vercel *)",
+      "Bash(npx vercel *)",
+      "Bash(npx plugins *)",
+      "Bash(git commit *)",
+      "Skill(update-config)",
+      "Bash(npx tsc *)",
+      "Bash(git -C /Users/felixdobelmann/Developer/Projects/Trinkspiel status)",
+      "Bash(git -C /Users/felixdobelmann/Developer/Projects/Trinkspiel diff --stat)",
+      "Bash(git *)"
     ]
-  }
+  },
+  "model": "claude-sonnet-4-6"
 }

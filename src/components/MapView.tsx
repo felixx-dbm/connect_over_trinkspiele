@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { Loader2, Swords, Users, AlertCircle } from "lucide-react";
+import { Loader2, Swords, Users, AlertCircle, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
@@ -75,6 +75,8 @@ function RecenterOnce({ lat, lng }: { lat: number; lng: number }) {
   return null;
 }
 
+const REFRESH_INTERVAL_MS = 30_000;
+
 export default function MapView({ filter }: { filter: string }) {
   const router = useRouter();
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -83,7 +85,23 @@ export default function MapView({ filter }: { filter: string }) {
   const [queue, setQueue] = useState<NearbyQueue[]>([]);
   const [accepting, setAccepting] = useState<string | null>(null);
   const [acceptError, setAcceptError] = useState<string | null>(null);
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+
+  const fetchChallenges = useCallback((loc: { lat: number; lng: number }) => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    fetch(`/api/map/challenges?lat=${loc.lat}&lng=${loc.lng}&radius=10`, { signal: controller.signal })
+      .then((r) => r.json())
+      .then((data) => {
+        setMatches(data.matches ?? []);
+        setQueue(data.queue ?? []);
+        setLastRefresh(new Date());
+      })
+      .catch((e) => { if (e.name !== "AbortError") console.error("[map]", e); });
+  }, []);
 
   useEffect(() => {
     if (!navigator.geolocation) { setLocationError(true); return; }
@@ -96,20 +114,15 @@ export default function MapView({ filter }: { filter: string }) {
 
   useEffect(() => {
     if (!location) return;
-    abortRef.current?.abort();
-    const controller = new AbortController();
-    abortRef.current = controller;
+    fetchChallenges(location);
+  }, [location, fetchChallenges]);
 
-    fetch(`/api/map/challenges?lat=${location.lat}&lng=${location.lng}&radius=10`, { signal: controller.signal })
-      .then((r) => r.json())
-      .then((data) => {
-        setMatches(data.matches ?? []);
-        setQueue(data.queue ?? []);
-      })
-      .catch((e) => { if (e.name !== "AbortError") console.error("[map]", e); });
-
-    return () => controller.abort();
-  }, [location]);
+  // Auto-refresh every 30 seconds
+  useEffect(() => {
+    if (!location) return;
+    const t = setInterval(() => fetchChallenges(location), REFRESH_INTERVAL_MS);
+    return () => clearInterval(t);
+  }, [location, fetchChallenges]);
 
   const accept = async (matchId: string) => {
     setAccepting(matchId);
@@ -133,6 +146,9 @@ export default function MapView({ filter }: { filter: string }) {
     ? matches
     : matches.filter((m) => m.game_type_name.replace(/_/g, " ").toLowerCase() === filter.toLowerCase());
 
+  const externalQueue = queue.filter((q) => !q.is_own);
+  const hasNearby = filteredMatches.length > 0 || externalQueue.length > 0;
+
   if (!location && !locationError) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center gap-3 bg-zinc-900">
@@ -144,8 +160,12 @@ export default function MapView({ filter }: { filter: string }) {
 
   if (locationError && !location) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center gap-3 bg-zinc-900 px-6 text-center">
-        <p className="text-zinc-400 text-sm">Location access denied. Enable GPS to see nearby battles.</p>
+      <div className="flex-1 flex flex-col items-center justify-center gap-4 bg-zinc-900 px-6 text-center">
+        <AlertCircle size={32} className="text-zinc-600" />
+        <div>
+          <p className="text-zinc-300 font-medium text-sm mb-1">Location access required</p>
+          <p className="text-zinc-500 text-sm">Enable GPS in your browser settings to see nearby battles.</p>
+        </div>
       </div>
     );
   }
@@ -222,7 +242,7 @@ export default function MapView({ filter }: { filter: string }) {
                   <>
                     <p className="text-zinc-400 font-bold text-sm mb-1">You (searching)</p>
                     <p className="text-zinc-500 text-xs capitalize mb-1">{q.game_type_name.replace(/_/g, " ")}</p>
-                    <p className="text-zinc-600 text-xs">Your position in queue</p>
+                    <p className="text-zinc-600 text-xs">Looking for a match nearby</p>
                   </>
                 ) : (
                   <>
@@ -237,10 +257,38 @@ export default function MapView({ filter }: { filter: string }) {
         ))}
       </MapContainer>
 
-      {filteredMatches.length > 0 && (
+      {/* Nearby count badge */}
+      {hasNearby && (
         <div className="absolute top-3 right-3 z-[1000] bg-zinc-900/90 backdrop-blur border border-amber-500/20 rounded-xl px-3 py-2 flex items-center gap-2">
           <Users size={12} className="text-amber-400" />
           <span className="text-amber-400 text-xs font-bold">{filteredMatches.length} nearby</span>
+        </div>
+      )}
+
+      {/* Empty state overlay */}
+      {!hasNearby && lastRefresh && (
+        <div className="absolute inset-0 z-[999] pointer-events-none flex items-end justify-center pb-32">
+          <div className="pointer-events-auto bg-zinc-900/95 backdrop-blur border border-zinc-800 rounded-2xl px-5 py-4 mx-4 text-center max-w-xs">
+            <p className="text-zinc-300 font-medium text-sm mb-1">No battles nearby</p>
+            <p className="text-zinc-500 text-xs mb-3">Post an Open Challenge and let others find you</p>
+            <button
+              onClick={() => location && fetchChallenges(location)}
+              className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-200 mx-auto cursor-pointer transition-colors"
+            >
+              <RefreshCw size={11} />
+              Refresh
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Last refreshed indicator */}
+      {lastRefresh && (
+        <div className="absolute bottom-24 left-3 z-[1000] bg-zinc-900/80 backdrop-blur rounded-lg px-2.5 py-1.5 flex items-center gap-1.5">
+          <RefreshCw size={10} className="text-zinc-600" />
+          <span className="text-zinc-600 text-[10px]">
+            {lastRefresh.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          </span>
         </div>
       )}
     </div>

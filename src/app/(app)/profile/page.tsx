@@ -122,6 +122,15 @@ export default async function ProfilePage() {
       </div>
 
       {/* Recent matches */}
+      {recentMatches && recentMatches.length === 0 && (
+        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-6 text-center">
+          <Swords size={24} className="text-zinc-700 mx-auto mb-2" />
+          <p className="text-zinc-500 text-sm">No battles yet</p>
+          <Link href="/matches/new" className="text-amber-400 text-sm hover:text-amber-300 transition-colors mt-1 inline-block">
+            Start your first →
+          </Link>
+        </div>
+      )}
       {recentMatches && recentMatches.length > 0 && (
         <div className="mb-6">
           <p className="text-xs text-zinc-500 uppercase tracking-widest mb-3">Recent Battles</p>

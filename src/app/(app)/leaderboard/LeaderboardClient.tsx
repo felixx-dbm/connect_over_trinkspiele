@@ -83,7 +83,7 @@ export default function LeaderboardClient({ players, crews, city, currentUserId 
                         {name.slice(0, 2).toUpperCase()}
                       </div>
                       <p className="text-zinc-300 text-xs font-medium truncate max-w-[72px] text-center">{name}</p>
-                      <p className="text-zinc-500 text-xs">{entry.wins}W</p>
+                      <p className="text-zinc-500 text-xs">{entry.wins}{tab === "crews" ? " combined" : "W"}</p>
                     </div>
                     <div className={`w-full flex-1 rounded-t-xl bg-gradient-to-t ${colorClass.split(" ").slice(0, 2).join(" ")} border-t border-x ${colorClass.split(" ")[2]} flex items-center justify-center`}>
                       <span className={colorClass.split(" ")[3]}>
@@ -119,7 +119,7 @@ export default function LeaderboardClient({ players, crews, city, currentUserId 
                   <div className="flex items-center gap-1 text-zinc-400 text-sm">
                     <TrendingUp size={12} className="text-zinc-600" />
                     <span className="font-medium">{entry.wins}</span>
-                    <span className="text-zinc-600 text-xs">W</span>
+                    <span className="text-zinc-600 text-xs">{tab === "crews" ? "combined" : "W"}</span>
                   </div>
                 </div>
               );

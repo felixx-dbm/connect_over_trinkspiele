@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Users, Crown, Copy, Plus, LogIn, Swords, Check, AlertCircle, Shield } from "lucide-react";
 import { createCrew, joinCrew } from "@/app/actions/crews";
@@ -222,13 +221,11 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
         </div>
       </div>
 
-      <Link
-        href="/matches/new"
-        className="w-full h-12 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-zinc-950 font-bold text-sm rounded-2xl transition-all active:scale-[0.98] cursor-pointer amber-glow mb-5"
-      >
-        <Swords size={16} />
-        Challenge Another Crew
-      </Link>
+      <div className="bg-zinc-900/60 border border-dashed border-zinc-700 rounded-2xl p-5 mb-5 text-center">
+        <Swords size={22} className="text-zinc-600 mx-auto mb-2" />
+        <p className="text-zinc-400 font-semibold text-sm mb-1">Crew Battles</p>
+        <p className="text-zinc-600 text-xs leading-relaxed">Challenge other crews to organized matches — coming soon</p>
+      </div>
 
       {/* Members */}
       <p className="text-xs text-zinc-500 uppercase tracking-widest mb-3">Members</p>
