@@ -25,6 +25,17 @@ const challengeIcon = new L.DivIcon({
   className: "",
 });
 
+const ownChallengeIcon = new L.DivIcon({
+  html: `<div style="width:36px;height:36px;background:#6366f1;border-radius:50%;border:2px solid #818cf8;display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(99,102,241,0.5)">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"></polyline><line x1="13" x2="19" y1="6" y2="12"></line><line x1="6" x2="13" y1="13" y2="19"></line><line x1="16" x2="20" y1="17" y2="21"></line><line x1="4" x2="8" y1="3" y2="7"></line>
+    </svg>
+  </div>`,
+  iconSize: [36, 36],
+  iconAnchor: [18, 18],
+  className: "",
+});
+
 const userIcon = new L.DivIcon({
   html: `<div style="width:20px;height:20px;background:#3b82f6;border-radius:50%;border:3px solid #93c5fd;box-shadow:0 0 0 8px rgba(59,130,246,0.15)"></div>`,
   iconSize: [20, 20],
@@ -40,6 +51,7 @@ type NearbyMatch = {
   distance_m: number;
   lat: number;
   lng: number;
+  is_own: boolean;
 };
 
 type NearbyQueue = {
@@ -49,6 +61,7 @@ type NearbyQueue = {
   distance_m: number;
   lat: number;
   lng: number;
+  is_own: boolean;
 };
 
 function RecenterOnce({ lat, lng }: { lat: number; lng: number }) {
@@ -161,37 +174,63 @@ export default function MapView({ filter }: { filter: string }) {
         />
 
         {filteredMatches.map((m) => (
-          <Marker key={m.id} position={[m.lat, m.lng]} icon={challengeIcon}>
+          <Marker key={m.id} position={[m.lat, m.lng]} icon={m.is_own ? ownChallengeIcon : challengeIcon}>
             <Popup>
               <div className="bg-zinc-900 rounded-xl p-3 min-w-[180px]">
-                <p className="text-amber-400 font-bold text-sm mb-1">{m.challenger_username}</p>
-                <p className="text-zinc-400 text-xs capitalize mb-1">{m.game_type_name.replace(/_/g, " ")}</p>
-                <p className="text-zinc-600 text-xs capitalize mb-3">{m.mode} · {Math.round(m.distance_m)}m away</p>
-                {acceptError && accepting === null && (
-                  <p className="text-red-400 text-xs mb-2 flex items-center gap-1">
-                    <AlertCircle size={10} />{acceptError}
-                  </p>
+                {m.is_own ? (
+                  <>
+                    <p className="text-indigo-400 font-bold text-sm mb-1">Your Challenge</p>
+                    <p className="text-zinc-400 text-xs capitalize mb-1">{m.game_type_name.replace(/_/g, " ")}</p>
+                    <p className="text-zinc-600 text-xs capitalize mb-3">{m.mode} · Waiting for opponent</p>
+                    <button
+                      onClick={() => router.push(`/matches/${m.id}`)}
+                      className="w-full h-9 bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-indigo-300 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      View Lobby
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-amber-400 font-bold text-sm mb-1">{m.challenger_username}</p>
+                    <p className="text-zinc-400 text-xs capitalize mb-1">{m.game_type_name.replace(/_/g, " ")}</p>
+                    <p className="text-zinc-600 text-xs capitalize mb-3">{m.mode} · {Math.round(m.distance_m)}m away</p>
+                    {acceptError && accepting === null && (
+                      <p className="text-red-400 text-xs mb-2 flex items-center gap-1">
+                        <AlertCircle size={10} />{acceptError}
+                      </p>
+                    )}
+                    <button
+                      onClick={() => accept(m.id)}
+                      disabled={accepting !== null}
+                      className="w-full h-9 bg-amber-500 hover:bg-amber-400 text-zinc-950 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-60"
+                    >
+                      {accepting === m.id ? <Loader2 size={12} className="animate-spin" /> : <Swords size={12} />}
+                      Accept Challenge
+                    </button>
+                  </>
                 )}
-                <button
-                  onClick={() => accept(m.id)}
-                  disabled={accepting !== null}
-                  className="w-full h-9 bg-amber-500 hover:bg-amber-400 text-zinc-950 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-60"
-                >
-                  {accepting === m.id ? <Loader2 size={12} className="animate-spin" /> : <Swords size={12} />}
-                  Accept Challenge
-                </button>
               </div>
             </Popup>
           </Marker>
         ))}
 
         {queue.map((q) => (
-          <Marker key={q.id} position={[q.lat, q.lng]} icon={userIcon}>
+          <Marker key={q.id} position={[q.lat, q.lng]} icon={userIcon} opacity={q.is_own ? 0.45 : 1}>
             <Popup>
               <div className="bg-zinc-900 rounded-xl p-3 min-w-[160px]">
-                <p className="text-zinc-200 font-bold text-sm mb-1">{q.username}</p>
-                <p className="text-zinc-400 text-xs capitalize mb-1">{q.game_type_name.replace(/_/g, " ")}</p>
-                <p className="text-zinc-600 text-xs">{Math.round(q.distance_m)}m away · In queue</p>
+                {q.is_own ? (
+                  <>
+                    <p className="text-zinc-400 font-bold text-sm mb-1">You (searching)</p>
+                    <p className="text-zinc-500 text-xs capitalize mb-1">{q.game_type_name.replace(/_/g, " ")}</p>
+                    <p className="text-zinc-600 text-xs">Your position in queue</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-zinc-200 font-bold text-sm mb-1">{q.username}</p>
+                    <p className="text-zinc-400 text-xs capitalize mb-1">{q.game_type_name.replace(/_/g, " ")}</p>
+                    <p className="text-zinc-600 text-xs">{Math.round(q.distance_m)}m away · In queue</p>
+                  </>
+                )}
               </div>
             </Popup>
           </Marker>

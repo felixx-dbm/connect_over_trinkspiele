@@ -27,6 +27,8 @@ export default function NewMatchPage() {
   const [gameTypeId, setGameTypeId] = useState<string | null>(null);
   const [mode, setMode] = useState<"solo" | "crew" | "regional" | null>(null);
   const [finding, setFinding] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
+  const [timedOut, setTimedOut] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -37,6 +39,23 @@ export default function NewMatchPage() {
     });
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
   }, []);
+
+  useEffect(() => {
+    if (!finding || mode !== "solo") { setElapsed(0); return; }
+    let secs = 0;
+    const t = setInterval(() => {
+      secs += 1;
+      setElapsed(secs);
+      if (secs >= 120) {
+        clearInterval(t);
+        if (pollRef.current) clearInterval(pollRef.current);
+        fetch("/api/matchmaking/status", { method: "DELETE" }).catch(() => {});
+        setFinding(false);
+        setTimedOut(true);
+      }
+    }, 1000);
+    return () => clearInterval(t);
+  }, [finding, mode]);
 
   const selectedMode = MODE_CONFIG.find((m) => m.id === mode);
   const canProceed = gameTypeId && mode;
@@ -77,6 +96,7 @@ export default function NewMatchPage() {
         }
       };
 
+      setTimedOut(false);
       await poll();
       pollRef.current = setInterval(poll, 5000);
     } else {
@@ -196,13 +216,44 @@ export default function NewMatchPage() {
         </div>
       )}
 
+      {timedOut && (
+        <div className="bg-zinc-900 border border-zinc-700 rounded-2xl p-6 mb-4 text-center">
+          <p className="text-zinc-300 font-semibold mb-1">No one nearby right now</p>
+          <p className="text-zinc-500 text-sm mt-1">Try a different game type, or post an Open Challenge so others can find you on the map.</p>
+          <button
+            onClick={() => setTimedOut(false)}
+            className="mt-4 text-sm text-amber-400 hover:text-amber-300 underline cursor-pointer transition-colors"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
       {finding && mode === "solo" && (
         <div className="bg-zinc-900 border border-amber-500/20 rounded-2xl p-6 mb-4 text-center">
           <Loader2 size={32} className="text-amber-400 animate-spin mx-auto mb-3" />
           <p className="text-zinc-200 font-semibold">Finding opponent…</p>
-          <p className="text-zinc-500 text-sm mt-1">Checking nearby players every 5 s</p>
+          <p className="text-zinc-500 text-sm mt-1">
+            {elapsed < 30
+              ? "Checking nearby players every 5s"
+              : elapsed < 60
+              ? "No one nearby yet — still searching…"
+              : `Still searching · ${120 - elapsed}s before timeout`}
+          </p>
+          {elapsed >= 30 && (
+            <div className="mt-3 w-full bg-zinc-800 rounded-full h-1">
+              <div
+                className="bg-amber-500 h-1 rounded-full transition-all duration-1000"
+                style={{ width: `${Math.min((elapsed / 120) * 100, 100)}%` }}
+              />
+            </div>
+          )}
           <button
-            onClick={() => { if (pollRef.current) clearInterval(pollRef.current); setFinding(false); }}
+            onClick={() => {
+              if (pollRef.current) clearInterval(pollRef.current);
+              setFinding(false);
+              fetch("/api/matchmaking/status", { method: "DELETE" }).catch(() => {});
+            }}
             className="mt-4 text-sm text-zinc-500 hover:text-zinc-300 underline cursor-pointer transition-colors"
           >
             Cancel

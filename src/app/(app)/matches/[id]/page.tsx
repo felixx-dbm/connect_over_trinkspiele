@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ArrowLeft, MapPin, Clock, CheckCircle, XCircle, Trophy, Swords, Loader2, Share2, Copy, Check } from "lucide-react";
@@ -36,6 +36,10 @@ export default function MatchPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [joining, setJoining] = useState(false);
+  const [joinError, setJoinError] = useState<string | null>(null);
+  const [opponentJoined, setOpponentJoined] = useState(false);
+  const prevOpponentId = useRef<string | null | undefined>(undefined);
 
   const fetchMatch = useCallback(async () => {
     const supabase = createClient();
@@ -61,6 +65,11 @@ export default function MatchPage() {
         .eq("id", id)
         .single();
       if (data) {
+        if (prevOpponentId.current === null && data.opponent_id) {
+          setOpponentJoined(true);
+          setTimeout(() => setOpponentJoined(false), 3000);
+        }
+        prevOpponentId.current = data.opponent_id;
         setMatch((prev) => prev ? { ...prev, ...data } : prev);
         if (data.status === "completed" || data.status === "cancelled") clearInterval(interval);
       }
@@ -85,6 +94,19 @@ export default function MatchPage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
+  };
+
+  const handleJoin = async () => {
+    setJoining(true);
+    setJoinError(null);
+    const res = await fetch(`/api/matches/${id}/accept`, { method: "POST" });
+    if (res.ok) {
+      fetchMatch();
+    } else {
+      const data = await res.json() as { error?: string };
+      setJoinError(data.error ?? "Failed to join match");
+    }
+    setJoining(false);
   };
 
   const handleSubmit = async () => {
@@ -200,6 +222,13 @@ export default function MatchPage() {
         </span>
       </div>
 
+      {opponentJoined && (
+        <div className="bg-green-500/10 border border-green-500/30 rounded-xl px-4 py-3 mb-4 flex items-center gap-2 text-green-400 text-sm font-medium">
+          <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
+          Opponent joined — battle is starting!
+        </div>
+      )}
+
       {/* VS card */}
       <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-5 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-zinc-800/30 pointer-events-none" />
@@ -288,11 +317,32 @@ export default function MatchPage() {
         </div>
       )}
 
-      {match.status === "open" && (
+      {match.status === "open" && currentUserId && currentUserId !== match.challenger_id && (
+        <div className="bg-zinc-900 border border-amber-500/20 rounded-2xl p-6 text-center">
+          <Swords size={28} className="text-amber-400 mx-auto mb-3" />
+          <p className="text-zinc-200 font-semibold mb-1">You're invited to battle</p>
+          <p className="text-zinc-500 text-sm mb-5">
+            {match.challenger?.username} is challenging you to {match.game_types?.name?.replace(/_/g, " ")}
+          </p>
+          {joinError && (
+            <p className="text-red-400 text-sm mb-3">{joinError}</p>
+          )}
+          <button
+            onClick={handleJoin}
+            disabled={joining}
+            className="w-full h-14 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-zinc-950 font-bold text-base rounded-2xl transition-all cursor-pointer disabled:opacity-60 amber-glow"
+          >
+            {joining ? <Loader2 size={18} className="animate-spin" /> : <Swords size={18} />}
+            {joining ? "Joining…" : "Accept Challenge"}
+          </button>
+        </div>
+      )}
+
+      {match.status === "open" && (currentUserId === match.challenger_id || !currentUserId) && (
         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 text-center">
           <Loader2 size={24} className="text-amber-400 animate-spin mx-auto mb-3" />
           <p className="text-zinc-300 font-medium">Waiting for opponent…</p>
-          <p className="text-zinc-500 text-sm mt-1">Share the link below to invite someone</p>
+          <p className="text-zinc-500 text-sm mt-1">Share this link with your opponent to start</p>
           <button
             onClick={shareMatch}
             className="mt-4 flex items-center gap-2 text-sm bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-300 px-4 py-2.5 rounded-xl transition-all cursor-pointer mx-auto"

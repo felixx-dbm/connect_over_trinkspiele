@@ -57,3 +57,12 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({ status: "waiting" });
 }
+
+export async function DELETE() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  await supabase.from("match_queue").delete().eq("user_id", user.id);
+  return NextResponse.json({ ok: true });
+}
