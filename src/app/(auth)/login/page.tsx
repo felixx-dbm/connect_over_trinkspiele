@@ -2,13 +2,12 @@
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { ArrowLeft, Eye, EyeOff, Mail, Lock, AlertCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { safeRedirect } from "@/lib/redirect";
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next");
 
@@ -27,21 +26,26 @@ function LoginForm() {
     e.preventDefault();
     setLoading(true);
 
-    const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: form.email,
-      password: form.password,
-    });
+    try {
+      const supabase = createClient();
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: form.email,
+        password: form.password,
+      });
 
-    setLoading(false);
+      if (signInError) {
+        setError(signInError.message);
+        setLoading(false);
+        return;
+      }
 
-    if (signInError) {
-      setError(signInError.message);
-      return;
+      // Full reload ensures the server reads the newly set session cookies.
+      // router.push does a soft nav that can miss cookies Supabase just wrote.
+      window.location.href = safeRedirect(next);
+    } catch {
+      setError("Network error — please try again");
+      setLoading(false);
     }
-
-    // router.refresh() not needed — destination page fetches fresh server data
-    router.push(safeRedirect(next));
   };
 
   const handleGoogle = async () => {

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowLeft, MapPin, Clock, CheckCircle, XCircle, Trophy, Swords, Loader2 } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, CheckCircle, XCircle, Trophy, Swords, Loader2, Share2, Copy, Check } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 type Match = {
@@ -33,7 +33,9 @@ export default function MatchPage() {
   const [result, setResult] = useState<"win" | "loss" | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
 
   const fetchMatch = useCallback(async () => {
     const supabase = createClient();
@@ -51,28 +53,44 @@ export default function MatchPage() {
     supabase.auth.getUser().then(({ data }) => setCurrentUserId(data.user?.id ?? null));
     fetchMatch();
 
-    // Poll every 5 s while match is open or active
     const interval = setInterval(async () => {
       const supabase = createClient();
       const { data } = await supabase
         .from("matches")
-        .select("status, winner_id")
+        .select("status, winner_id, opponent_id")
         .eq("id", id)
         .single();
       if (data) {
         setMatch((prev) => prev ? { ...prev, ...data } : prev);
-        if (data.status === "completed" || data.status === "cancelled") {
-          clearInterval(interval);
-        }
+        if (data.status === "completed" || data.status === "cancelled") clearInterval(interval);
       }
     }, 5000);
 
     return () => clearInterval(interval);
   }, [id, fetchMatch]);
 
+  const shareMatch = async () => {
+    const url = `${window.location.origin}/matches/${id}`;
+    let usedShare = false;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "Join my battle!", url });
+        usedShare = true;
+      } catch {
+        // Fallthrough to clipboard
+      }
+    }
+    if (!usedShare) {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!result || !match || !currentUserId) return;
     setSubmitting(true);
+    setSubmitError(null);
 
     const winnerId = result === "win" ? currentUserId : (
       match.challenger_id === currentUserId ? match.opponent_id : match.challenger_id
@@ -88,6 +106,14 @@ export default function MatchPage() {
     if (res.ok) {
       setSubmitted(true);
       setMatch((prev) => prev ? { ...prev, status: "completed", winner_id: winnerId } : prev);
+    } else {
+      const data = await res.json() as { error?: string };
+      if (res.status === 409) {
+        setSubmitError("Result already submitted — refresh to see outcome.");
+        fetchMatch();
+      } else {
+        setSubmitError(data.error ?? "Failed to submit result");
+      }
     }
   };
 
@@ -147,7 +173,7 @@ export default function MatchPage() {
   const challengerName = match.challenger?.username ?? "Unknown";
   const opponentName = match.opponent?.username ?? "Waiting…";
   const challengerInitials = challengerName.slice(0, 2).toUpperCase();
-  const opponentInitials = opponentName.slice(0, 2).toUpperCase();
+  const opponentInitials = match.opponent ? opponentName.slice(0, 2).toUpperCase() : "?";
   const isChallenger = match.challenger_id === currentUserId;
 
   return (
@@ -193,12 +219,12 @@ export default function MatchPage() {
           </div>
           <div className="flex flex-col items-center gap-2 flex-1">
             <div className={`w-16 h-16 rounded-full flex items-center justify-center font-display text-lg ${
-              !isChallenger ? "bg-amber-500 text-zinc-950" : "bg-zinc-700 text-zinc-300"
+              !isChallenger && match.opponent ? "bg-amber-500 text-zinc-950" : "bg-zinc-700 text-zinc-300"
             }`}>
               {opponentInitials}
             </div>
             <p className="text-zinc-200 font-semibold text-sm text-center">{opponentName}</p>
-            {!isChallenger && <span className="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full">You</span>}
+            {!isChallenger && match.opponent && <span className="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full">You</span>}
           </div>
         </div>
       </div>
@@ -242,6 +268,11 @@ export default function MatchPage() {
               </button>
             ))}
           </div>
+          {submitError && (
+            <div className="text-amber-400 text-sm bg-amber-500/5 border border-amber-500/20 rounded-xl px-4 py-3 mb-4">
+              {submitError}
+            </div>
+          )}
           <button
             onClick={handleSubmit}
             disabled={!result || submitting}
@@ -261,7 +292,13 @@ export default function MatchPage() {
         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 text-center">
           <Loader2 size={24} className="text-amber-400 animate-spin mx-auto mb-3" />
           <p className="text-zinc-300 font-medium">Waiting for opponent…</p>
-          <p className="text-zinc-500 text-sm mt-1">Share your invite or wait for someone to accept</p>
+          <p className="text-zinc-500 text-sm mt-1">Share the link below to invite someone</p>
+          <button
+            onClick={shareMatch}
+            className="mt-4 flex items-center gap-2 text-sm bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-300 px-4 py-2.5 rounded-xl transition-all cursor-pointer mx-auto"
+          >
+            {copied ? <><Check size={14} className="text-green-400" /> Copied!</> : <><Share2 size={14} /> Share Match Link</>}
+          </button>
         </div>
       )}
     </div>

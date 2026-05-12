@@ -54,3 +54,37 @@ body {
 .pb-safe {
   padding-bottom: max(80px, calc(80px + env(safe-area-inset-bottom)));
 }
+
+/* Leaflet dark map tiles */
+.leaflet-tile {
+  filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+}
+
+.leaflet-container {
+  background: #18181b;
+}
+
+/* Leaflet popup dark style */
+.leaflet-popup-content-wrapper {
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+}
+
+.leaflet-popup-content {
+  margin: 0;
+}
+
+.leaflet-popup-tip {
+  background: #27272a;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

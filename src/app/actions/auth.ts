@@ -12,8 +12,7 @@ export async function signUp(data: {
   email: string;
   password: string;
   dob: string;
-}): Promise<{ error: string | null }> {
-  // Server-side age gate — client check is UX-only and bypassable
+}): Promise<{ error: string | null; needsConfirmation?: boolean }> {
   if (getAge(data.dob) < 18) {
     return { error: "You must be 18 or older to register." };
   }
@@ -23,19 +22,24 @@ export async function signUp(data: {
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
-    email: data.email,
-    password: data.password,
-    options: {
-      data: {
-        username: data.username.trim(),
-        birth_date: data.dob,
-      },
-    },
-  });
+  let signUpData, error;
+  try {
+    ({ data: signUpData, error } = await supabase.auth.signUp({
+      email: data.email,
+      password: data.password,
+      options: { data: { username: data.username.trim(), birth_date: data.dob } },
+    }));
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("[signUp] network error:", msg);
+    return { error: "Could not reach the server — check your connection and try again." };
+  }
 
   if (error) return { error: error.message };
-  return { error: null };
+
+  // If no session, Supabase requires email confirmation before login
+  const needsConfirmation = !signUpData?.session;
+  return { error: null, needsConfirmation };
 }
 
 export async function signOut() {

@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Settings, MapPin, Trophy, Swords, TrendingUp, Clock, ChevronRight, Edit3, Users } from "lucide-react";
+import { Settings, MapPin, Trophy, Swords, TrendingUp, Clock, ChevronRight, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/actions/auth";
 import type { MatchRow } from "@/lib/types";
+import ProfileEditButton from "./ProfileEditButton";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -39,9 +40,12 @@ export default async function ProfilePage() {
         <h1 className="font-display text-xl text-zinc-100">
           MY <span className="text-amber-400">PROFILE</span>
         </h1>
-        <button className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center hover:border-zinc-700 transition-colors cursor-pointer">
+        <Link
+          href="/settings"
+          className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center hover:border-zinc-700 transition-colors cursor-pointer"
+        >
           <Settings size={16} className="text-zinc-400" />
-        </button>
+        </Link>
       </div>
 
       {/* Profile card */}
@@ -52,9 +56,7 @@ export default async function ProfilePage() {
             <div className="w-16 h-16 rounded-full bg-amber-500 flex items-center justify-center font-display text-zinc-950 text-xl">
               {initials}
             </div>
-            <button className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center cursor-pointer hover:border-zinc-600 transition-colors">
-              <Edit3 size={10} className="text-zinc-400" />
-            </button>
+            <ProfileEditButton username={profile?.username ?? ""} city={profile?.city ?? ""} />
           </div>
           <div>
             <h2 className="font-display text-2xl text-zinc-100">{profile?.username ?? "—"}</h2>
@@ -100,7 +102,7 @@ export default async function ProfilePage() {
             ? { label: "My Crew", sublabel: crew.name, Icon: Users, href: "/crews" }
             : { label: "Create a Crew", sublabel: "Start your own team", Icon: Users, href: "/crews" },
           { label: "Leaderboard", sublabel: profile?.city ? `Rankings in ${profile.city}` : "City rankings", Icon: Trophy, href: "/leaderboard" },
-          { label: "Settings", sublabel: "Account & preferences", Icon: Settings, href: "#" },
+          { label: "Settings", sublabel: "Account & preferences", Icon: Settings, href: "/settings" },
         ].map(({ label, sublabel, Icon, href }, i) => (
           <Link
             key={label}

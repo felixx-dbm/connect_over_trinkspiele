@@ -16,6 +16,7 @@ export default function RegisterPage() {
   const [form, setForm] = useState({ username: "", email: "", password: "", dob: "" });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
 
   const ageError = form.dob ? getAge(form.dob) < 18 : false;
   const passwordError =
@@ -41,8 +42,34 @@ export default function RegisterPage() {
       return;
     }
 
-    router.push("/home");
+    if (result.needsConfirmation) {
+      setConfirmed(true);
+      return;
+    }
+
+    window.location.href = "/home";
   };
+
+  if (confirmed) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center px-6 text-center gap-6">
+        <div className="w-20 h-20 rounded-full bg-amber-500/10 border-2 border-amber-500/30 flex items-center justify-center">
+          <Mail size={32} className="text-amber-400" />
+        </div>
+        <div>
+          <h2 className="font-display text-3xl text-zinc-100 mb-2">CHECK YOUR <span className="text-amber-400">EMAIL</span></h2>
+          <p className="text-zinc-400 text-sm leading-relaxed">
+            We sent a confirmation link to<br />
+            <span className="text-zinc-200 font-medium">{form.email}</span>
+          </p>
+          <p className="text-zinc-600 text-xs mt-3">Click the link in the email to activate your account, then sign in.</p>
+        </div>
+        <Link href="/login" className="h-12 px-8 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold rounded-2xl flex items-center justify-center transition-all cursor-pointer">
+          Go to Sign In
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex flex-col px-6 py-8">

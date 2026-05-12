@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const APP_ROUTES = ["/home", "/map", "/leaderboard", "/crews", "/matches", "/profile"];
+const APP_ROUTES = ["/home", "/map", "/leaderboard", "/crews", "/matches", "/profile", "/settings"];
 const AUTH_ROUTES = ["/login", "/register"];
 
 // Copy refreshed session cookies from supabaseResponse onto the redirect so tokens aren't lost
