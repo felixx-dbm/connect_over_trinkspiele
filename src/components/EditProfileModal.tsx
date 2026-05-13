@@ -38,15 +38,14 @@ export default function EditProfileModal({ initialUsername, initialCity, onClose
 
   return (
     <div
-      className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-end"
+      className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center px-4"
       onClick={onClose}
     >
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-lg mx-auto bg-zinc-900 border border-zinc-800 rounded-t-3xl p-6"
+        className="w-full max-w-lg bg-zinc-900 border border-zinc-800 rounded-3xl p-6"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-6" />
         <div className="flex items-center justify-between mb-5">
           <h3 className="font-display text-lg text-zinc-100">Edit Profile</h3>
           <button type="button" onClick={onClose} className="text-zinc-500 hover:text-zinc-300 cursor-pointer transition-colors">
