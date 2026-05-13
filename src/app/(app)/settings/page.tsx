@@ -17,7 +17,7 @@ export default async function SettingsPage() {
     .single();
 
   return (
-    <div className="min-h-screen px-4 pt-12 pb-6">
+    <div className="min-h-screen px-4 pt-8 pb-6">
       <div className="flex items-center gap-3 mb-8">
         <Link href="/profile" className="text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer">
           <ArrowLeft size={20} />
@@ -43,13 +43,9 @@ export default async function SettingsPage() {
           <div className="flex items-center gap-3">
             <MapPin size={14} className="text-zinc-600 flex-shrink-0" />
             <span className="text-zinc-400 text-sm flex-1">City</span>
-            {profile?.city ? (
-              <span className="text-zinc-200 text-sm font-medium">{profile.city}</span>
-            ) : (
-              <Link href="/profile" className="text-amber-400 text-sm hover:text-amber-300 transition-colors cursor-pointer">
-                Set city →
-              </Link>
-            )}
+            <span className="text-zinc-200 text-sm font-medium">
+              {profile?.city ?? <span className="text-zinc-500">Not set</span>}
+            </span>
           </div>
           <div className="h-px bg-zinc-800" />
           <div className="flex items-center gap-3">

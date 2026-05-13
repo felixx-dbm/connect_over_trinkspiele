@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { adminClient } from "@/lib/supabase/admin";
 import { isUUID } from "@/lib/validate";
 
 export async function POST(
@@ -15,6 +16,7 @@ export async function POST(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  // Use user client to read — lets RLS verify the record is visible
   const { data: match } = await supabase
     .from("matches")
     .select("id, status, challenger_id")
@@ -25,14 +27,18 @@ export async function POST(
   if (match.challenger_id !== user.id) return NextResponse.json({ error: "Not your match" }, { status: 403 });
   if (match.status !== "open") return NextResponse.json({ error: "Can only cancel open matches" }, { status: 409 });
 
-  const { error } = await supabase
+  // Use admin client for the write — RLS policies may not grant UPDATE on status to the challenger
+  const { error } = await adminClient
     .from("matches")
     .update({ status: "cancelled" })
     .eq("id", matchId)
     .eq("status", "open")
     .eq("challenger_id", user.id);
 
-  if (error) return NextResponse.json({ error: "Failed to cancel match" }, { status: 500 });
+  if (error) {
+    console.error("[cancel]", error.message);
+    return NextResponse.json({ error: "Failed to cancel match" }, { status: 500 });
+  }
 
   return NextResponse.json({ ok: true });
 }

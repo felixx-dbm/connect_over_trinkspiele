@@ -43,6 +43,7 @@ export default function MatchPage() {
   const [opponentSubmittedFirst, setOpponentSubmittedFirst] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [cancelConfirm, setCancelConfirm] = useState(false);
+  const [cancelError, setCancelError] = useState<string | null>(null);
   const prevOpponentId = useRef<string | null | undefined>(undefined);
   const prevStatus = useRef<string | undefined>(undefined);
 
@@ -124,10 +125,21 @@ export default function MatchPage() {
   const handleCancel = async () => {
     if (!cancelConfirm) { setCancelConfirm(true); return; }
     setCancelling(true);
-    const res = await fetch(`/api/matches/${id}/cancel`, { method: "POST" });
-    setCancelling(false);
-    if (res.ok) {
-      router.push("/home");
+    setCancelError(null);
+    try {
+      const res = await fetch(`/api/matches/${id}/cancel`, { method: "POST" });
+      if (res.ok) {
+        router.push("/home");
+      } else {
+        const data = await res.json() as { error?: string };
+        setCancelError(data.error ?? "Failed to cancel");
+        setCancelConfirm(false);
+      }
+    } catch {
+      setCancelError("Network error — try again");
+      setCancelConfirm(false);
+    } finally {
+      setCancelling(false);
     }
   };
 
@@ -425,18 +437,23 @@ export default function MatchPage() {
             Copy link
           </button>
           {currentUserId === match.challenger_id && (
-            <button
-              onClick={handleCancel}
-              disabled={cancelling}
-              className={`mt-5 flex items-center gap-2 text-xs px-4 py-2 rounded-xl transition-all cursor-pointer mx-auto border ${
-                cancelConfirm
-                  ? "text-red-400 border-red-500/40 bg-red-500/10 hover:bg-red-500/20"
-                  : "text-zinc-600 border-zinc-800 hover:text-zinc-400 hover:border-zinc-700"
-              }`}
-            >
-              {cancelling ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
-              {cancelling ? "Cancelling…" : cancelConfirm ? "Confirm cancel" : "Cancel challenge"}
-            </button>
+            <div className="mt-5">
+              {cancelError && (
+                <p className="text-red-400 text-xs mb-2 text-center">{cancelError}</p>
+              )}
+              <button
+                onClick={handleCancel}
+                disabled={cancelling}
+                className={`flex items-center gap-2 text-xs px-4 py-2 rounded-xl transition-all cursor-pointer mx-auto border ${
+                  cancelConfirm
+                    ? "text-red-400 border-red-500/40 bg-red-500/10 hover:bg-red-500/20"
+                    : "text-zinc-600 border-zinc-800 hover:text-zinc-400 hover:border-zinc-700"
+                }`}
+              >
+                {cancelling ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+                {cancelling ? "Cancelling…" : cancelConfirm ? "Tap again to confirm" : "Cancel challenge"}
+              </button>
+            </div>
           )}
         </div>
       )}
