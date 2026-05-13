@@ -153,6 +153,8 @@ export default function MapView({ filter }: { filter: string }) {
     ? matches
     : matches.filter((m) => m.game_type_name.replace(/_/g, " ").toLowerCase() === filter.toLowerCase());
 
+  const externalMatches = filteredMatches.filter((m) => !m.is_own);
+  const ownMatches = filteredMatches.filter((m) => m.is_own);
   const externalQueue = queue.filter((q) => !q.is_own);
   const hasNearby = filteredMatches.length > 0 || externalQueue.length > 0;
 
@@ -265,10 +267,10 @@ export default function MapView({ filter }: { filter: string }) {
       </MapContainer>
 
       {/* Nearby count badge */}
-      {hasNearby && (
+      {externalMatches.length > 0 && (
         <div className="absolute top-3 right-3 z-[1000] bg-zinc-900/90 backdrop-blur border border-amber-500/20 rounded-xl px-3 py-2 flex items-center gap-2">
           <Users size={12} className="text-amber-400" />
-          <span className="text-amber-400 text-xs font-bold">{filteredMatches.length} nearby</span>
+          <span className="text-amber-400 text-xs font-bold">{externalMatches.length} nearby</span>
         </div>
       )}
 
@@ -313,13 +315,13 @@ export default function MapView({ filter }: { filter: string }) {
           <div className="flex items-center gap-2">
             <Swords size={14} className="text-amber-400" />
             <span className="text-zinc-200 text-sm font-semibold">
-              {filteredMatches.length + externalQueue.length === 0
+              {externalMatches.length === 0
                 ? "No battles nearby"
-                : `${filteredMatches.length + externalQueue.length} battle${filteredMatches.length + externalQueue.length !== 1 ? "s" : ""} nearby`}
+                : `${externalMatches.length} battle${externalMatches.length !== 1 ? "s" : ""} nearby`}
             </span>
-            {filteredMatches.filter((m) => m.is_own).length > 0 && (
+            {ownMatches.length > 0 && (
               <span className="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full">
-                {filteredMatches.filter((m) => m.is_own).length} yours
+                {ownMatches.length} yours
               </span>
             )}
           </div>
@@ -330,11 +332,11 @@ export default function MapView({ filter }: { filter: string }) {
         {listOpen && (
           <div className="bg-zinc-950 border-t border-zinc-800 max-h-[55vh] overflow-y-auto">
             {/* Own challenges */}
-            {filteredMatches.filter((m) => m.is_own).length > 0 && (
+            {ownMatches.length > 0 && (
               <div className="px-4 pt-4 pb-2">
                 <p className="text-[10px] text-indigo-400 uppercase tracking-widest mb-2">Your Challenges</p>
                 <div className="flex flex-col gap-2">
-                  {filteredMatches.filter((m) => m.is_own).map((m) => (
+                  {ownMatches.map((m) => (
                     <button
                       key={m.id}
                       onClick={() => router.push(`/matches/${m.id}`)}
@@ -358,11 +360,11 @@ export default function MapView({ filter }: { filter: string }) {
             )}
 
             {/* Nearby battles */}
-            {filteredMatches.filter((m) => !m.is_own).length > 0 && (
+            {externalMatches.length > 0 && (
               <div className="px-4 pt-3 pb-2">
                 <p className="text-[10px] text-amber-400 uppercase tracking-widest mb-2">Nearby Battles</p>
                 <div className="flex flex-col gap-2">
-                  {filteredMatches.filter((m) => !m.is_own).map((m) => (
+                  {externalMatches.map((m) => (
                     <div
                       key={m.id}
                       className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 rounded-xl p-3"

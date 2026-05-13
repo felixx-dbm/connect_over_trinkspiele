@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { ArrowLeft, MapPin, Clock, CheckCircle, XCircle, Trophy, Swords, Loader2, Share2, Copy, Check, RefreshCw } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { ArrowLeft, MapPin, Clock, CheckCircle, XCircle, Trophy, Swords, Loader2, Share2, Copy, Check, RefreshCw, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 type Match = {
@@ -28,6 +28,7 @@ const STATUS_CONFIG = {
 
 export default function MatchPage() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
   const [match, setMatch] = useState<Match | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [result, setResult] = useState<"win" | "loss" | null>(null);
@@ -40,6 +41,8 @@ export default function MatchPage() {
   const [joinError, setJoinError] = useState<string | null>(null);
   const [opponentJoined, setOpponentJoined] = useState(false);
   const [opponentSubmittedFirst, setOpponentSubmittedFirst] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+  const [cancelConfirm, setCancelConfirm] = useState(false);
   const prevOpponentId = useRef<string | null | undefined>(undefined);
   const prevStatus = useRef<string | undefined>(undefined);
 
@@ -116,6 +119,16 @@ export default function MatchPage() {
       setJoinError(data.error ?? "Failed to join match");
     }
     setJoining(false);
+  };
+
+  const handleCancel = async () => {
+    if (!cancelConfirm) { setCancelConfirm(true); return; }
+    setCancelling(true);
+    const res = await fetch(`/api/matches/${id}/cancel`, { method: "POST" });
+    setCancelling(false);
+    if (res.ok) {
+      router.push("/home");
+    }
   };
 
   const handleSubmit = async () => {
@@ -411,6 +424,20 @@ export default function MatchPage() {
             <Copy size={12} />
             Copy link
           </button>
+          {currentUserId === match.challenger_id && (
+            <button
+              onClick={handleCancel}
+              disabled={cancelling}
+              className={`mt-5 flex items-center gap-2 text-xs px-4 py-2 rounded-xl transition-all cursor-pointer mx-auto border ${
+                cancelConfirm
+                  ? "text-red-400 border-red-500/40 bg-red-500/10 hover:bg-red-500/20"
+                  : "text-zinc-600 border-zinc-800 hover:text-zinc-400 hover:border-zinc-700"
+              }`}
+            >
+              {cancelling ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+              {cancelling ? "Cancelling…" : cancelConfirm ? "Confirm cancel" : "Cancel challenge"}
+            </button>
+          )}
         </div>
       )}
     </div>
