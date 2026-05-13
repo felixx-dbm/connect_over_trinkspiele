@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { isUUID } from "@/lib/validate";
 
 export async function POST(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: matchId } = await params;
+  if (!isUUID(matchId)) return NextResponse.json({ error: "Invalid match ID" }, { status: 400 });
+
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();

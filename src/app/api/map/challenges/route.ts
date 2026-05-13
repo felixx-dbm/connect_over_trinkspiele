@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { isValidLat, isValidLng } from "@/lib/validate";
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
@@ -13,8 +14,8 @@ export async function GET(request: NextRequest) {
   const lng = parseFloat(searchParams.get("lng") ?? "");
   const radiusKm = Math.min(parseInt(searchParams.get("radius") ?? "10"), 50);
 
-  if (isNaN(lat) || isNaN(lng)) {
-    return NextResponse.json({ error: "lat and lng are required" }, { status: 400 });
+  if (!isValidLat(lat) || !isValidLng(lng)) {
+    return NextResponse.json({ error: "lat and lng must be valid coordinates" }, { status: 400 });
   }
 
   const [{ data: matches }, { data: queue }, { data: ownMatches }, { data: myQueue }] = await Promise.all([

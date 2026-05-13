@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { validatePassword } from "@/lib/validate";
 
 function getAge(dob: string): number {
   return Math.floor((Date.now() - new Date(dob).getTime()) / (365.25 * 24 * 60 * 60 * 1000));
@@ -17,9 +18,8 @@ export async function signUp(data: {
     return { error: "You must be 18 or older to register." };
   }
 
-  if (data.password.length < 8 || data.password.length > 72) {
-    return { error: "Password must be between 8 and 72 characters." };
-  }
+  const passwordError = validatePassword(data.password);
+  if (passwordError) return { error: passwordError };
 
   const supabase = await createClient();
   let signUpData, error;

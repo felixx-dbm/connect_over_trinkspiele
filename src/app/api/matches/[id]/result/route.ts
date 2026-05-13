@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { isUUID } from "@/lib/validate";
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: matchId } = await params;
+  if (!isUUID(matchId)) return NextResponse.json({ error: "Invalid match ID" }, { status: 400 });
+
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -15,7 +18,7 @@ export async function POST(
   const body = await request.json() as { winner_id: string };
   const { winner_id } = body;
 
-  if (!winner_id) return NextResponse.json({ error: "winner_id required" }, { status: 400 });
+  if (!isUUID(winner_id)) return NextResponse.json({ error: "winner_id must be a valid UUID" }, { status: 400 });
 
   // Fetch match to verify caller is a participant and match is active
   const { data: match } = await supabase

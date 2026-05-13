@@ -2,27 +2,46 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ArrowLeft, Eye, EyeOff, Mail, Lock, User, Calendar, AlertCircle } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Mail, Lock, User, Calendar, AlertCircle, Check, X } from "lucide-react";
 import { signUp } from "@/app/actions/auth";
+import { validatePassword, passwordStrength } from "@/lib/validate";
 
 function getAge(dob: string): number {
   return Math.floor((Date.now() - new Date(dob).getTime()) / (365.25 * 24 * 60 * 60 * 1000));
 }
 
+const STRENGTH_LABELS = ["", "Weak", "Fair", "Good", "Strong"] as const;
+const STRENGTH_COLORS = ["", "bg-red-500", "bg-orange-400", "bg-yellow-400", "bg-green-500"] as const;
+const STRENGTH_TEXT = ["", "text-red-400", "text-orange-400", "text-yellow-400", "text-green-400"] as const;
+
+function PasswordRequirement({ met, label }: { met: boolean; label: string }) {
+  return (
+    <div className={`flex items-center gap-1.5 text-xs ${met ? "text-green-400" : "text-zinc-600"}`}>
+      {met ? <Check size={10} /> : <X size={10} />}
+      {label}
+    </div>
+  );
+}
+
 export default function RegisterPage() {
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ username: "", email: "", password: "", dob: "" });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
 
   const ageError = form.dob ? getAge(form.dob) < 18 : false;
-  const passwordError =
-    form.password.length > 0 && (form.password.length < 8 || form.password.length > 72);
+  const passwordError = form.password.length > 0 ? validatePassword(form.password) : null;
+  const strength = passwordStrength(form.password);
+
   const canSubmit =
-    form.username && form.email && form.password && form.dob && !ageError && !passwordError;
+    form.username.trim().length >= 2 &&
+    form.email &&
+    !passwordError &&
+    form.password.length > 0 &&
+    form.dob &&
+    !ageError;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -99,6 +118,8 @@ export default function RegisterPage() {
             value={form.username}
             onChange={handleChange}
             autoComplete="username"
+            minLength={2}
+            maxLength={30}
             required
             className="w-full h-14 bg-zinc-900 border border-zinc-800 rounded-xl pl-11 pr-4 text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-all text-sm"
           />
@@ -124,13 +145,15 @@ export default function RegisterPage() {
             <input
               name="password"
               type={showPassword ? "text" : "password"}
-              placeholder="Password (8–72 characters)"
+              placeholder="Password"
               value={form.password}
               onChange={handleChange}
+              onFocus={() => setPasswordFocused(true)}
+              onBlur={() => setPasswordFocused(false)}
               autoComplete="new-password"
               required
               className={`w-full h-14 bg-zinc-900 border rounded-xl pl-11 pr-12 text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-1 transition-all text-sm ${
-                passwordError
+                passwordError && form.password.length > 0
                   ? "border-red-500/50 focus:border-red-500/50 focus:ring-red-500/20"
                   : "border-zinc-800 focus:border-amber-500/50 focus:ring-amber-500/20"
               }`}
@@ -143,10 +166,33 @@ export default function RegisterPage() {
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
-          {passwordError && (
-            <div className="flex items-center gap-2 mt-2 text-red-400 text-xs">
-              <AlertCircle size={12} />
-              Password must be between 8 and 72 characters
+
+          {/* Strength bar */}
+          {form.password.length > 0 && (
+            <div className="mt-2">
+              <div className="flex gap-1 mb-1.5">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+                      i <= strength ? STRENGTH_COLORS[strength] : "bg-zinc-800"
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className={`text-xs ${STRENGTH_TEXT[strength]}`}>
+                {STRENGTH_LABELS[strength]}
+              </span>
+            </div>
+          )}
+
+          {/* Requirements checklist — shows when focused or has content */}
+          {(passwordFocused || form.password.length > 0) && (
+            <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
+              <PasswordRequirement met={form.password.length >= 8} label="8+ characters" />
+              <PasswordRequirement met={/[A-Z]/.test(form.password)} label="Uppercase letter" />
+              <PasswordRequirement met={/[0-9]/.test(form.password)} label="Number" />
+              <PasswordRequirement met={/[^A-Za-z0-9]/.test(form.password)} label="Special character" />
             </div>
           )}
         </div>

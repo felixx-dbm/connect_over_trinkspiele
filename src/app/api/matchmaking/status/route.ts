@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { adminClient } from "@/lib/supabase/admin";
 import { fuzzCoords } from "@/lib/geo";
+import { isUUID, isValidLat, isValidLng } from "@/lib/validate";
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
@@ -15,7 +16,9 @@ export async function GET(request: NextRequest) {
   const lng = parseFloat(searchParams.get("lng") ?? "");
   const radiusKm = Math.min(parseInt(searchParams.get("radius") ?? "5"), 50);
 
-  if (!gameTypeId) return NextResponse.json({ error: "game_type_id required" }, { status: 400 });
+  if (!gameTypeId || !isUUID(gameTypeId)) {
+    return NextResponse.json({ error: "game_type_id must be a valid UUID" }, { status: 400 });
+  }
 
   // Check if already queued for a different game type
   const { data: existing } = await supabase
@@ -28,8 +31,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Already queued for a different game type" }, { status: 409 });
   }
 
-  // Upsert queue entry — fuzz coords server-side regardless of client input
-  const location = !isNaN(lat) && !isNaN(lng)
+  // Only accept coordinates if they're valid — fuzz server-side regardless of client input
+  const location = isValidLat(lat) && isValidLng(lng)
     ? (() => { const f = fuzzCoords(lat, lng); return `POINT(${f.lng} ${f.lat})`; })()
     : null;
 
