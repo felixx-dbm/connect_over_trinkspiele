@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, MapPin, Clock, CheckCircle, XCircle, Trophy, Swords, Loader2, Share2, Copy, Check, RefreshCw, Trash2, Users, UserPlus } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, CheckCircle, XCircle, Trophy, Swords, Loader2, Share2, Copy, Check, RefreshCw, Trash2, Users, UserPlus, Navigation, Timer } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useT } from "@/components/LanguageProvider";
 
@@ -15,12 +15,16 @@ type Match = {
   challenger_id: string;
   opponent_id: string | null;
   created_at: string;
+  expires_at: string | null;
   team_size: number;
   slots_challenger: number;
   slots_opponent: number;
   challenger_result: "win" | "loss" | null;
   opponent_result: "win" | "loss" | null;
   disputed: boolean;
+  meeting_hint: string | null;
+  fuzzy_lat: number | null;
+  fuzzy_lng: number | null;
   game_types: { name: string } | null;
   challenger: { username: string } | null;
   opponent: { username: string } | null;
@@ -60,6 +64,7 @@ export default function MatchPage() {
   const [cancelConfirm, setCancelConfirm] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
+  const [timeLeft, setTimeLeft] = useState<string | null>(null);
   const prevOpponentId = useRef<string | null | undefined>(undefined);
   const prevStatus = useRef<string | undefined>(undefined);
 
@@ -76,7 +81,7 @@ export default function MatchPage() {
     const supabase = createClient();
     const { data } = await supabase
       .from("matches")
-      .select("id, status, mode, winner_id, challenger_id, opponent_id, created_at, team_size, slots_challenger, slots_opponent, challenger_result, opponent_result, disputed, game_types(name), challenger:challenger_id(username), opponent:opponent_id(username)")
+      .select("id, status, mode, winner_id, challenger_id, opponent_id, created_at, expires_at, team_size, slots_challenger, slots_opponent, challenger_result, opponent_result, disputed, meeting_hint, fuzzy_lat, fuzzy_lng, game_types(name), challenger:challenger_id(username), opponent:opponent_id(username)")
       .eq("id", id)
       .single();
     if (data) setMatch(data as unknown as Match);
@@ -116,6 +121,20 @@ export default function MatchPage() {
 
     return () => clearInterval(interval);
   }, [id, fetchMatch, fetchMembers, t.matches.opponentJoined, t.matches.teamFilled]);
+
+  useEffect(() => {
+    if (!match?.expires_at || match.status !== "open") return;
+    const tick = () => {
+      const ms = new Date(match.expires_at!).getTime() - Date.now();
+      if (ms <= 0) { setTimeLeft(null); return; }
+      const h = Math.floor(ms / 3_600_000);
+      const m = Math.floor((ms % 3_600_000) / 60_000);
+      setTimeLeft(h > 0 ? `${h}h ${m}m` : `${m}m`);
+    };
+    tick();
+    const t = setInterval(tick, 60_000);
+    return () => clearInterval(t);
+  }, [match?.expires_at, match?.status]);
 
   const showNotif = (msg: string) => {
     setNotification(msg);
@@ -446,7 +465,7 @@ export default function MatchPage() {
       </div>
 
       {/* Match info chips */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
+      <div className="grid grid-cols-2 gap-3 mb-4">
         <div className="bg-white border border-amber-100 rounded-2xl p-3 flex items-center gap-2 shadow-sm">
           <Clock size={14} className="text-amber-400 flex-shrink-0" />
           <div>
@@ -457,13 +476,49 @@ export default function MatchPage() {
           </div>
         </div>
         <div className="bg-white border border-amber-100 rounded-2xl p-3 flex items-center gap-2 shadow-sm">
-          <MapPin size={14} className="text-amber-400 flex-shrink-0" />
-          <div>
-            <p className="text-stone-400 text-xs font-bold">{t.matches.mode}</p>
-            <p className="text-stone-700 text-sm font-extrabold capitalize">{match.mode}</p>
-          </div>
+          {timeLeft ? (
+            <>
+              <Timer size={14} className="text-amber-400 flex-shrink-0" />
+              <div>
+                <p className="text-stone-400 text-xs font-bold">{t.matches.expiresIn}</p>
+                <p className="text-stone-700 text-sm font-extrabold">{timeLeft}</p>
+              </div>
+            </>
+          ) : (
+            <>
+              <MapPin size={14} className="text-amber-400 flex-shrink-0" />
+              <div>
+                <p className="text-stone-400 text-xs font-bold">{t.matches.mode}</p>
+                <p className="text-stone-700 text-sm font-extrabold capitalize">{match.mode}</p>
+              </div>
+            </>
+          )}
         </div>
       </div>
+
+      {/* Meeting point */}
+      {(match.meeting_hint || match.fuzzy_lat) && match.status !== "cancelled" && (
+        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-5 flex items-start gap-3">
+          <MapPin size={15} className="text-emerald-500 mt-0.5 flex-shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="text-xs text-emerald-700 font-bold uppercase tracking-widest mb-0.5">{t.matches.meetingPoint}</p>
+            {match.meeting_hint && (
+              <p className="text-stone-800 text-sm font-semibold leading-snug">{match.meeting_hint}</p>
+            )}
+          </div>
+          {match.fuzzy_lat && match.fuzzy_lng && (
+            <a
+              href={`https://maps.google.com/?q=${match.fuzzy_lat},${match.fuzzy_lng}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-shrink-0 flex items-center gap-1.5 bg-emerald-500 text-white text-xs font-bold px-3 py-2 rounded-xl shadow-sm hover:bg-emerald-600 transition-colors"
+            >
+              <Navigation size={12} />
+              {t.matches.navigate}
+            </a>
+          )}
+        </div>
+      )}
 
       {/* ── ACTIVE: Result submission ── */}
       {match.status === "active" && isParticipant && !iAlreadySubmitted && (

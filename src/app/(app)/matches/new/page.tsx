@@ -22,6 +22,7 @@ export default function NewMatchPage() {
   const router = useRouter();
   const [gameTypes, setGameTypes] = useState<GameType[]>([]);
   const [gameTypeId, setGameTypeId] = useState<string | null>(null);
+  const [meetingHint, setMeetingHint] = useState("");
   const [posting, setPosting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -65,7 +66,12 @@ export default function NewMatchPage() {
         challenger_type: "user",
         team_size: teamSize,
         slots_challenger: teamSize > 1 ? 0 : 1,
-        ...(coords ? { location: `POINT(${coords.lng} ${coords.lat})` } : {}),
+        ...(meetingHint.trim() ? { meeting_hint: meetingHint.trim() } : {}),
+        ...(coords ? {
+          location: `POINT(${coords.lng} ${coords.lat})`,
+          fuzzy_lat: coords.lat,
+          fuzzy_lng: coords.lng,
+        } : {}),
       })
       .select("id")
       .single();
@@ -143,11 +149,27 @@ export default function NewMatchPage() {
       </div>
 
       {/* Location info */}
-      <div className="bg-sky-50 border border-sky-200 rounded-2xl p-4 mb-6 flex items-start gap-3">
+      <div className="bg-sky-50 border border-sky-200 rounded-2xl p-4 mb-4 flex items-start gap-3">
         <Navigation size={15} className="text-sky-500 mt-0.5 flex-shrink-0" />
         <p className="text-xs text-stone-500 leading-relaxed font-semibold">
           {t.matches.locationNote}
         </p>
+      </div>
+
+      {/* Meeting hint */}
+      <div className="mb-6">
+        <label className="text-xs text-stone-400 font-bold uppercase tracking-widest block mb-2">
+          {t.matches.meetingHintLabel}
+        </label>
+        <input
+          type="text"
+          maxLength={100}
+          value={meetingHint}
+          onChange={(e) => setMeetingHint(e.target.value)}
+          placeholder={t.matches.meetingHintPlaceholder}
+          className="w-full h-12 px-4 bg-white border border-amber-200 rounded-2xl text-sm text-stone-800 font-semibold placeholder:text-stone-300 focus:outline-none focus:border-amber-400 transition-colors shadow-sm"
+        />
+        <p className="text-xs text-stone-400 font-semibold mt-2 px-1">{t.matches.meetingHintNote}</p>
       </div>
 
       {error && (
