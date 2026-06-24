@@ -44,7 +44,26 @@
       "Bash(npx tsc *)",
       "Bash(git -C /Users/felixdobelmann/Developer/Projects/Trinkspiel status)",
       "Bash(git -C /Users/felixdobelmann/Developer/Projects/Trinkspiel diff --stat)",
-      "Bash(git *)"
+      "Bash(git *)",
+      "Bash(xargs cat)",
+      "mcp__supabase__list_tables",
+      "mcp__supabase__apply_migration",
+      "mcp__supabase__search_docs",
+      "Bash(find ~/Downloads -type d -iname \"*frontend*design*\" -o -type d -iname \"*design*improvement*\" 2>/dev/null | head -20)",
+      "Read(//Users/felixdobelmann/Downloads/**)",
+      "Bash(mkdir -p /Users/felixdobelmann/Developer/Projects/Trinkspiel/src/app/api/crew-matches/\\\\[id\\\\]/accept /Users/felixdobelmann/Developer/Projects/Trinkspiel/src/app/api/crew-matches/\\\\[id\\\\]/join /Users/felixdobelmann/Developer/Projects/Trinkspiel/src/app/api/crew-matches/\\\\[id\\\\]/result)",
+      "Bash(mkdir -p \"/Users/felixdobelmann/Developer/Projects/Trinkspiel/src/app/\\(app\\)/crew-matches/[id]\")",
+      "mcp__supabase__execute_sql",
+      "Bash(mkdir -p \\\\ *)",
+      "Bash(npx playwright *)",
+      "Bash(npx supabase *)",
+      "Bash(mkdir -p /Users/felixdobelmann/Developer/Projects/Trinkspiel/src/app/api/matches/\\\\[id\\\\]/start)"
+    ],
+    "additionalDirectories": [
+      "/Users/felixdobelmann/Developer/Projects/Trinkspiel/src/app/api/crew-matches/[id]",
+      "/Users/felixdobelmann/Developer/Projects/Trinkspiel/src/app/(app)/crew-matches",
+      "/Users/felixdobelmann/Developer/Projects/Trinkspiel/src/app/(app)/events",
+      "/Users/felixdobelmann/Developer/Projects/Trinkspiel/src/app/api/matches/[id]"
     ]
   },
   "model": "claude-sonnet-4-6"

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Trinkspiel — Projektpräsentation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Russo+One&family=Chakra+Petch:wght@400;600&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #09090b;
+    --card: #18181b;
+    --elevated: #27272a;
+    --amber: #fbbf24;
+    --amber-dim: #d97706;
+    --text: #f4f4f5;
+    --muted: #a1a1aa;
+    --border: #3f3f46;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Chakra Petch', monospace, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 24px 80px;
+    gap: 48px;
+  }
+
+  /* grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  .slide {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 900px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px 52px;
+    box-shadow: 0 0 0 1px rgba(251,191,36,0.06), 0 24px 60px rgba(0,0,0,0.5);
+  }
+
+  .slide-number {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  h1 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 2.4rem;
+    letter-spacing: 0.02em;
+    line-height: 1.15;
+    margin-bottom: 6px;
+  }
+
+  h1 span {
+    color: var(--amber);
+  }
+
+  .tagline {
+    color: var(--muted);
+    font-size: 1rem;
+    margin-bottom: 40px;
+    border-left: 3px solid var(--amber-dim);
+    padding-left: 12px;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+
+  .box {
+    background: var(--elevated);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .box h3 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 14px;
+  }
+
+  .box ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .box ul li {
+    font-size: 0.875rem;
+    color: var(--text);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.4;
+  }
+
+  .box ul li::before {
+    content: '›';
+    color: var(--amber-dim);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .screenshot-zone {
+    background: var(--bg);
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 0.8rem;
+    min-height: 180px;
+    padding: 20px;
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+
+  .screenshot-zone:hover {
+    border-color: var(--amber-dim);
+  }
+
+  .screenshot-zone svg {
+    opacity: 0.3;
+  }
+
+  .screenshot-zone span {
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* Image drop support */
+  .screenshot-zone img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+
+  .pill {
+    display: inline-block;
+    background: rgba(251,191,36,0.12);
+    border: 1px solid rgba(251,191,36,0.25);
+    color: var(--amber);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 99px;
+    margin-right: 6px;
+    margin-bottom: 6px;
+  }
+
+  .section-title {
+    font-family: 'Russo One', sans-serif;
+    font-size: 2.2rem;
+    margin-bottom: 6px;
+  }
+
+  .challenge-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 0;
+  }
+
+  .challenge-item {
+    background: var(--elevated);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  .challenge-item .problem {
+    font-size: 0.78rem;
+    color: #ef4444;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .challenge-item .label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+
+  .challenge-item .fix {
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .challenge-item .fix strong {
+    color: #4ade80;
+    font-weight: 600;
+  }
+
+  .status-bar {
+    margin-top: 28px;
+    background: rgba(251,191,36,0.07);
+    border: 1px solid rgba(251,191,36,0.2);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .status-bar .status-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .status-bar .status-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+
+  .status-bar .status-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--amber);
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 28px 0;
+  }
+
+  @media print {
+    body { background: #09090b; padding: 0; gap: 0; }
+    .slide { break-after: page; border-radius: 0; max-width: 100%; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== SLIDE 1 ===== -->
+<div class="slide">
+  <div class="slide-number">Slide 01 / 02</div>
+  <h1>Trinkspiel <span>Battle App</span></h1>
+  <p class="tagline">Spontane Bierspiel-Challenges per Standort finden & annehmen</p>
+
+  <div class="grid-2" style="margin-bottom: 20px;">
+
+    <div>
+      <div class="box" style="margin-bottom: 20px;">
+        <h3>Was ist es?</h3>
+        <ul>
+          <li>Mobile-first Web App für Bierspiel-Challenges zwischen Gruppen</li>
+          <li>Nutzer posten offene Challenges auf einer Live-Karte</li>
+          <li>Andere nehmen sie an — Gewinner steigen im Leaderboard</li>
+          <li>Crews: Gruppen können zusammen antreten</li>
+        </ul>
+      </div>
+
+      <div class="box">
+        <h3>Tech Stack</h3>
+        <div style="margin-top: 4px;">
+          <span class="pill">Next.js 16</span>
+          <span class="pill">TypeScript</span>
+          <span class="pill">Tailwind v4</span>
+          <span class="pill">Supabase</span>
+          <span class="pill">PostGIS</span>
+          <span class="pill">OpenStreetMap</span>
+          <span class="pill">Vercel</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="screenshot-zone" id="drop1">
+      <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <rect x="3" y="3" width="18" height="18" rx="3"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <path d="m21 15-5-5L5 21"/>
+      </svg>
+      <span>Screenshot hier einfügen</span>
+      <span style="font-size:0.65rem; opacity:0.6;">Map / Home Screen</span>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="box">
+      <h3>Seiten</h3>
+      <ul>
+        <li>Age-Gate Splash</li>
+        <li>Login / Register</li>
+        <li>Home Dashboard</li>
+        <li>Karte (Live GPS)</li>
+        <li>Leaderboard</li>
+        <li>Crews</li>
+        <li>Match-Flow</li>
+        <li>Profil / Settings</li>
+      </ul>
+    </div>
+
+    <div class="box">
+      <h3>Backend</h3>
+      <ul>
+        <li>Supabase Auth mit E-Mail-Bestätigung</li>
+        <li>PostGIS für Nearby-Queries</li>
+        <li>Matchmaking-Queue in DB</li>
+        <li>Race-Condition-Schutz bei Match-Accept</li>
+        <li>RLS-Policies (Row Level Security)</li>
+        <li>Trigger: User-Row bei Registrierung</li>
+      </ul>
+    </div>
+
+    <div class="box">
+      <h3>Design System</h3>
+      <ul>
+        <li>Dark only: Zinc-950 / Amber-400</li>
+        <li>Russo One + Chakra Petch</li>
+        <li>Mobile Bottom-Nav (5 Tabs)</li>
+        <li>Amber Glow CSS-Effekt</li>
+        <li>Grain-Textur Overlay</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== SLIDE 2 ===== -->
+<div class="slide">
+  <div class="slide-number">Slide 02 / 02</div>
+  <h1 class="section-title">Hürden & <span style="color: var(--amber)">Lösungen</span></h1>
+  <p class="tagline">Technische Probleme, auf die wir gestoßen sind — und wie wir sie gelöst haben</p>
+
+  <div class="challenge-row" style="margin-bottom: 20px;">
+    <div class="challenge-item">
+      <div class="problem">Session-Bug</div>
+      <div class="label">Login verliert Cookie nach Redirect</div>
+      <div class="fix">Next.js Soft-Nav überträgt Supabase-Session-Cookies nicht. Fix: <strong>window.location.href</strong> statt router.push → Full Page Reload.</div>
+    </div>
+    <div class="challenge-item">
+      <div class="problem">Race Condition</div>
+      <div class="label">Zwei User nehmen dasselbe Match an</div>
+      <div class="fix">DB-Check <strong>opponent_id IS NULL</strong> im API-Route verhindert Doppel-Accept durch optimistisches Locking.</div>
+    </div>
+    <div class="challenge-item">
+      <div class="problem">SSR-Crash</div>
+      <div class="label">Leaflet Map bricht beim Build</div>
+      <div class="fix">Leaflet braucht <code>window</code>-Objekt. Fix: <strong>dynamic import mit ssr: false</strong> isoliert es vom Server-Render.</div>
+    </div>
+    <div class="challenge-item">
+      <div class="problem">TypeScript-Fehler</div>
+      <div class="label">Supabase-Joins als Array inferiert</div>
+      <div class="fix">Supabase-Client gibt Joins immer als Array zurück. Fix: <strong>as unknown as Type</strong> Cast als einheitliches Pattern.</div>
+    </div>
+    <div class="challenge-item">
+      <div class="problem">Scope-Entscheidung</div>
+      <div class="label">Solo-Matchmaking war zu komplex</div>
+      <div class="fix">Queue-basiertes Matchmaking gestrichen → vereinfacht zu <strong>reinen Map-Challenges</strong>. Klarer und nutzbarer.</div>
+    </div>
+    <div class="challenge-item">
+      <div class="problem">Deployment</div>
+      <div class="label">Vercel CLI im Uni-Netz geblockt</div>
+      <div class="fix">eduroam blockiert die CLI-Auth. Umweg: <strong>Deploy via Vercel Browser-UI</strong> per GitHub-Import.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="grid-2">
+    <div>
+      <div class="box">
+        <h3>Wichtige Architektur-Entscheidungen</h3>
+        <ul>
+          <li>Server Actions als einzige Mutations-Schicht — kein direkter DB-Zugriff vom Client</li>
+          <li>5s-Polling statt Supabase Realtime — einfacher, kein Websocket-Overhead</li>
+          <li>OpenStreetMap kostenlos, kein API-Key nötig</li>
+          <li>Leaflet Icons lokal gebündelt — kein CDN-Risiko</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="screenshot-zone" id="drop2">
+      <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <rect x="3" y="3" width="18" height="18" rx="3"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <path d="m21 15-5-5L5 21"/>
+      </svg>
+      <span>Screenshot hier einfügen</span>
+      <span style="font-size:0.65rem; opacity:0.6;">Match-Flow / Profil</span>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <div class="status-item">
+      <span class="status-label">Status</span>
+      <span class="status-value">Feature-complete</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Seiten</span>
+      <span class="status-value">8 Screens</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Datenbank</span>
+      <span class="status-value">5 Migrations</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Deployment</span>
+      <span class="status-value">Vercel + GitHub</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Backend</span>
+      <span class="status-value">Supabase (Postgres + Auth)</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Drag & Drop Screenshots in die Platzhalter
+  ['drop1', 'drop2'].forEach(id => {
+    const zone = document.getElementById(id);
+    zone.addEventListener('dragover', e => {
+      e.preventDefault();
+      zone.style.borderColor = '#fbbf24';
+    });
+    zone.addEventListener('dragleave', () => {
+      zone.style.borderColor = '';
+    });
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      const file = e.dataTransfer.files[0];
+      if (!file || !file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        zone.innerHTML = `<img src="${ev.target.result}" alt="screenshot" />`;
+      };
+      reader.readAsDataURL(file);
+    });
+    zone.addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+          zone.innerHTML = `<img src="${ev.target.result}" alt="screenshot" />`;
+        };
+        reader.readAsDataURL(file);
+      };
+      input.click();
+    });
+  });
+</script>
+</body>
+</html>

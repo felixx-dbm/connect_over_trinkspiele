@@ -107,9 +107,9 @@ function LoginForm() {
         </div>
 
         <div className="flex justify-end">
-          <button type="button" className="text-sm font-bold text-amber-600 hover:text-amber-700 transition-colors cursor-pointer">
+          <Link href="/forgot-password" className="text-sm font-bold text-amber-600 hover:text-amber-700 transition-colors cursor-pointer">
             {t.auth.forgotPassword}
-          </button>
+          </Link>
         </div>
 
         {error && (

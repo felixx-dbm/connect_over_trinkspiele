@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, MapPin, Clock, CheckCircle, XCircle, Trophy, Swords, Loader2, Share2, Copy, Check, RefreshCw, Trash2, Users, UserPlus, Navigation, Timer, Play } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, CheckCircle, XCircle, Trophy, Swords, Loader2, Share2, Copy, Check, RefreshCw, Trash2, Users, UserPlus, Navigation, Timer, Play, Flag } from "lucide-react";
+import ReportModal from "@/components/ReportModal";
 import { createClient } from "@/lib/supabase/client";
 import { useT } from "@/components/LanguageProvider";
 
@@ -67,6 +68,7 @@ export default function MatchPage() {
   const [cancelError, setCancelError] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
   const [startError, setStartError] = useState<string | null>(null);
+  const [showReport, setShowReport] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState<string | null>(null);
   const prevOpponentId = useRef<string | null | undefined>(undefined);
@@ -751,6 +753,25 @@ export default function MatchPage() {
             </button>
           </div>
         </div>
+      )}
+      {/* Report button — shown to non-challengers when match has an opponent */}
+      {isParticipant && !isChallenger && match.status !== "cancelled" && (
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={() => setShowReport(true)}
+            className="flex items-center gap-1.5 text-xs text-stone-400 hover:text-rose-500 font-semibold transition-colors cursor-pointer"
+          >
+            <Flag size={11} /> Report user
+          </button>
+        </div>
+      )}
+
+      {showReport && match.opponent_id && (
+        <ReportModal
+          reportedUserId={isChallenger ? (match.opponent_id ?? "") : match.challenger_id}
+          matchId={id}
+          onClose={() => setShowReport(false)}
+        />
       )}
     </div>
   );

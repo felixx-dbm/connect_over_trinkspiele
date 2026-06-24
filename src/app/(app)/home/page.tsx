@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Bell, Swords, Trophy, TrendingUp, Clock, ChevronRight, Flame, Users, MapPin, CalendarDays, Zap } from "lucide-react";
+import { Swords, Trophy, TrendingUp, Clock, ChevronRight, Flame, Users, MapPin, CalendarDays, Zap } from "lucide-react";
+import NotificationBell from "@/components/NotificationBell";
 import { createClient } from "@/lib/supabase/server";
 import { getT } from "@/lib/i18n-server";
 import type { MatchRow } from "@/lib/types";
@@ -81,9 +82,7 @@ export default async function HomePage() {
           </h1>
         </div>
         <div className="flex items-center gap-3">
-          <div className="relative w-10 h-10 rounded-2xl bg-white border border-amber-100 flex items-center justify-center opacity-40 shadow-sm" title="Notifications coming soon">
-            <Bell size={18} className="text-stone-500" />
-          </div>
+          <NotificationBell />
           <Link href="/profile">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center font-display text-white text-sm cursor-pointer shadow-md shadow-amber-200/60">
               {initials}
