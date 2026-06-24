@@ -1,6 +1,6 @@
 @AGENTS.md
 
-# Trinkspiel — Project Context
+# Prost — Project Context
 
 Beer drinking game battle app. Mobile-first Next.js 16 + Supabase + Tailwind v4.
 

@@ -20,8 +20,8 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "Trinkspiel",
-  description: "The ultimate beer game battle platform",
+  title: "Prost",
+  description: "Challenge strangers to beer games at festivals, parties and bars.",
 };
 
 export const viewport: Viewport = {
