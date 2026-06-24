@@ -3,8 +3,7 @@
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { Filter } from "lucide-react";
-
-const GAME_TYPES = ["All", "Beer Pong", "Flunky Ball", "Freestyle"];
+import { useT } from "@/components/LanguageProvider";
 
 const MapView = dynamic(() => import("@/components/MapView"), {
   ssr: false,
@@ -16,7 +15,9 @@ const MapView = dynamic(() => import("@/components/MapView"), {
 });
 
 export default function MapPage() {
-  const [filter, setFilter] = useState("All");
+  const t = useT();
+  const GAME_TYPES = [t.map.all, "Beer Pong", "Flunky Ball", "Freestyle"];
+  const [filter, setFilter] = useState<string>(t.map.all);
 
   return (
     <div className="h-screen flex flex-col">
@@ -24,11 +25,11 @@ export default function MapPage() {
       <div className="px-4 pt-12 pb-4 bg-white/92 backdrop-blur-md flex-shrink-0 z-10 border-b border-amber-100/80 shadow-sm shadow-amber-100/40">
         <div className="flex items-center justify-between mb-4">
           <h1 className="font-display text-xl text-stone-900">
-            NEARBY <span className="text-gradient">BATTLES</span>
+            {t.map.title} <span className="text-gradient">{t.map.titleAccent}</span>
           </h1>
           <button className="flex items-center gap-2 bg-amber-50 border border-amber-200 px-3 py-2 rounded-xl text-xs text-stone-600 hover:border-amber-400 transition-colors cursor-pointer font-bold">
             <Filter size={12} className="text-amber-500" />
-            Filter
+            {t.map.filter}
           </button>
         </div>
         <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">

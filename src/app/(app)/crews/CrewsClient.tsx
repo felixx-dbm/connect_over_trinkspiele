@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Users, Crown, Copy, Plus, LogIn, Swords, Check, AlertCircle, Shield } from "lucide-react";
 import { createCrew, joinCrew } from "@/app/actions/crews";
+import { useT } from "@/components/LanguageProvider";
 
 type Member = {
   id: string;
@@ -28,6 +29,7 @@ type Props = {
 };
 
 export default function CrewsClient({ crew, members, totalWins, currentUserId }: Props) {
+  const t = useT();
   const router = useRouter();
   const [copied, setCopied] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
@@ -74,9 +76,9 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
       <div className="min-h-screen px-4 pt-12 pb-6 flex flex-col">
         <div className="mb-8">
           <h1 className="font-display text-xl text-stone-900 mb-1">
-            MY <span className="text-gradient">CREW</span>
+            {t.crews.title} <span className="text-gradient">{t.crews.titleAccent}</span>
           </h1>
-          <p className="text-stone-500 text-sm font-semibold">Join forces with friends to battle crews</p>
+          <p className="text-stone-500 text-sm font-semibold">{t.crews.subtitle}</p>
         </div>
 
         <div className="flex flex-col gap-4 flex-1">
@@ -88,8 +90,8 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
               <Plus size={26} className="text-white" />
             </div>
             <div className="text-center">
-              <p className="text-stone-800 font-extrabold text-base">Create a Crew</p>
-              <p className="text-stone-500 text-sm font-semibold">Start your own team</p>
+              <p className="text-stone-800 font-extrabold text-base">{t.crews.createCrew}</p>
+              <p className="text-stone-500 text-sm font-semibold">{t.crews.createHint}</p>
             </div>
           </button>
 
@@ -101,8 +103,8 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
               <LogIn size={24} className="text-white" />
             </div>
             <div className="text-center">
-              <p className="text-stone-800 font-extrabold text-base">Join a Crew</p>
-              <p className="text-stone-500 text-sm font-semibold">Enter an invite code</p>
+              <p className="text-stone-800 font-extrabold text-base">{t.crews.joinCrew}</p>
+              <p className="text-stone-500 text-sm font-semibold">{t.crews.joinHint}</p>
             </div>
           </button>
         </div>
@@ -113,15 +115,15 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
             <form onSubmit={handleCreate} className="w-full max-w-lg mx-auto bg-white rounded-t-3xl p-6 border-t border-amber-100 shadow-2xl" onClick={(e) => e.stopPropagation()}>
               <div className="w-10 h-1 bg-stone-200 rounded-full mx-auto mb-6" />
               <div className="text-3xl mb-3">⚔️</div>
-              <h3 className="font-display text-xl text-stone-900 mb-1">Create a Crew</h3>
-              <p className="text-stone-500 text-sm font-semibold mb-5">Your crew&apos;s invite code is auto-generated</p>
+              <h3 className="font-display text-xl text-stone-900 mb-1">{t.crews.createModalTitle}</h3>
+              <p className="text-stone-500 text-sm font-semibold mb-5">{t.crews.createModalHint}</p>
               <div className="flex flex-col gap-3 mb-4">
-                <input type="text" placeholder="Crew name" value={crewName} onChange={(e) => setCrewName(e.target.value)} required className={inputClass} />
-                <input type="text" placeholder="City (optional)" value={crewCity} onChange={(e) => setCrewCity(e.target.value)} className={inputClass} />
+                <input type="text" placeholder={t.crews.crewNamePlaceholder} value={crewName} onChange={(e) => setCrewName(e.target.value)} required className={inputClass} />
+                <input type="text" placeholder={t.crews.cityPlaceholder} value={crewCity} onChange={(e) => setCrewCity(e.target.value)} className={inputClass} />
               </div>
               {error && <div className="flex items-center gap-2 text-rose-600 text-sm mb-4 font-semibold"><AlertCircle size={14} />{error}</div>}
               <button type="submit" disabled={loading} className="w-full h-13 btn-gold rounded-2xl h-12 flex items-center justify-center cursor-pointer">
-                {loading ? "Creating…" : "Create Crew 🍻"}
+                {loading ? t.crews.creating : t.crews.createBtn}
               </button>
             </form>
           </div>
@@ -133,11 +135,11 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
             <form onSubmit={handleJoin} className="w-full max-w-lg mx-auto bg-white rounded-t-3xl p-6 border-t border-amber-100 shadow-2xl" onClick={(e) => e.stopPropagation()}>
               <div className="w-10 h-1 bg-stone-200 rounded-full mx-auto mb-6" />
               <div className="text-3xl mb-3">👥</div>
-              <h3 className="font-display text-xl text-stone-900 mb-1">Join a Crew</h3>
-              <p className="text-stone-500 text-sm font-semibold mb-5">Enter the invite code your captain shared</p>
+              <h3 className="font-display text-xl text-stone-900 mb-1">{t.crews.joinModalTitle}</h3>
+              <p className="text-stone-500 text-sm font-semibold mb-5">{t.crews.joinModalHint}</p>
               <input
                 type="text"
-                placeholder="e.g. BIER-4821"
+                placeholder={t.crews.codePlaceholder}
                 value={inviteCode}
                 onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
                 required
@@ -146,7 +148,7 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
               {error && <div className="flex items-center gap-2 text-rose-600 text-sm mb-4 font-semibold"><AlertCircle size={14} />{error}</div>}
               <button type="submit" disabled={loading} className="w-full h-12 bg-gradient-to-r from-violet-500 to-purple-600 text-white font-bold rounded-2xl transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-violet-200/60 hover:shadow-violet-300/60">
                 <LogIn size={16} />
-                {loading ? "Joining…" : "Join Crew"}
+                {loading ? t.crews.joining : t.crews.joinBtn}
               </button>
             </form>
           </div>
@@ -158,7 +160,7 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
   return (
     <div className="min-h-screen px-4 pt-12 pb-6">
       <h1 className="font-display text-xl text-stone-900 mb-6">
-        MY <span className="text-gradient">CREW</span>
+        {t.crews.title} <span className="text-gradient">{t.crews.titleAccent}</span>
       </h1>
 
       {/* Crew hero card */}
@@ -173,22 +175,22 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
             </div>
             <div className="text-right">
               <p className="font-display text-4xl text-white">{totalWins}</p>
-              <p className="text-amber-100 text-xs font-bold uppercase tracking-wider">Total Wins</p>
+              <p className="text-amber-100 text-xs font-bold uppercase tracking-wider">{t.crews.totalWins}</p>
             </div>
           </div>
           <div className="flex gap-2">
             <div className="flex-1 bg-white/20 backdrop-blur rounded-2xl p-3">
-              <p className="text-amber-100 text-xs font-bold mb-1">Members</p>
+              <p className="text-amber-100 text-xs font-bold mb-1">{t.crews.members}</p>
               <p className="text-white font-extrabold flex items-center gap-2">
                 <Users size={14} />
                 {members.length}
               </p>
             </div>
             <div className="flex-1 bg-white/20 backdrop-blur rounded-2xl p-3">
-              <p className="text-amber-100 text-xs font-bold mb-1">Role</p>
+              <p className="text-amber-100 text-xs font-bold mb-1">{t.crews.role}</p>
               <p className="text-white font-extrabold flex items-center gap-2">
                 <Shield size={14} />
-                {crew.captain_id === currentUserId ? "Captain" : "Member"}
+                {crew.captain_id === currentUserId ? t.crews.captain : t.crews.member}
               </p>
             </div>
           </div>
@@ -197,7 +199,7 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
 
       {/* Invite code */}
       <div className="bg-white border border-amber-100 rounded-2xl p-4 mb-5 shadow-sm">
-        <p className="text-stone-400 text-xs font-bold uppercase tracking-widest mb-2">Invite Code</p>
+        <p className="text-stone-400 text-xs font-bold uppercase tracking-widest mb-2">{t.crews.inviteCode}</p>
         <div className="flex items-center gap-3">
           <span className="flex-1 font-display text-2xl text-gradient-gold tracking-widest">{crew.invite_code}</span>
           <button
@@ -205,7 +207,7 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
             className="flex items-center gap-2 bg-amber-50 border border-amber-200 hover:bg-amber-100 px-4 py-2 rounded-xl text-sm font-bold text-amber-700 transition-all cursor-pointer"
           >
             {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
-            {copied ? "Copied!" : "Copy"}
+            {copied ? t.common.copied : t.common.copy}
           </button>
         </div>
       </div>
@@ -213,12 +215,12 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
       {/* Coming soon */}
       <div className="bg-violet-50 border border-dashed border-violet-200 rounded-2xl p-5 mb-5 text-center">
         <Swords size={22} className="text-violet-400 mx-auto mb-2" />
-        <p className="text-violet-700 font-bold text-sm mb-1">Crew Battles</p>
-        <p className="text-violet-500 text-xs leading-relaxed font-semibold">Challenge other crews to organized matches — coming soon</p>
+        <p className="text-violet-700 font-bold text-sm mb-1">{t.crews.crewBattles}</p>
+        <p className="text-violet-500 text-xs leading-relaxed font-semibold">{t.crews.crewBattlesHint}</p>
       </div>
 
       {/* Members */}
-      <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">Members</p>
+      <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">{t.crews.members}</p>
       <div className="flex flex-col gap-2">
         {members.map((member) => (
           <div key={member.id} className="flex items-center gap-3 bg-white border border-amber-100 rounded-2xl p-3 shadow-sm">
@@ -234,7 +236,7 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
                 <p className="text-stone-800 text-sm font-bold truncate">{member.users?.username ?? "Unknown"}</p>
                 {member.role === "captain" && <Crown size={12} className="text-amber-500 flex-shrink-0" />}
               </div>
-              <p className="text-stone-400 text-xs font-semibold capitalize">{member.role}</p>
+              <p className="text-stone-400 text-xs font-semibold capitalize">{member.role === "captain" ? t.crews.captain : t.crews.member}</p>
             </div>
             <p className="text-stone-600 text-sm font-bold flex-shrink-0">{member.users?.wins ?? 0}W</p>
           </div>

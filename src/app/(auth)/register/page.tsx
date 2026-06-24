@@ -5,12 +5,12 @@ import Link from "next/link";
 import { ArrowLeft, Eye, EyeOff, Mail, Lock, User, Calendar, AlertCircle, Check, X } from "lucide-react";
 import { signUp } from "@/app/actions/auth";
 import { validatePassword, passwordStrength } from "@/lib/validate";
+import { useT } from "@/components/LanguageProvider";
 
 function getAge(dob: string): number {
   return Math.floor((Date.now() - new Date(dob).getTime()) / (365.25 * 24 * 60 * 60 * 1000));
 }
 
-const STRENGTH_LABELS = ["", "Weak", "Fair", "Good", "Strong"] as const;
 const STRENGTH_COLORS = ["", "bg-rose-400", "bg-orange-400", "bg-amber-400", "bg-emerald-500"] as const;
 const STRENGTH_TEXT   = ["", "text-rose-500", "text-orange-500", "text-amber-600", "text-emerald-600"] as const;
 
@@ -24,6 +24,7 @@ function PasswordRequirement({ met, label }: { met: boolean; label: string }) {
 }
 
 export default function RegisterPage() {
+  const t = useT();
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ username: "", email: "", password: "", dob: "" });
   const [error, setError] = useState<string | null>(null);
@@ -67,16 +68,16 @@ export default function RegisterPage() {
         </div>
         <div>
           <h2 className="font-display text-3xl text-stone-900 mb-2">
-            CHECK YOUR <span className="text-gradient">EMAIL</span>
+            {t.auth.confirmTitle} <span className="text-gradient">{t.auth.confirmTitleAccent}</span>
           </h2>
           <p className="text-stone-500 text-sm leading-relaxed font-semibold">
-            We sent a confirmation link to<br />
+            {t.auth.confirmText}<br />
             <span className="text-stone-800 font-extrabold">{form.email}</span>
           </p>
-          <p className="text-stone-400 text-xs mt-3">Click the link to activate your account, then sign in.</p>
+          <p className="text-stone-400 text-xs mt-3">{t.auth.confirmHint}</p>
         </div>
         <Link href="/login" className="h-12 px-8 btn-gold rounded-2xl flex items-center justify-center cursor-pointer">
-          Go to Sign In →
+          {t.auth.goToSignIn}
         </Link>
       </div>
     );
@@ -92,15 +93,15 @@ export default function RegisterPage() {
         className="flex items-center gap-2 text-stone-500 hover:text-stone-800 transition-colors w-fit mb-8 cursor-pointer"
       >
         <ArrowLeft size={18} />
-        <span className="text-sm font-bold">Back</span>
+        <span className="text-sm font-bold">{t.common.back}</span>
       </Link>
 
       <div className="mb-8">
         <div className="text-5xl mb-4 animate-bounce-in">⚔️</div>
         <h1 className="font-display text-4xl text-stone-900 leading-tight mb-1">
-          JOIN THE <span className="text-gradient">BATTLE</span>
+          {t.auth.registerTitle} <span className="text-gradient">{t.auth.registerTitleAccent}</span>
         </h1>
-        <p className="text-stone-500 text-sm font-semibold">Create your account to start playing</p>
+        <p className="text-stone-500 text-sm font-semibold">{t.auth.registerSubtitle}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 flex-1">
@@ -109,7 +110,7 @@ export default function RegisterPage() {
           <input
             name="username"
             type="text"
-            placeholder="Username"
+            placeholder={t.auth.username}
             value={form.username}
             onChange={handleChange}
             autoComplete="username"
@@ -125,7 +126,7 @@ export default function RegisterPage() {
           <input
             name="email"
             type="email"
-            placeholder="Email address"
+            placeholder={t.auth.email}
             value={form.email}
             onChange={handleChange}
             autoComplete="email"
@@ -140,7 +141,7 @@ export default function RegisterPage() {
             <input
               name="password"
               type={showPassword ? "text" : "password"}
-              placeholder="Password"
+              placeholder={t.auth.password}
               value={form.password}
               onChange={handleChange}
               onFocus={() => setPasswordFocused(true)}
@@ -165,16 +166,16 @@ export default function RegisterPage() {
                   <div key={i} className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${i <= strength ? STRENGTH_COLORS[strength] : "bg-amber-100"}`} />
                 ))}
               </div>
-              <span className={`text-xs font-bold ${STRENGTH_TEXT[strength]}`}>{STRENGTH_LABELS[strength]}</span>
+              <span className={`text-xs font-bold ${STRENGTH_TEXT[strength]}`}>{t.auth.strengthLabels[strength]}</span>
             </div>
           )}
 
           {(passwordFocused || form.password.length > 0) && (
             <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
-              <PasswordRequirement met={form.password.length >= 8} label="8+ characters" />
-              <PasswordRequirement met={/[A-Z]/.test(form.password)} label="Uppercase letter" />
-              <PasswordRequirement met={/[0-9]/.test(form.password)} label="Number" />
-              <PasswordRequirement met={/[^A-Za-z0-9]/.test(form.password)} label="Special character" />
+              <PasswordRequirement met={form.password.length >= 8} label={t.auth.reqLength} />
+              <PasswordRequirement met={/[A-Z]/.test(form.password)} label={t.auth.reqUpper} />
+              <PasswordRequirement met={/[0-9]/.test(form.password)} label={t.auth.reqNumber} />
+              <PasswordRequirement met={/[^A-Za-z0-9]/.test(form.password)} label={t.auth.reqSpecial} />
             </div>
           )}
         </div>
@@ -194,7 +195,7 @@ export default function RegisterPage() {
           </div>
           {ageError && (
             <div className="flex items-center gap-2 mt-2 text-rose-600 text-xs font-bold">
-              <AlertCircle size={12} /> You must be 18 or older to register
+              <AlertCircle size={12} /> {t.auth.ageError}
             </div>
           )}
         </div>
@@ -214,19 +215,19 @@ export default function RegisterPage() {
               canSubmit && !loading ? "btn-gold" : "bg-amber-100 text-amber-400 cursor-not-allowed font-bold"
             }`}
           >
-            {loading ? "Creating account…" : "CREATE ACCOUNT 🎉"}
+            {loading ? t.auth.creatingAccount : t.auth.createAccount}
           </button>
         </div>
 
         <p className="text-xs text-stone-400 text-center leading-relaxed font-semibold">
-          By creating an account you confirm you are 18+ and agree to our terms.
+          {t.auth.terms}
         </p>
       </form>
 
       <p className="text-center text-sm text-stone-500 mt-4 font-semibold">
-        Already have an account?{" "}
+        {t.auth.hasAccount}{" "}
         <Link href="/login" className="text-amber-600 hover:text-amber-700 font-extrabold transition-colors cursor-pointer">
-          Sign in →
+          {t.auth.signInLink}
         </Link>
       </p>
     </div>

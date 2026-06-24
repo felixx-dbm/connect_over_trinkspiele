@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Settings, MapPin, Trophy, Swords, TrendingUp, Clock, ChevronRight, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/actions/auth";
+import { getT } from "@/lib/i18n-server";
 import type { MatchRow } from "@/lib/types";
 import ProfileEditButton from "./ProfileEditButton";
 
@@ -10,6 +11,8 @@ export default async function ProfilePage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+
+  const t = await getT();
 
   const [{ data: profile }, { data: recentMatches }, { data: crewMember }] = await Promise.all([
     supabase.from("users").select("*").eq("id", user.id).single(),
@@ -38,7 +41,7 @@ export default async function ProfilePage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <h1 className="font-display text-xl text-stone-900">
-          MY <span className="text-gradient">PROFILE</span>
+          {t.profile.title} <span className="text-gradient">{t.profile.titleAccent}</span>
         </h1>
         <Link
           href="/settings"
@@ -85,9 +88,9 @@ export default async function ProfilePage() {
 
         <div className="grid grid-cols-3 gap-2">
           {[
-            { label: "Wins",     value: profile?.wins ?? 0,   Icon: Trophy,    bg: "bg-amber-50",   border: "border-amber-200",   text: "text-amber-600",   icon: "text-amber-500"   },
-            { label: "Losses",   value: profile?.losses ?? 0, Icon: Swords,    bg: "bg-rose-50",    border: "border-rose-200",    text: "text-rose-600",    icon: "text-rose-400"    },
-            { label: "Win Rate", value: `${winRate}%`,        Icon: TrendingUp, bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-700", icon: "text-emerald-500" },
+            { label: t.profile.wins,    value: profile?.wins ?? 0,   Icon: Trophy,    bg: "bg-amber-50",   border: "border-amber-200",   text: "text-amber-600",   icon: "text-amber-500"   },
+            { label: t.profile.losses,  value: profile?.losses ?? 0, Icon: Swords,    bg: "bg-rose-50",    border: "border-rose-200",    text: "text-rose-600",    icon: "text-rose-400"    },
+            { label: t.profile.winRate, value: `${winRate}%`,        Icon: TrendingUp, bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-700", icon: "text-emerald-500" },
           ].map(({ label, value, Icon, bg, border, text, icon }) => (
             <div key={label} className={`${bg} border ${border} rounded-2xl p-3 text-center shadow-sm`}>
               <Icon size={14} className={`${icon} mx-auto mb-1`} />
@@ -102,10 +105,10 @@ export default async function ProfilePage() {
       <div className="bg-white border border-amber-100 rounded-2xl overflow-hidden mb-5 shadow-sm">
         {[
           crew
-            ? { label: "My Crew",    sublabel: crew.name,                         Icon: Users,    href: "/crews",       color: "text-violet-500", bg: "bg-violet-50"  }
-            : { label: "Create Crew",sublabel: "Start your own team",              Icon: Users,    href: "/crews",       color: "text-violet-500", bg: "bg-violet-50"  },
-          {   label: "Leaderboard",  sublabel: profile?.city ? `Rankings in ${profile.city}` : "City rankings", Icon: Trophy, href: "/leaderboard", color: "text-amber-500",  bg: "bg-amber-50"   },
-          {   label: "Settings",     sublabel: "Account & preferences",            Icon: Settings, href: "/settings",    color: "text-stone-500",  bg: "bg-stone-100"  },
+            ? { label: t.profile.myCrew,     sublabel: crew.name,                                                  Icon: Users,    href: "/crews",       color: "text-violet-500", bg: "bg-violet-50"  }
+            : { label: t.profile.createCrew, sublabel: t.profile.createCrewHint,                                   Icon: Users,    href: "/crews",       color: "text-violet-500", bg: "bg-violet-50"  },
+          {   label: t.profile.leaderboard,  sublabel: profile?.city ? t.profile.rankingsIn.replace("{city}", profile.city) : t.profile.cityRankings, Icon: Trophy, href: "/leaderboard", color: "text-amber-500",  bg: "bg-amber-50"   },
+          {   label: t.profile.settings,     sublabel: t.profile.settingsHint,                                     Icon: Settings, href: "/settings",    color: "text-stone-500",  bg: "bg-stone-100"  },
         ].map(({ label, sublabel, Icon, href, color, bg }, i) => (
           <Link
             key={label}
@@ -128,16 +131,16 @@ export default async function ProfilePage() {
       {recentMatches && recentMatches.length === 0 && (
         <div className="bg-white border border-amber-100 rounded-2xl p-6 mb-6 text-center shadow-sm">
           <div className="text-4xl mb-2">⚔️</div>
-          <p className="text-stone-500 text-sm font-semibold">No battles yet</p>
+          <p className="text-stone-500 text-sm font-semibold">{t.profile.noBattles}</p>
           <Link href="/matches/new" className="text-amber-600 font-bold text-sm hover:text-amber-700 transition-colors mt-1 inline-block">
-            Start your first →
+            {t.profile.startFirst}
           </Link>
         </div>
       )}
 
       {recentMatches && recentMatches.length > 0 && (
         <div className="mb-6">
-          <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">Recent Battles</p>
+          <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">{t.profile.recentBattles}</p>
           <div className="flex flex-col gap-2">
             {(recentMatches as unknown as MatchRow[]).map((match) => {
               const isWin = match.winner_id === user.id;
@@ -158,7 +161,7 @@ export default async function ProfilePage() {
                     {isWin ? "W" : "L"}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-stone-800 text-sm font-bold truncate">vs {opponentName ?? "Unknown"}</p>
+                    <p className="text-stone-800 text-sm font-bold truncate">{t.profile.vs} {opponentName ?? "Unknown"}</p>
                     <p className="text-stone-400 text-xs font-semibold capitalize">{match.game_types?.name?.replace("_", " ")}</p>
                   </div>
                   <div className="flex items-center gap-1.5 flex-shrink-0">
@@ -180,7 +183,7 @@ export default async function ProfilePage() {
           type="submit"
           className="w-full h-12 flex items-center justify-center text-rose-500 border border-rose-200 hover:bg-rose-50 rounded-2xl text-sm font-bold transition-all cursor-pointer"
         >
-          Sign out
+          {t.common.signOut}
         </button>
       </form>
     </div>

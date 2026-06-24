@@ -6,17 +6,19 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { fuzzCoords } from "@/lib/geo";
+import { useT } from "@/components/LanguageProvider";
 
 type GameType = { id: string; name: string };
 
-const GAME_META: Record<string, { emoji: string; desc: string; color: string; border: string; activeColor: string }> = {
-  beer_pong:  { emoji: "🏓", desc: "Classic cup-clearing table battle",  color: "bg-amber-50",   border: "border-amber-200",  activeColor: "bg-amber-100 border-amber-500" },
-  flunky_ball:{ emoji: "⚽", desc: "Outdoor team relay drinking game",  color: "bg-emerald-50", border: "border-emerald-200", activeColor: "bg-emerald-100 border-emerald-500" },
-  freestyle:  { emoji: "🎲", desc: "Your rules, your game, anything goes", color: "bg-violet-50",  border: "border-violet-200",  activeColor: "bg-violet-100 border-violet-500" },
+const GAME_STYLE: Record<string, { emoji: string; color: string; border: string; activeColor: string }> = {
+  beer_pong:  { emoji: "🏓", color: "bg-amber-50",   border: "border-amber-200",  activeColor: "bg-amber-100 border-amber-500" },
+  flunky_ball:{ emoji: "⚽", color: "bg-emerald-50", border: "border-emerald-200", activeColor: "bg-emerald-100 border-emerald-500" },
+  freestyle:  { emoji: "🎲", color: "bg-violet-50",  border: "border-violet-200",  activeColor: "bg-violet-100 border-violet-500" },
 };
-const FALLBACK = { emoji: "🍺", desc: "Ready to battle?", color: "bg-amber-50", border: "border-amber-200", activeColor: "bg-amber-100 border-amber-500" };
+const FALLBACK_STYLE = { emoji: "🍺", color: "bg-amber-50", border: "border-amber-200", activeColor: "bg-amber-100 border-amber-500" };
 
 export default function NewMatchPage() {
+  const t = useT();
   const router = useRouter();
   const [gameTypes, setGameTypes] = useState<GameType[]>([]);
   const [gameTypeId, setGameTypeId] = useState<string | null>(null);
@@ -75,11 +77,11 @@ export default function NewMatchPage() {
           <ArrowLeft size={18} />
         </Link>
         <h1 className="font-display text-xl text-stone-900">
-          NEW <span className="text-gradient">BATTLE</span>
+          {t.matches.newTitle} <span className="text-gradient">{t.matches.newAccent}</span>
         </h1>
       </div>
 
-      <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">Choose your game</p>
+      <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">{t.matches.chooseGame}</p>
 
       <div className="flex flex-col gap-3 mb-8">
         {gameTypes.length === 0 && (
@@ -88,7 +90,8 @@ export default function NewMatchPage() {
           ))
         )}
         {gameTypes.map((g) => {
-          const meta = GAME_META[g.name] ?? FALLBACK;
+          const style = GAME_STYLE[g.name] ?? FALLBACK_STYLE;
+          const desc = (t.matches.gameDesc as Record<string, string>)[g.name] ?? "";
           const active = gameTypeId === g.id;
           return (
             <button
@@ -96,16 +99,16 @@ export default function NewMatchPage() {
               onClick={() => setGameTypeId(g.id)}
               className={`flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer text-left shadow-sm ${
                 active
-                  ? meta.activeColor + " shadow-md"
-                  : meta.color + " " + meta.border + " hover:shadow-md"
+                  ? style.activeColor + " shadow-md"
+                  : style.color + " " + style.border + " hover:shadow-md"
               }`}
             >
-              <span className="text-4xl select-none">{meta.emoji}</span>
+              <span className="text-4xl select-none">{style.emoji}</span>
               <div className="flex-1">
                 <p className={`font-extrabold text-sm ${active ? "text-stone-900" : "text-stone-700"}`}>
                   {g.name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
                 </p>
-                <p className="text-stone-500 text-xs font-semibold mt-0.5">{meta.desc}</p>
+                <p className="text-stone-500 text-xs font-semibold mt-0.5">{desc}</p>
               </div>
               {active && (
                 <div className="w-6 h-6 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0 shadow-md shadow-amber-200/50">
@@ -121,7 +124,7 @@ export default function NewMatchPage() {
       <div className="bg-sky-50 border border-sky-200 rounded-2xl p-4 mb-6 flex items-start gap-3">
         <Navigation size={15} className="text-sky-500 mt-0.5 flex-shrink-0" />
         <p className="text-xs text-stone-500 leading-relaxed font-semibold">
-          Your location will be requested so your challenge appears on the map. Coordinates are fuzzed to ±200 m for privacy.
+          {t.matches.locationNote}
         </p>
       </div>
 
@@ -144,10 +147,10 @@ export default function NewMatchPage() {
           ? <Loader2 size={18} className="animate-spin" />
           : <ChevronRight size={18} />}
         {posting
-          ? "Posting…"
+          ? t.matches.posting
           : selectedGame
-            ? `Post ${selectedGame.name.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())} Challenge`
-            : "Post to Map"}
+            ? t.matches.postChallenge.replace("{game}", selectedGame.name.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()))
+            : t.matches.postToMap}
       </button>
     </div>
   );

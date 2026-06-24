@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { MapPin, Trophy, Medal, Users, TrendingUp, Crown } from "lucide-react";
+import { useT } from "@/components/LanguageProvider";
 
 type Player = { rank: number; id: string; username: string; wins: number; losses: number };
 type Crew   = { rank: number; id: string; name: string; wins: number };
@@ -13,15 +14,17 @@ type Props = {
   currentUserId: string;
 };
 
-const PODIUM = [
-  { color: "from-amber-400 to-yellow-300",  border: "border-amber-300",  text: "text-amber-700",  bg: "bg-amber-50",  icon: <Trophy size={18} className="text-amber-600" />, label: "1st" },
-  { color: "from-slate-400 to-stone-300",   border: "border-slate-300",  text: "text-slate-600",  bg: "bg-slate-50",  icon: <Medal  size={16} className="text-slate-500"  />, label: "2nd" },
-  { color: "from-orange-500 to-amber-400",  border: "border-orange-300", text: "text-orange-700", bg: "bg-orange-50", icon: <Medal  size={14} className="text-orange-500" />, label: "3rd" },
+const PODIUM_BASE = [
+  { color: "from-amber-400 to-yellow-300",  border: "border-amber-300",  text: "text-amber-700",  bg: "bg-amber-50",  icon: <Trophy size={18} className="text-amber-600" /> },
+  { color: "from-slate-400 to-stone-300",   border: "border-slate-300",  text: "text-slate-600",  bg: "bg-slate-50",  icon: <Medal  size={16} className="text-slate-500"  /> },
+  { color: "from-orange-500 to-amber-400",  border: "border-orange-300", text: "text-orange-700", bg: "bg-orange-50", icon: <Medal  size={14} className="text-orange-500" /> },
 ];
 
 export default function LeaderboardClient({ players, crews, city, currentUserId }: Props) {
+  const t = useT();
   const [tab, setTab] = useState<"city" | "crews">("city");
 
+  const PODIUM = PODIUM_BASE.map((p, i) => ({ ...p, label: t.leaderboard.podium[i] }));
   const list = tab === "city" ? players : crews;
   const top3 = list.slice(0, 3);
   const rest = list.slice(3);
@@ -31,7 +34,7 @@ export default function LeaderboardClient({ players, crews, city, currentUserId 
 
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-display text-xl text-stone-900">
-          LEADER<span className="text-gradient">BOARD</span>
+          {t.leaderboard.title}<span className="text-gradient">{t.leaderboard.titleAccent}</span>
         </h1>
         {city && (
           <div className="flex items-center gap-1.5 bg-white border border-amber-100 px-3 py-1.5 rounded-full text-xs text-stone-600 font-bold shadow-sm">
@@ -42,16 +45,16 @@ export default function LeaderboardClient({ players, crews, city, currentUserId 
       </div>
 
       <div className="flex gap-2 mb-6 bg-white border border-amber-100 p-1 rounded-2xl shadow-sm">
-        {(["city", "crews"] as const).map((t) => (
+        {(["city", "crews"] as const).map((tabKey) => (
           <button
-            key={t}
-            onClick={() => setTab(t)}
+            key={tabKey}
+            onClick={() => setTab(tabKey)}
             className={`flex-1 h-10 flex items-center justify-center gap-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${
-              tab === t ? "btn-gold" : "text-stone-500 hover:text-stone-700"
+              tab === tabKey ? "btn-gold" : "text-stone-500 hover:text-stone-700"
             }`}
           >
-            {t === "city" ? <Trophy size={14} /> : <Users size={14} />}
-            {t === "city" ? "Players" : "Crews"}
+            {tabKey === "city" ? <Trophy size={14} /> : <Users size={14} />}
+            {tabKey === "city" ? t.leaderboard.tabPlayers : t.leaderboard.tabCrews}
           </button>
         ))}
       </div>
@@ -61,8 +64,10 @@ export default function LeaderboardClient({ players, crews, city, currentUserId 
           <div className="text-5xl mb-4">🏆</div>
           <p className="text-stone-500 text-sm font-semibold">
             {city
-              ? `No ${tab === "city" ? "players" : "crews"} in ${city} yet.`
-              : "Set your city in your profile to see local rankings."}
+              ? t.leaderboard.noEntries
+                  .replace("{tab}", tab === "city" ? t.leaderboard.tabPlayers : t.leaderboard.tabCrews)
+                  .replace("{city}", city)
+              : t.leaderboard.noCity}
           </p>
         </div>
       ) : (
@@ -121,7 +126,7 @@ export default function LeaderboardClient({ players, crews, city, currentUserId 
                   <div className="flex items-center gap-1 text-sm font-bold text-stone-600">
                     <TrendingUp size={12} className="text-stone-400" />
                     <span>{entry.wins}</span>
-                    <span className="text-stone-400 text-xs font-semibold">{tab === "crews" ? "combined" : "W"}</span>
+                    <span className="text-stone-400 text-xs font-semibold">{tab === "crews" ? t.leaderboard.combined : t.leaderboard.winsShort}</span>
                   </div>
                   {isMe && <Crown size={12} className="text-amber-500 flex-shrink-0" />}
                 </div>

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { X, AlertCircle, Check } from "lucide-react";
 import { updateProfile } from "@/app/actions/profile";
+import { useT } from "@/components/LanguageProvider";
 
 type Props = {
   initialUsername: string;
@@ -13,6 +14,7 @@ type Props = {
 
 export default function EditProfileModal({ initialUsername, initialCity, onClose }: Props) {
   const router = useRouter();
+  const t = useT();
   const [username, setUsername] = useState(initialUsername);
   const [city, setCity] = useState(initialCity);
   const [loading, setLoading] = useState(false);
@@ -48,8 +50,8 @@ export default function EditProfileModal({ initialUsername, initialCity, onClose
       >
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h3 className="font-display text-xl text-stone-900">Edit Profile</h3>
-            <p className="text-stone-400 text-xs font-semibold mt-0.5">Update your public details</p>
+            <h3 className="font-display text-xl text-stone-900">{t.editProfile.title}</h3>
+            <p className="text-stone-400 text-xs font-semibold mt-0.5">{t.editProfile.subtitle}</p>
           </div>
           <button type="button" onClick={onClose} className="w-8 h-8 rounded-xl bg-stone-100 hover:bg-stone-200 flex items-center justify-center cursor-pointer transition-colors">
             <X size={16} className="text-stone-500" />
@@ -58,7 +60,7 @@ export default function EditProfileModal({ initialUsername, initialCity, onClose
 
         <div className="flex flex-col gap-3 mb-4">
           <div>
-            <label className="text-xs text-stone-400 font-bold uppercase tracking-widest block mb-1.5">Username</label>
+            <label className="text-xs text-stone-400 font-bold uppercase tracking-widest block mb-1.5">{t.editProfile.username}</label>
             <input
               type="text"
               value={username}
@@ -70,12 +72,12 @@ export default function EditProfileModal({ initialUsername, initialCity, onClose
             />
           </div>
           <div>
-            <label className="text-xs text-stone-400 font-bold uppercase tracking-widest block mb-1.5">City</label>
+            <label className="text-xs text-stone-400 font-bold uppercase tracking-widest block mb-1.5">{t.editProfile.city}</label>
             <input
               type="text"
               value={city}
               onChange={(e) => setCity(e.target.value)}
-              placeholder="Optional"
+              placeholder={t.editProfile.cityPlaceholder}
               maxLength={60}
               className="w-full h-14 bg-amber-50 border border-amber-200 rounded-2xl px-4 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 text-sm font-semibold"
             />
@@ -99,7 +101,7 @@ export default function EditProfileModal({ initialUsername, initialCity, onClose
               : "btn-gold"
           }`}
         >
-          {saved ? <><Check size={16} className="text-emerald-600" /> Saved!</> : loading ? "Saving…" : "Save Changes"}
+          {saved ? <><Check size={16} className="text-emerald-600" /> {t.common.saved}</> : loading ? t.common.saving : t.common.save}
         </button>
       </form>
     </div>

@@ -1,5 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Russo_One, Nunito } from "next/font/google";
+import { cookies } from "next/headers";
+import { LanguageProvider } from "@/components/LanguageProvider";
+import type { Locale } from "@/lib/i18n";
 import "./globals.css";
 
 const russo = Russo_One({
@@ -28,10 +31,15 @@ export const viewport: Viewport = {
   themeColor: "#FFFBEB",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const cookieStore = await cookies();
+  const locale = (cookieStore.get("lang")?.value ?? "en") as Locale;
+
   return (
-    <html lang="en" className={`${russo.variable} ${nunito.variable}`}>
-      <body className="bg-amber-50 text-stone-900 antialiased">{children}</body>
+    <html lang={locale} className={`${russo.variable} ${nunito.variable}`}>
+      <body className="bg-amber-50 text-stone-900 antialiased">
+        <LanguageProvider locale={locale}>{children}</LanguageProvider>
+      </body>
     </html>
   );
 }

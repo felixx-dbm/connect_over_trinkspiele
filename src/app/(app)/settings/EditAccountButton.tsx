@@ -3,11 +3,13 @@
 import { useState } from "react";
 import { Edit3 } from "lucide-react";
 import EditProfileModal from "@/components/EditProfileModal";
+import { useT } from "@/components/LanguageProvider";
 
 type Props = { username: string; city: string; fullWidth?: boolean };
 
 export default function EditAccountButton({ username, city, fullWidth }: Props) {
   const [open, setOpen] = useState(false);
+  const t = useT();
   return (
     <>
       <button
@@ -19,7 +21,7 @@ export default function EditAccountButton({ username, city, fullWidth }: Props) 
         }`}
       >
         <Edit3 size={fullWidth ? 14 : 12} />
-        {fullWidth ? "Edit Profile" : "Edit"}
+        {fullWidth ? t.settings.editProfile : t.common.edit}
       </button>
       {open && (
         <EditProfileModal

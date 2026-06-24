@@ -6,10 +6,12 @@ import { useSearchParams } from "next/navigation";
 import { ArrowLeft, Eye, EyeOff, Mail, Lock, AlertCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { safeRedirect } from "@/lib/redirect";
+import { useT } from "@/components/LanguageProvider";
 
 function LoginForm() {
   const searchParams = useSearchParams();
   const next = searchParams.get("next");
+  const t = useT();
 
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
@@ -57,15 +59,15 @@ function LoginForm() {
         className="flex items-center gap-2 text-stone-500 hover:text-stone-800 transition-colors w-fit mb-10 cursor-pointer"
       >
         <ArrowLeft size={18} />
-        <span className="text-sm font-bold">Back</span>
+        <span className="text-sm font-bold">{t.common.back}</span>
       </Link>
 
       <div className="mb-10">
         <div className="text-5xl mb-4 animate-bounce-in">👋</div>
         <h1 className="font-display text-4xl text-stone-900 leading-tight mb-1">
-          WELCOME <span className="text-gradient">BACK</span>
+          {t.auth.loginTitle} <span className="text-gradient">{t.auth.loginTitleAccent}</span>
         </h1>
-        <p className="text-stone-500 text-sm font-semibold">Sign in to continue your battles</p>
+        <p className="text-stone-500 text-sm font-semibold">{t.auth.loginSubtitle}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 flex-1">
@@ -74,7 +76,7 @@ function LoginForm() {
           <input
             name="email"
             type="email"
-            placeholder="Email address"
+            placeholder={t.auth.email}
             value={form.email}
             onChange={handleChange}
             autoComplete="email"
@@ -88,7 +90,7 @@ function LoginForm() {
           <input
             name="password"
             type={showPassword ? "text" : "password"}
-            placeholder="Password"
+            placeholder={t.auth.password}
             value={form.password}
             onChange={handleChange}
             autoComplete="current-password"
@@ -106,7 +108,7 @@ function LoginForm() {
 
         <div className="flex justify-end">
           <button type="button" className="text-sm font-bold text-amber-600 hover:text-amber-700 transition-colors cursor-pointer">
-            Forgot password?
+            {t.auth.forgotPassword}
           </button>
         </div>
 
@@ -124,12 +126,12 @@ function LoginForm() {
             !loading ? "btn-gold" : "bg-amber-100 text-amber-400 cursor-not-allowed font-bold"
           }`}
         >
-          {loading ? "Signing in…" : "SIGN IN 🍺"}
+          {loading ? t.auth.signingIn : t.auth.signIn}
         </button>
 
         <div className="flex items-center gap-3 my-1">
           <div className="flex-1 h-px bg-amber-100" />
-          <span className="text-xs text-stone-400 font-bold tracking-wider">OR</span>
+          <span className="text-xs text-stone-400 font-bold tracking-wider">{t.common.or}</span>
           <div className="flex-1 h-px bg-amber-100" />
         </div>
 
@@ -145,14 +147,14 @@ function LoginForm() {
             <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
             <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
           </svg>
-          {oauthLoading ? "Redirecting…" : "Continue with Google"}
+          {oauthLoading ? t.auth.redirecting : t.auth.continueGoogle}
         </button>
       </form>
 
       <p className="text-center text-sm text-stone-500 mt-6 font-semibold">
-        No account?{" "}
+        {t.auth.noAccount}{" "}
         <Link href="/register" className="text-amber-600 hover:text-amber-700 font-extrabold transition-colors cursor-pointer">
-          Register here →
+          {t.auth.registerHere}
         </Link>
       </p>
     </div>

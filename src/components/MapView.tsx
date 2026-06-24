@@ -6,6 +6,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Loader2, Swords, Users, AlertCircle, RefreshCw, ChevronUp, ChevronDown, MapPin, Navigation } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useT } from "@/components/LanguageProvider";
 
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -84,6 +85,7 @@ const GAME_ICONS: Record<string, string> = {
 };
 
 export default function MapView({ filter }: { filter: string }) {
+  const t = useT();
   const router = useRouter();
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationError, setLocationError] = useState(false);
@@ -162,7 +164,7 @@ export default function MapView({ filter }: { filter: string }) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center gap-3 bg-amber-50">
         <Loader2 size={28} className="text-amber-500 animate-spin" />
-        <p className="text-stone-500 text-sm font-semibold">Getting your location…</p>
+        <p className="text-stone-500 text-sm font-semibold">{t.map.gettingLocation}</p>
       </div>
     );
   }
@@ -174,8 +176,8 @@ export default function MapView({ filter }: { filter: string }) {
           <AlertCircle size={24} className="text-rose-400" />
         </div>
         <div>
-          <p className="text-stone-700 font-bold text-sm mb-1">Location access required</p>
-          <p className="text-stone-400 text-sm font-semibold">Enable GPS in your browser settings to see nearby battles.</p>
+          <p className="text-stone-700 font-bold text-sm mb-1">{t.map.locationRequired}</p>
+          <p className="text-stone-400 text-sm font-semibold">{t.map.locationHint}</p>
         </div>
       </div>
     );
@@ -272,7 +274,7 @@ export default function MapView({ filter }: { filter: string }) {
       {externalMatches.length > 0 && (
         <div className="absolute top-3 right-3 z-[1000] bg-white/92 backdrop-blur border border-amber-200 rounded-xl px-3 py-2 flex items-center gap-2 shadow-sm shadow-amber-100/50">
           <Users size={12} className="text-amber-500" />
-          <span className="text-amber-600 text-xs font-bold">{externalMatches.length} nearby</span>
+          <span className="text-amber-600 text-xs font-bold">{externalMatches.length} {t.map.nearby}</span>
         </div>
       )}
 
@@ -280,14 +282,14 @@ export default function MapView({ filter }: { filter: string }) {
       {!hasNearby && lastRefresh && (
         <div className="absolute inset-0 z-[999] pointer-events-none flex items-end justify-center pb-32">
           <div className="pointer-events-auto bg-white/95 backdrop-blur border border-amber-100 rounded-2xl px-5 py-4 mx-4 text-center max-w-xs shadow-lg shadow-amber-100/40">
-            <p className="text-stone-700 font-bold text-sm mb-1">No battles nearby</p>
-            <p className="text-stone-400 text-xs font-semibold mb-3">Post an Open Challenge and let others find you</p>
+            <p className="text-stone-700 font-bold text-sm mb-1">{t.map.noBattles}</p>
+            <p className="text-stone-400 text-xs font-semibold mb-3">{t.map.noBattlesHint}</p>
             <button
               onClick={() => location && fetchChallenges(location)}
               className="flex items-center gap-1.5 text-xs text-amber-600 hover:text-amber-700 mx-auto cursor-pointer transition-colors font-bold"
             >
               <RefreshCw size={11} />
-              Refresh
+              {t.matches.refresh}
             </button>
           </div>
         </div>
@@ -318,12 +320,12 @@ export default function MapView({ filter }: { filter: string }) {
             <Swords size={14} className="text-amber-500" />
             <span className="text-stone-800 text-sm font-bold">
               {externalMatches.length === 0
-                ? "No battles nearby"
-                : `${externalMatches.length} battle${externalMatches.length !== 1 ? "s" : ""} nearby`}
+                ? t.map.noBattles
+                : `${externalMatches.length} ${externalMatches.length !== 1 ? t.map.battlePlural : t.map.battleSingular} ${t.map.nearby}`}
             </span>
             {ownMatches.length > 0 && (
               <span className="text-[10px] bg-violet-50 text-violet-600 border border-violet-200 px-2 py-0.5 rounded-full font-bold">
-                {ownMatches.length} yours
+                {ownMatches.length} {t.map.yours}
               </span>
             )}
           </div>
@@ -336,7 +338,7 @@ export default function MapView({ filter }: { filter: string }) {
             {/* Own challenges */}
             {ownMatches.length > 0 && (
               <div className="px-4 pt-4 pb-2">
-                <p className="text-[10px] text-violet-500 uppercase tracking-widest mb-2 font-bold">Your Challenges</p>
+                <p className="text-[10px] text-violet-500 uppercase tracking-widest mb-2 font-bold">{t.map.yourChallenges}</p>
                 <div className="flex flex-col gap-2">
                   {ownMatches.map((m) => (
                     <button
@@ -351,7 +353,7 @@ export default function MapView({ filter }: { filter: string }) {
                         </p>
                         <p className="text-stone-400 text-xs font-semibold flex items-center gap-1 mt-0.5">
                           <Navigation size={9} />
-                          Waiting for opponent
+                          {t.map.waitingOpponent}
                         </p>
                       </div>
                       <span className="text-xs text-violet-500 font-bold flex-shrink-0">View →</span>
@@ -364,7 +366,7 @@ export default function MapView({ filter }: { filter: string }) {
             {/* Nearby battles */}
             {externalMatches.length > 0 && (
               <div className="px-4 pt-3 pb-2">
-                <p className="text-[10px] text-amber-500 uppercase tracking-widest mb-2 font-bold">Nearby Battles</p>
+                <p className="text-[10px] text-amber-500 uppercase tracking-widest mb-2 font-bold">{t.map.nearbyBattles}</p>
                 <div className="flex flex-col gap-2">
                   {externalMatches.map((m) => (
                     <div
@@ -385,7 +387,7 @@ export default function MapView({ filter }: { filter: string }) {
                         className="flex-shrink-0 h-8 px-3 bg-gradient-to-r from-amber-400 to-orange-500 disabled:opacity-50 text-white text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1 shadow-sm shadow-amber-200/60"
                       >
                         {accepting === m.id ? <Loader2 size={11} className="animate-spin" /> : <Swords size={11} />}
-                        Accept
+                        {t.map.accept}
                       </button>
                     </div>
                   ))}
@@ -395,7 +397,7 @@ export default function MapView({ filter }: { filter: string }) {
 
             {filteredMatches.length === 0 && (
               <div className="px-4 py-8 text-center">
-                <p className="text-stone-400 text-sm font-semibold">No battles match your filter</p>
+                <p className="text-stone-400 text-sm font-semibold">{t.map.noBattlesFilter}</p>
               </div>
             )}
 

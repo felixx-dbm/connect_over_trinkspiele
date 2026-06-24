@@ -2,12 +2,15 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Bell, Swords, Trophy, TrendingUp, Clock, ChevronRight, Flame, Users, MapPin } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { getT } from "@/lib/i18n-server";
 import type { MatchRow } from "@/lib/types";
 
 export default async function HomePage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+
+  const t = await getT();
 
   const [{ data: profile }, { data: recentMatches }, { data: activeMatch }] = await Promise.all([
     supabase.from("users").select("username, wins, losses, city").eq("id", user.id).single(),
@@ -28,10 +31,10 @@ export default async function HomePage() {
 
   const hour = new Date().getHours();
   const greeting =
-    hour < 5  ? "Good night," :
-    hour < 12 ? "Good morning," :
-    hour < 17 ? "Good afternoon," :
-    hour < 21 ? "Good evening," : "Good night,";
+    hour < 5  ? t.home.greetNight :
+    hour < 12 ? t.home.greetMorning :
+    hour < 17 ? t.home.greetAfternoon :
+    hour < 21 ? t.home.greetEvening : t.home.greetNight;
   const greetEmoji =
     hour < 5  ? "🌙" :
     hour < 12 ? "☀️" :
@@ -77,9 +80,9 @@ export default async function HomePage() {
       {/* ── Stats ── */}
       <div className="grid grid-cols-3 gap-3 mb-6">
         {[
-          { label: "Wins",     value: wins,       Icon: Trophy,    bg: "bg-amber-50",   border: "border-amber-200",   text: "text-amber-600",   icon: "text-amber-500"   },
-          { label: "Losses",   value: losses,     Icon: Swords,    bg: "bg-rose-50",    border: "border-rose-200",    text: "text-rose-600",    icon: "text-rose-400"    },
-          { label: "Win Rate", value: `${winRate}%`, Icon: TrendingUp, bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-700", icon: "text-emerald-500" },
+          { label: t.home.wins,    value: wins,          Icon: Trophy,    bg: "bg-amber-50",   border: "border-amber-200",   text: "text-amber-600",   icon: "text-amber-500"   },
+          { label: t.home.losses,  value: losses,        Icon: Swords,    bg: "bg-rose-50",    border: "border-rose-200",    text: "text-rose-600",    icon: "text-rose-400"    },
+          { label: t.home.winRate, value: `${winRate}%`, Icon: TrendingUp, bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-700", icon: "text-emerald-500" },
         ].map(({ label, value, Icon, bg, border, text, icon }) => (
           <div key={label} className={`${bg} border ${border} rounded-2xl p-3 flex flex-col items-center gap-1 shadow-sm`}>
             <Icon size={16} className={icon} />
@@ -97,7 +100,7 @@ export default async function HomePage() {
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-xs text-stone-500 uppercase tracking-widest font-bold">Live Match</span>
+                <span className="text-xs text-stone-500 uppercase tracking-widest font-bold">{t.home.liveMatch}</span>
               </div>
               <span className="text-xs bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full font-bold capitalize">
                 {(activeMatch.game_types as unknown as { name: string } | null)?.name?.replace("_", " ")}
@@ -108,7 +111,7 @@ export default async function HomePage() {
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center font-display text-white text-sm mb-1 mx-auto shadow-md shadow-amber-200/50">
                   {initials}
                 </div>
-                <p className="text-xs text-stone-600 font-bold">You</p>
+                <p className="text-xs text-stone-600 font-bold">{t.home.you}</p>
               </div>
               <span className="font-display text-amber-500 text-2xl">VS</span>
               <div className="text-center">
@@ -128,7 +131,7 @@ export default async function HomePage() {
               href={`/matches/${activeMatch.id}`}
               className="mt-3 w-full h-10 flex items-center justify-center btn-gold rounded-xl text-sm cursor-pointer"
             >
-              Go to match →
+              {t.home.goToMatch}
             </Link>
           </div>
         </div>
@@ -144,8 +147,8 @@ export default async function HomePage() {
             <MapPin size={16} className="text-amber-600" />
           </div>
           <div className="flex-1">
-            <p className="text-stone-800 text-sm font-bold">Set your city</p>
-            <p className="text-stone-500 text-xs font-semibold">Appear on the local leaderboard</p>
+            <p className="text-stone-800 text-sm font-bold">{t.home.setCity}</p>
+            <p className="text-stone-500 text-xs font-semibold">{t.home.setCityHint}</p>
           </div>
           <ChevronRight size={14} className="text-stone-400" />
         </Link>
@@ -158,14 +161,14 @@ export default async function HomePage() {
           className="btn-gold rounded-2xl p-4 flex items-center gap-3 text-sm cursor-pointer"
         >
           <Swords size={20} />
-          <span className="font-bold">Find Battle</span>
+          <span className="font-bold">{t.home.findBattle}</span>
         </Link>
         <Link
           href="/crews"
           className="bg-white border border-violet-200 text-violet-700 rounded-2xl p-4 flex items-center gap-3 font-bold text-sm transition-all cursor-pointer hover:bg-violet-50 shadow-sm"
         >
           <Users size={20} className="text-violet-500" />
-          My Crew
+          {t.home.myCrew}
         </Link>
       </div>
 
@@ -176,8 +179,8 @@ export default async function HomePage() {
             <Flame size={20} className="text-orange-500" />
           </div>
           <div className="flex-1">
-            <p className="text-stone-800 font-extrabold text-sm">🔥 {streak}-game win streak!</p>
-            <p className="text-stone-500 text-xs font-semibold">Keep it going — find your next opponent</p>
+            <p className="text-stone-800 font-extrabold text-sm">{t.home.streak.replace("{n}", String(streak))}</p>
+            <p className="text-stone-500 text-xs font-semibold">{t.home.streakHint}</p>
           </div>
           <ChevronRight size={16} className="text-stone-400" />
         </div>
@@ -186,7 +189,7 @@ export default async function HomePage() {
       {/* ── Recent matches ── */}
       {allCompleted.length > 0 && (
         <div>
-          <h2 className="font-display text-sm text-stone-500 uppercase tracking-widest mb-3">Recent Battles</h2>
+          <h2 className="font-display text-sm text-stone-500 uppercase tracking-widest mb-3">{t.home.recentBattles}</h2>
           <div className="flex flex-col gap-2">
             {allCompleted.map((match) => {
               const isWin = match.winner_id === user.id;
@@ -207,7 +210,7 @@ export default async function HomePage() {
                     {isWin ? "W" : "L"}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-stone-800 text-sm font-bold truncate">vs {opponentName ?? "Unknown"}</p>
+                    <p className="text-stone-800 text-sm font-bold truncate">{t.profile.vs} {opponentName ?? "Unknown"}</p>
                     <p className="text-stone-500 text-xs font-semibold capitalize">{match.game_types?.name?.replace("_", " ")}</p>
                   </div>
                   <div className="flex items-center gap-1.5 flex-shrink-0">
@@ -227,9 +230,9 @@ export default async function HomePage() {
       {!activeMatch && allCompleted.length === 0 && (
         <div className="text-center py-14">
           <div className="text-5xl mb-4">🍺</div>
-          <p className="text-stone-500 text-sm font-semibold mb-1">No battles yet!</p>
+          <p className="text-stone-500 text-sm font-semibold mb-1">{t.home.noBattles}</p>
           <Link href="/matches/new" className="text-amber-600 font-bold text-sm hover:text-amber-700 transition-colors">
-            Start your first one →
+            {t.home.startFirst}
           </Link>
         </div>
       )}

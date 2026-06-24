@@ -3,18 +3,26 @@ import Link from "next/link";
 import { ArrowLeft, Trash2, User, Mail, MapPin } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/actions/auth";
+import { getT, getLocale } from "@/lib/i18n-server";
 import EditAccountButton from "./EditAccountButton";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase
-    .from("users")
-    .select("username, city")
-    .eq("id", user.id)
-    .single();
+  const [{ data: profile }, t, locale] = await Promise.all([
+    supabase.from("users").select("username, city").eq("id", user.id).single(),
+    getT(),
+    getLocale(),
+  ]);
+
+  const accountRows = [
+    { Icon: User,   label: t.settings.username, value: profile?.username ?? "—" },
+    { Icon: MapPin, label: t.settings.city,      value: profile?.city ?? null    },
+    { Icon: Mail,   label: t.settings.email,     value: user.email ?? "—"        },
+  ];
 
   return (
     <div className="min-h-screen px-4 pt-12 pb-6">
@@ -23,22 +31,18 @@ export default async function SettingsPage() {
           <ArrowLeft size={18} />
         </Link>
         <h1 className="font-display text-xl text-stone-900">
-          SET<span className="text-gradient">TINGS</span>
+          {t.settings.title}<span className="text-gradient">{t.settings.titleAccent}</span>
         </h1>
       </div>
 
       {/* Account info */}
       <div className="bg-white border border-amber-100 rounded-3xl p-5 mb-4 shadow-sm">
         <div className="flex items-center justify-between mb-4">
-          <p className="text-xs text-stone-400 font-bold uppercase tracking-widest">Account</p>
+          <p className="text-xs text-stone-400 font-bold uppercase tracking-widest">{t.settings.account}</p>
           <EditAccountButton username={profile?.username ?? ""} city={profile?.city ?? ""} />
         </div>
         <div className="flex flex-col">
-          {[
-            { Icon: User,  label: "Username", value: profile?.username ?? "—"   },
-            { Icon: MapPin,label: "City",     value: profile?.city ?? null      },
-            { Icon: Mail,  label: "Email",    value: user.email ?? "—"          },
-          ].map(({ Icon, label, value }, i) => (
+          {accountRows.map(({ Icon, label, value }, i) => (
             <div key={label}>
               {i !== 0 && <div className="h-px bg-amber-50 mx-1" />}
               <div className="flex items-center gap-3 py-3.5">
@@ -47,7 +51,7 @@ export default async function SettingsPage() {
                 </div>
                 <span className="text-stone-500 text-sm font-semibold flex-1">{label}</span>
                 <span className={`text-sm font-bold truncate max-w-[160px] ${value ? "text-stone-800" : "text-stone-300"}`}>
-                  {value ?? "Not set"}
+                  {value ?? t.settings.notSet}
                 </span>
               </div>
             </div>
@@ -58,14 +62,17 @@ export default async function SettingsPage() {
         </div>
       </div>
 
+      {/* Language switcher */}
+      <div className="bg-white border border-amber-100 rounded-3xl p-5 mb-4 shadow-sm">
+        <LanguageSwitcher currentLocale={locale} />
+      </div>
+
       {/* Coming soon */}
       <div className="bg-white border border-amber-100 rounded-3xl p-5 mb-4 shadow-sm">
-        <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">Coming Soon</p>
-        <p className="text-stone-500 text-sm font-semibold mb-3 leading-relaxed">
-          Push notifications, location privacy controls, and language preferences are in development.
-        </p>
+        <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">{t.settings.comingSoonTitle}</p>
+        <p className="text-stone-500 text-sm font-semibold mb-3 leading-relaxed">{t.settings.comingSoonText}</p>
         <div className="flex flex-wrap gap-2">
-          {["Push Notifications", "Location Privacy", "Language"].map((label) => (
+          {t.settings.comingSoonTags.map((label) => (
             <span key={label} className="text-xs bg-amber-50 text-amber-600 border border-amber-200 px-3 py-1.5 rounded-full font-bold">
               {label}
             </span>
@@ -75,15 +82,15 @@ export default async function SettingsPage() {
 
       {/* Danger zone */}
       <div className="bg-white border border-rose-100 rounded-3xl p-5 mb-6 shadow-sm">
-        <p className="text-xs text-rose-400 font-bold uppercase tracking-widest mb-3">Danger Zone</p>
+        <p className="text-xs text-rose-400 font-bold uppercase tracking-widest mb-3">{t.settings.dangerZone}</p>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-rose-50 flex items-center justify-center">
               <Trash2 size={13} className="text-rose-400" />
             </div>
-            <span className="text-stone-500 text-sm font-semibold">Delete Account</span>
+            <span className="text-stone-500 text-sm font-semibold">{t.settings.deleteAccount}</span>
           </div>
-          <span className="text-xs bg-stone-100 text-stone-400 border border-stone-200 px-2.5 py-1 rounded-full font-bold">Soon</span>
+          <span className="text-xs bg-stone-100 text-stone-400 border border-stone-200 px-2.5 py-1 rounded-full font-bold">{t.common.comingSoon}</span>
         </div>
       </div>
 
@@ -92,7 +99,7 @@ export default async function SettingsPage() {
           type="submit"
           className="w-full h-12 flex items-center justify-center text-rose-500 border border-rose-200 hover:bg-rose-50 rounded-2xl text-sm font-bold transition-all cursor-pointer"
         >
-          Sign out
+          {t.common.signOut}
         </button>
       </form>
     </div>
