@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import { fuzzCoords } from "@/lib/geo";
 import { useT } from "@/components/LanguageProvider";
 
-type GameType = { id: string; name: string };
+type GameType = { id: string; name: string; team_size: number };
 
 const GAME_STYLE: Record<string, { emoji: string; color: string; border: string; activeColor: string }> = {
   beer_pong:  { emoji: "🏓", color: "bg-amber-50",   border: "border-amber-200",  activeColor: "bg-amber-100 border-amber-500" },
@@ -27,7 +27,7 @@ export default function NewMatchPage() {
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.from("game_types").select("id, name").then(({ data }) => {
+    supabase.from("game_types").select("id, name, team_size").then(({ data }) => {
       if (data) setGameTypes(data);
     });
   }, []);
@@ -50,14 +50,21 @@ export default function NewMatchPage() {
 
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setPosting(false); setError("Not logged in"); return; }
+
+    const selectedType = gameTypes.find((g) => g.id === gameTypeId);
+    const teamSize = selectedType?.team_size ?? 1;
+
     const { data: match, error: matchError } = await supabase
       .from("matches")
       .insert({
         game_type_id: gameTypeId,
         mode: "regional",
         status: "open",
-        challenger_id: user?.id,
+        challenger_id: user.id,
         challenger_type: "user",
+        team_size: teamSize,
+        slots_challenger: teamSize > 1 ? 0 : 1,
         ...(coords ? { location: `POINT(${coords.lng} ${coords.lat})` } : {}),
       })
       .select("id")
@@ -65,6 +72,14 @@ export default function NewMatchPage() {
 
     setPosting(false);
     if (matchError) { setError(matchError.message); return; }
+
+    // For team games auto-add creator to challenger team
+    if (teamSize > 1) {
+      await supabase
+        .from("match_members")
+        .insert({ match_id: match.id, user_id: user.id, team: "challenger" });
+    }
+
     router.push(`/matches/${match.id}`);
   };
 
@@ -105,9 +120,16 @@ export default function NewMatchPage() {
             >
               <span className="text-4xl select-none">{style.emoji}</span>
               <div className="flex-1">
-                <p className={`font-extrabold text-sm ${active ? "text-stone-900" : "text-stone-700"}`}>
-                  {g.name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className={`font-extrabold text-sm ${active ? "text-stone-900" : "text-stone-700"}`}>
+                    {g.name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+                  </p>
+                  {g.team_size > 1 && (
+                    <span className="text-[10px] bg-violet-100 text-violet-600 border border-violet-200 px-1.5 py-0.5 rounded-full font-bold">
+                      {g.team_size}v{g.team_size}
+                    </span>
+                  )}
+                </div>
                 <p className="text-stone-500 text-xs font-semibold mt-0.5">{desc}</p>
               </div>
               {active && (

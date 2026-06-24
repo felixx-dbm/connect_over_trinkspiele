@@ -64,6 +64,9 @@ type NearbyMatch = {
   lat: number;
   lng: number;
   is_own: boolean;
+  team_size: number;
+  slots_challenger: number;
+  slots_opponent: number;
 };
 
 type NearbyQueue = {
@@ -250,20 +253,25 @@ export default function MapView({ filter }: { filter: string }) {
                 ) : (
                   <>
                     <p style={{color:"#d97706",fontWeight:800,fontSize:"13px",marginBottom:"4px"}}>{m.challenger_username}</p>
-                    <p style={{color:"#78716c",fontSize:"11px",textTransform:"capitalize",marginBottom:"2px"}}>{m.game_type_name.replace(/_/g, " ")}</p>
-                    <p style={{color:"#a8a29e",fontSize:"11px",marginBottom:"12px"}}>{m.mode} · {Math.round(m.distance_m)}m away</p>
+                    <p style={{color:"#78716c",fontSize:"11px",textTransform:"capitalize",marginBottom:"2px"}}>{m.game_type_name.replace(/_/g, " ")}{m.team_size > 1 ? ` · ${m.team_size}v${m.team_size}` : ""}</p>
+                    <p style={{color:"#a8a29e",fontSize:"11px",marginBottom:"4px"}}>{Math.round(m.distance_m)}m away</p>
+                    {m.team_size > 1 && (
+                      <p style={{color:"#7c3aed",fontSize:"11px",fontWeight:700,marginBottom:"8px"}}>
+                        {m.slots_challenger}/{m.team_size} vs {m.slots_opponent}/{m.team_size} filled
+                      </p>
+                    )}
                     {acceptError && accepting === null && (
                       <p style={{color:"#e11d48",fontSize:"10px",marginBottom:"6px",display:"flex",alignItems:"center",gap:"4px"}}>
                         <AlertCircle size={10} />{acceptError}
                       </p>
                     )}
                     <button
-                      onClick={() => accept(m.id)}
+                      onClick={() => m.team_size > 1 ? router.push(`/matches/${m.id}`) : accept(m.id)}
                       disabled={accepting !== null}
                       style={{width:"100%",height:"34px",background:"linear-gradient(135deg,#f59e0b,#f97316)",border:"none",color:"#fff",fontSize:"11px",fontWeight:700,borderRadius:"8px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:"4px",opacity:accepting !== null ? 0.6 : 1}}
                     >
                       {accepting === m.id ? <Loader2 size={12} className="animate-spin" /> : <Swords size={12} />}
-                      Accept Challenge
+                      {m.team_size > 1 ? "View Lobby" : "Accept Challenge"}
                     </button>
                   </>
                 )}
@@ -418,19 +426,25 @@ export default function MapView({ filter }: { filter: string }) {
                     >
                       <span className="text-xl flex-shrink-0">{GAME_ICONS[m.game_type_name] ?? "🎮"}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-stone-800 text-sm font-bold">{m.challenger_username}</p>
+                        <div className="flex items-center gap-1.5">
+                          <p className="text-stone-800 text-sm font-bold">{m.challenger_username}</p>
+                          {m.team_size > 1 && (
+                            <span className="text-[9px] bg-violet-100 text-violet-600 border border-violet-200 px-1 py-0.5 rounded-full font-bold leading-none">{m.team_size}v{m.team_size}</span>
+                          )}
+                        </div>
                         <p className="text-stone-400 text-xs font-semibold capitalize flex items-center gap-1 mt-0.5">
                           <MapPin size={9} />
                           {m.game_type_name.replace(/_/g, " ")} · {Math.round(m.distance_m)}m
+                          {m.team_size > 1 && ` · ${m.slots_challenger}/${m.team_size} vs ${m.slots_opponent}/${m.team_size}`}
                         </p>
                       </div>
                       <button
-                        onClick={() => accept(m.id)}
+                        onClick={() => m.team_size > 1 ? router.push(`/matches/${m.id}`) : accept(m.id)}
                         disabled={accepting !== null}
                         className="flex-shrink-0 h-8 px-3 bg-gradient-to-r from-amber-400 to-orange-500 disabled:opacity-50 text-white text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1 shadow-sm shadow-amber-200/60"
                       >
                         {accepting === m.id ? <Loader2 size={11} className="animate-spin" /> : <Swords size={11} />}
-                        {t.map.accept}
+                        {m.team_size > 1 ? "View" : t.map.accept}
                       </button>
                     </div>
                   ))}
