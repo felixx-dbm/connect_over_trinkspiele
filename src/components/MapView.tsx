@@ -37,6 +37,17 @@ const ownChallengeIcon = new L.DivIcon({
   className: "",
 });
 
+const crewChallengeIcon = new L.DivIcon({
+  html: `<div style="width:36px;height:36px;background:#8b5cf6;border-radius:8px;border:2px solid #a78bfa;display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(139,92,246,0.5)">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+    </svg>
+  </div>`,
+  iconSize: [36, 36],
+  iconAnchor: [18, 18],
+  className: "",
+});
+
 const userIcon = new L.DivIcon({
   html: `<div style="width:20px;height:20px;background:#3b82f6;border-radius:50%;border:3px solid #93c5fd;box-shadow:0 0 0 8px rgba(59,130,246,0.15)"></div>`,
   iconSize: [20, 20],
@@ -59,6 +70,17 @@ type NearbyQueue = {
   id: string;
   game_type_name: string;
   username: string;
+  distance_m: number;
+  lat: number;
+  lng: number;
+  is_own: boolean;
+};
+
+type NearbyCrewMatch = {
+  id: string;
+  game_type_name: string;
+  challenger_crew_name: string;
+  challenger_crew_id: string;
   distance_m: number;
   lat: number;
   lng: number;
@@ -91,6 +113,7 @@ export default function MapView({ filter }: { filter: string }) {
   const [locationError, setLocationError] = useState(false);
   const [matches, setMatches] = useState<NearbyMatch[]>([]);
   const [queue, setQueue] = useState<NearbyQueue[]>([]);
+  const [crewMatches, setCrewMatches] = useState<NearbyCrewMatch[]>([]);
   const [accepting, setAccepting] = useState<string | null>(null);
   const [acceptError, setAcceptError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
@@ -107,6 +130,7 @@ export default function MapView({ filter }: { filter: string }) {
       .then((data) => {
         setMatches(data.matches ?? []);
         setQueue(data.queue ?? []);
+        setCrewMatches(data.crew_matches ?? []);
         setLastRefresh(new Date());
       })
       .catch((e) => { if (e.name !== "AbortError") console.error("[map]", e); });
@@ -158,7 +182,8 @@ export default function MapView({ filter }: { filter: string }) {
   const externalMatches = filteredMatches.filter((m) => !m.is_own);
   const ownMatches = filteredMatches.filter((m) => m.is_own);
   const externalQueue = queue.filter((q) => !q.is_own);
-  const hasNearby = filteredMatches.length > 0 || externalQueue.length > 0;
+  const externalCrewMatches = crewMatches.filter((cm) => !cm.is_own);
+  const hasNearby = filteredMatches.length > 0 || externalQueue.length > 0 || externalCrewMatches.length > 0;
 
   if (!location && !locationError) {
     return (
@@ -242,6 +267,24 @@ export default function MapView({ filter }: { filter: string }) {
                     </button>
                   </>
                 )}
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+
+        {crewMatches.map((cm) => (
+          <Marker key={`crew-${cm.id}`} position={[cm.lat, cm.lng]} icon={crewChallengeIcon}>
+            <Popup>
+              <div style={{background:"#fff",borderRadius:"12px",padding:"12px",minWidth:"180px",border:"1px solid #ddd6fe",boxShadow:"0 4px 20px rgba(139,92,246,0.15)"}}>
+                <p style={{color:"#7c3aed",fontWeight:800,fontSize:"13px",marginBottom:"4px"}}>{cm.challenger_crew_name}</p>
+                <p style={{color:"#78716c",fontSize:"11px",textTransform:"capitalize",marginBottom:"2px"}}>{cm.game_type_name.replace(/_/g," ")}</p>
+                <p style={{color:"#a8a29e",fontSize:"11px",marginBottom:"12px"}}>{Math.round(cm.distance_m)}m away · Crew Battle</p>
+                <button
+                  onClick={() => router.push(`/crew-matches/${cm.id}`)}
+                  style={{width:"100%",height:"34px",background:"linear-gradient(135deg,#8b5cf6,#7c3aed)",border:"none",color:"#fff",fontSize:"11px",fontWeight:700,borderRadius:"8px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:"4px"}}
+                >
+                  View Battle
+                </button>
               </div>
             </Popup>
           </Marker>
@@ -395,7 +438,33 @@ export default function MapView({ filter }: { filter: string }) {
               </div>
             )}
 
-            {filteredMatches.length === 0 && (
+            {/* Nearby crew battles */}
+            {externalCrewMatches.length > 0 && (
+              <div className="px-4 pt-3 pb-2">
+                <p className="text-[10px] text-violet-500 uppercase tracking-widest mb-2 font-bold">Crew Battles</p>
+                <div className="flex flex-col gap-2">
+                  {externalCrewMatches.map((cm) => (
+                    <button
+                      key={cm.id}
+                      onClick={() => router.push(`/crew-matches/${cm.id}`)}
+                      className="flex items-center gap-3 bg-violet-50 border border-violet-200 rounded-xl p-3 text-left cursor-pointer hover:border-violet-400 transition-colors w-full"
+                    >
+                      <span className="text-xl flex-shrink-0">👥</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-violet-700 text-sm font-bold">{cm.challenger_crew_name}</p>
+                        <p className="text-stone-400 text-xs font-semibold capitalize flex items-center gap-1 mt-0.5">
+                          <MapPin size={9} />
+                          {cm.game_type_name.replace(/_/g, " ")} · {Math.round(cm.distance_m)}m
+                        </p>
+                      </div>
+                      <span className="text-xs text-violet-500 font-bold flex-shrink-0">View →</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {filteredMatches.length === 0 && externalCrewMatches.length === 0 && (
               <div className="px-4 py-8 text-center">
                 <p className="text-stone-400 text-sm font-semibold">{t.map.noBattlesFilter}</p>
               </div>

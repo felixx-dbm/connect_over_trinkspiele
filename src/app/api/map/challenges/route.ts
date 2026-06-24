@@ -18,18 +18,22 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "lat and lng must be valid coordinates" }, { status: 400 });
   }
 
-  const [{ data: matches }, { data: queue }, { data: ownMatches }, { data: myQueue }] = await Promise.all([
+  const [{ data: matches }, { data: queue }, { data: ownMatches }, { data: myQueue }, { data: crewMatches }, { data: ownCrewMatches }] = await Promise.all([
     supabase.rpc("nearby_open_matches", { user_lat: lat, user_lng: lng, radius_km: radiusKm }),
     supabase.rpc("nearby_queue_entries", { user_lat: lat, user_lng: lng, radius_km: radiusKm }),
     supabase.from("matches").select("id").eq("challenger_id", user.id).eq("status", "open").limit(10),
     supabase.from("match_queue").select("id").eq("user_id", user.id).maybeSingle(),
+    supabase.rpc("nearby_open_crew_matches", { user_lat: lat, user_lng: lng, radius_km: radiusKm }),
+    supabase.from("crew_matches").select("id").eq("created_by", user.id).eq("status", "open").limit(10),
   ]);
 
   const ownMatchIds = new Set((ownMatches ?? []).map((m: { id: string }) => m.id));
   const myQueueId = myQueue?.id;
+  const ownCrewMatchIds = new Set((ownCrewMatches ?? []).map((m: { id: string }) => m.id));
 
   return NextResponse.json({
     matches: (matches ?? []).map((m: { id: string }) => ({ ...m, is_own: ownMatchIds.has(m.id) })),
     queue: (queue ?? []).map((q: { id: string }) => ({ ...q, is_own: q.id === myQueueId })),
+    crew_matches: (crewMatches ?? []).map((m: { id: string }) => ({ ...m, is_own: ownCrewMatchIds.has(m.id) })),
   });
 }

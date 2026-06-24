@@ -10,12 +10,12 @@ export default async function CrewsPage() {
 
   const { data: membership } = await supabase
     .from("crew_members")
-    .select("role, crews(id, name, city, invite_code, captain_id)")
+    .select("role, crews(id, name, city, invite_code, captain_id, crew_wins)")
     .eq("user_id", user.id)
     .maybeSingle();
 
   const crew = membership?.crews as unknown as {
-    id: string; name: string; city: string | null; invite_code: string; captain_id: string;
+    id: string; name: string; city: string | null; invite_code: string; captain_id: string; crew_wins: number;
   } | null;
 
   let members: { id: string; user_id: string; role: string; users: { username: string; wins: number } | null }[] = [];

@@ -31,7 +31,35 @@ export type CrewRow = {
   city: string | null;
   invite_code: string;
   captain_id: string;
+  crew_wins: number;
   created_at: string;
+};
+
+export type CrewMatchRow = {
+  id: string;
+  game_type_id: string;
+  status: "open" | "active" | "completed" | "cancelled";
+  challenger_crew_id: string;
+  opponent_crew_id: string | null;
+  winner_crew_id: string | null;
+  join_code: string;
+  created_by: string;
+  accepted_by: string | null;
+  created_at: string;
+  completed_at: string | null;
+  game_types: { name: string } | null;
+  challenger_crew: { name: string } | null;
+  opponent_crew: { name: string } | null;
+};
+
+export type CrewMatchParticipantRow = {
+  id: string;
+  crew_match_id: string;
+  user_id: string;
+  crew_id: string;
+  joined_at: string;
+  users: { username: string } | null;
+  crews: { name: string } | null;
 };
 
 export type CrewMemberRow = {

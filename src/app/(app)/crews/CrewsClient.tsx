@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Users, Crown, Copy, Plus, LogIn, Swords, Check, AlertCircle, Shield } from "lucide-react";
+import { Users, Crown, Copy, Plus, LogIn, Swords, Check, AlertCircle, Shield, Loader2, Trophy } from "lucide-react";
 import { createCrew, joinCrew } from "@/app/actions/crews";
+import { createClient } from "@/lib/supabase/client";
 import { useT } from "@/components/LanguageProvider";
 
 type Member = {
@@ -19,6 +21,18 @@ type Crew = {
   city: string | null;
   invite_code: string;
   captain_id: string;
+  crew_wins: number;
+};
+
+type GameType = { id: string; name: string };
+
+type RecentCrewMatch = {
+  id: string;
+  status: string;
+  winner_crew_id: string | null;
+  challenger_crew: { name: string } | null;
+  opponent_crew: { name: string } | null;
+  game_types: { name: string } | null;
 };
 
 type Props = {
@@ -34,11 +48,62 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
   const [copied, setCopied] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
+  const [showChallenge, setShowChallenge] = useState(false);
   const [inviteCode, setInviteCode] = useState("");
   const [crewName, setCrewName] = useState("");
   const [crewCity, setCrewCity] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [gameTypes, setGameTypes] = useState<GameType[]>([]);
+  const [selectedGameType, setSelectedGameType] = useState<string>("");
+  const [challengePosting, setChallengePosting] = useState(false);
+  const [challengeError, setChallengeError] = useState<string | null>(null);
+  const [recentBattles, setRecentBattles] = useState<RecentCrewMatch[]>([]);
+
+  useEffect(() => {
+    if (!crew) return;
+    const supabase = createClient();
+    supabase
+      .from("crew_matches")
+      .select("id, status, winner_crew_id, challenger_crew:challenger_crew_id(name), opponent_crew:opponent_crew_id(name), game_types(name)")
+      .or(`challenger_crew_id.eq.${crew.id},opponent_crew_id.eq.${crew.id}`)
+      .order("created_at", { ascending: false })
+      .limit(5)
+      .then(({ data }) => {
+        if (data) setRecentBattles(data as unknown as RecentCrewMatch[]);
+      });
+  }, [crew]);
+
+  const openChallengeModal = async () => {
+    if (gameTypes.length === 0) {
+      const supabase = createClient();
+      const { data } = await supabase.from("game_types").select("id, name").order("name");
+      if (data) {
+        setGameTypes(data);
+        if (data.length > 0) setSelectedGameType(data[0].id);
+      }
+    }
+    setShowChallenge(true);
+  };
+
+  const handleChallenge = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setChallengePosting(true);
+    setChallengeError(null);
+    const res = await fetch("/api/crew-matches", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ game_type_id: selectedGameType }),
+    });
+    setChallengePosting(false);
+    if (res.ok) {
+      const data = await res.json() as { id: string };
+      window.location.href = `/crew-matches/${data.id}`;
+    } else {
+      const data = await res.json() as { error?: string };
+      setChallengeError(data.error ?? "Failed to create challenge");
+    }
+  };
 
   const copyCode = async () => {
     if (!crew) return;
@@ -187,6 +252,13 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
               </p>
             </div>
             <div className="flex-1 bg-white/20 backdrop-blur rounded-2xl p-3">
+              <p className="text-amber-100 text-xs font-bold mb-1">{t.crewMatches.crewWins}</p>
+              <p className="text-white font-extrabold flex items-center gap-2">
+                <Trophy size={14} />
+                {crew.crew_wins}
+              </p>
+            </div>
+            <div className="flex-1 bg-white/20 backdrop-blur rounded-2xl p-3">
               <p className="text-amber-100 text-xs font-bold mb-1">{t.crews.role}</p>
               <p className="text-white font-extrabold flex items-center gap-2">
                 <Shield size={14} />
@@ -212,12 +284,60 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
         </div>
       </div>
 
-      {/* Coming soon */}
-      <div className="bg-violet-50 border border-dashed border-violet-200 rounded-2xl p-5 mb-5 text-center">
-        <Swords size={22} className="text-violet-400 mx-auto mb-2" />
-        <p className="text-violet-700 font-bold text-sm mb-1">{t.crews.crewBattles}</p>
-        <p className="text-violet-500 text-xs leading-relaxed font-semibold">{t.crews.crewBattlesHint}</p>
-      </div>
+      {/* Challenge another crew */}
+      <button
+        onClick={openChallengeModal}
+        className="w-full bg-gradient-to-r from-violet-500 to-purple-600 rounded-2xl p-4 mb-5 flex items-center gap-4 shadow-lg shadow-violet-200/60 hover:shadow-violet-300/60 transition-all cursor-pointer"
+      >
+        <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+          <Swords size={20} className="text-white" />
+        </div>
+        <div className="text-left">
+          <p className="text-white font-extrabold text-sm">{t.crewMatches.challenge}</p>
+          <p className="text-violet-200 text-xs font-semibold">{t.crewMatches.challengeHint}</p>
+        </div>
+      </button>
+
+      {/* Recent crew battles */}
+      {recentBattles.length > 0 && (
+        <div className="mb-5">
+          <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">{t.crewMatches.recentBattles}</p>
+          <div className="flex flex-col gap-2">
+            {recentBattles.map((battle) => {
+              const challengerName = (battle.challenger_crew as unknown as { name: string } | null)?.name ?? "?";
+              const opponentName = (battle.opponent_crew as unknown as { name: string } | null)?.name ?? "?";
+              const gameName = (battle.game_types as unknown as { name: string } | null)?.name?.replace(/_/g, " ") ?? "";
+              const weWon = battle.winner_crew_id === crew!.id;
+              const isDone = battle.status === "completed";
+              return (
+                <Link key={battle.id} href={`/crew-matches/${battle.id}`} className="flex items-center gap-3 bg-white border border-violet-100 rounded-2xl p-3 shadow-sm hover:border-violet-300 transition-colors">
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                    isDone
+                      ? weWon ? "bg-gradient-to-br from-violet-400 to-purple-600" : "bg-rose-100 border border-rose-200"
+                      : "bg-violet-50 border border-violet-200"
+                  }`}>
+                    {isDone
+                      ? weWon ? <Trophy size={14} className="text-white" /> : <span className="text-xs font-bold text-rose-500">L</span>
+                      : <Swords size={14} className="text-violet-500" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-stone-800 text-sm font-bold truncate">{challengerName} vs {opponentName}</p>
+                    <p className="text-stone-400 text-xs font-semibold capitalize">{gameName}</p>
+                  </div>
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full capitalize flex-shrink-0 ${
+                    battle.status === "active" ? "bg-emerald-100 text-emerald-700" :
+                    battle.status === "open" ? "bg-sky-100 text-sky-700" :
+                    battle.status === "completed" ? "bg-stone-100 text-stone-500" :
+                    "bg-rose-100 text-rose-600"
+                  }`}>
+                    {t.crewMatches.status[battle.status as keyof typeof t.crewMatches.status] ?? battle.status}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Members */}
       <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">{t.crews.members}</p>
@@ -242,6 +362,44 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
           </div>
         ))}
       </div>
+
+      {/* Challenge modal */}
+      {showChallenge && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end" onClick={() => { setShowChallenge(false); setChallengeError(null); }}>
+          <form onSubmit={handleChallenge} className="w-full max-w-lg mx-auto bg-white rounded-t-3xl p-6 border-t border-violet-100 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="w-10 h-1 bg-stone-200 rounded-full mx-auto mb-6" />
+            <div className="text-3xl mb-3">⚔️</div>
+            <h3 className="font-display text-xl text-stone-900 mb-1">{t.crewMatches.title} <span className="text-gradient">{t.crewMatches.titleAccent}</span></h3>
+            <p className="text-stone-500 text-sm font-semibold mb-5">{t.crewMatches.challengeHint}</p>
+            <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-2">{t.crewMatches.chooseGame}</p>
+            <div className="flex flex-col gap-2 mb-5">
+              {gameTypes.map((gt) => (
+                <button
+                  key={gt.id}
+                  type="button"
+                  onClick={() => setSelectedGameType(gt.id)}
+                  className={`h-12 rounded-2xl border-2 text-sm font-bold capitalize transition-all cursor-pointer ${
+                    selectedGameType === gt.id
+                      ? "border-violet-400 bg-violet-50 text-violet-700"
+                      : "border-stone-200 bg-white text-stone-600 hover:border-violet-200"
+                  }`}
+                >
+                  {gt.name.replace(/_/g, " ")}
+                </button>
+              ))}
+            </div>
+            {challengeError && <div className="flex items-center gap-2 text-rose-600 text-sm mb-4 font-semibold"><AlertCircle size={14} />{challengeError}</div>}
+            <button
+              type="submit"
+              disabled={challengePosting || !selectedGameType}
+              className="w-full h-12 flex items-center justify-center gap-2 bg-gradient-to-r from-violet-500 to-purple-600 text-white font-bold rounded-2xl cursor-pointer disabled:opacity-60 shadow-lg shadow-violet-200/60"
+            >
+              {challengePosting ? <Loader2 size={16} className="animate-spin" /> : <Swords size={16} />}
+              {challengePosting ? t.crewMatches.posting : t.crewMatches.postChallenge}
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }

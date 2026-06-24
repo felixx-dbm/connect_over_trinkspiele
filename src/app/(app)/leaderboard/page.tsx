@@ -32,23 +32,21 @@ export default async function LeaderboardPage() {
     city
       ? supabase
           .from("crews")
-          .select("id, name, city, crew_members(users(wins))")
+          .select("id, name, city, crew_wins")
           .eq("city", city)
+          .order("crew_wins", { ascending: false })
           .limit(20)
       : supabase
           .from("crews")
-          .select("id, name, city, crew_members(users(wins))")
+          .select("id, name, city, crew_wins")
+          .order("crew_wins", { ascending: false })
           .limit(20),
   ]);
 
-  // Aggregate crew wins
-  const crewRankings = (crews ?? [])
-    .map((crew) => {
-      const totalWins = (crew.crew_members as unknown as { users: { wins: number } | null }[])
-        .reduce((sum, m) => sum + (m.users?.wins ?? 0), 0);
-      return { id: crew.id, name: crew.name, city: crew.city, wins: totalWins };
-    })
-    .sort((a, b) => b.wins - a.wins);
+  const crewRankings = (crews ?? []).map((crew) => ({
+    id: crew.id, name: crew.name, city: crew.city,
+    wins: (crew as unknown as { crew_wins: number }).crew_wins ?? 0,
+  }));
 
   return (
     <LeaderboardClient
