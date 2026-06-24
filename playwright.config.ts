@@ -5,6 +5,9 @@ export const STORAGE_STATE = path.join(__dirname, "tests/.auth/user.json");
 
 export default defineConfig({
   testDir: "./tests",
+  testIgnore: /global-setup\.ts/,
+  globalSetup: "./tests/global-setup.ts",
+
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -18,21 +21,16 @@ export default defineConfig({
   },
 
   projects: [
-    // Auth setup — runs first, produces saved session
-    {
-      name: "setup",
-      testMatch: /auth\.setup\.ts/,
-    },
-    // All authenticated tests share the saved session
+    // Authenticated tests — use saved session from globalSetup
     {
       name: "chromium",
+      testIgnore: /auth\.spec\.ts/,
       use: {
         ...devices["Desktop Chrome"],
         storageState: STORAGE_STATE,
       },
-      dependencies: ["setup"],
     },
-    // Unauthenticated tests (age gate, login form rendering)
+    // Unauthenticated tests — no session
     {
       name: "chromium-unauth",
       testMatch: /auth\.spec\.ts/,
