@@ -4,9 +4,10 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { Loader2, Swords, Users, AlertCircle, RefreshCw, ChevronUp, ChevronDown, MapPin, Navigation } from "lucide-react";
+import { Loader2, Swords, Users, AlertCircle, RefreshCw, ChevronUp, ChevronDown, MapPin, Navigation, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useT } from "@/components/LanguageProvider";
+import { createClient } from "@/lib/supabase/client";
 
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -27,13 +28,13 @@ const challengeIcon = new L.DivIcon({
 });
 
 const ownChallengeIcon = new L.DivIcon({
-  html: `<div style="width:36px;height:36px;background:#6366f1;border-radius:50%;border:2px solid #818cf8;display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(99,102,241,0.5)">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  html: `<div class="own-match-pulse" style="width:42px;height:42px;background:#6366f1;border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"></polyline><line x1="13" x2="19" y1="6" y2="12"></line><line x1="6" x2="13" y1="13" y2="19"></line><line x1="16" x2="20" y1="17" y2="21"></line><line x1="4" x2="8" y1="3" y2="7"></line>
     </svg>
   </div>`,
-  iconSize: [36, 36],
-  iconAnchor: [18, 18],
+  iconSize: [42, 42],
+  iconAnchor: [21, 21],
   className: "",
 });
 
@@ -67,6 +68,16 @@ type NearbyMatch = {
   team_size: number;
   slots_challenger: number;
   slots_opponent: number;
+};
+
+type LiveMatch = {
+  id: string;
+  status: "open" | "active";
+  game_types: { name: string } | null;
+  challenger: { username: string } | null;
+  opponent: { username: string } | null;
+  challenger_id: string;
+  opponent_id: string | null;
 };
 
 type NearbyQueue = {
@@ -121,6 +132,8 @@ export default function MapView({ filter }: { filter: string }) {
   const [acceptError, setAcceptError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
   const [listOpen, setListOpen] = useState(false);
+  const [liveMatch, setLiveMatch] = useState<LiveMatch | null>(null);
+  const [liveUserId, setLiveUserId] = useState<string>("");
   const abortRef = useRef<AbortController | null>(null);
 
   const fetchChallenges = useCallback((loc: { lat: number; lng: number }) => {
@@ -160,6 +173,34 @@ export default function MapView({ filter }: { filter: string }) {
     return () => clearInterval(t);
   }, [location, fetchChallenges]);
 
+  // Live match tracker — poll own open/active matches every 8s
+  useEffect(() => {
+    const supabase = createClient();
+    let userId = "";
+
+    const poll = async () => {
+      if (!userId) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        userId = user.id;
+        setLiveUserId(user.id);
+      }
+      const { data } = await supabase
+        .from("matches")
+        .select("id, status, challenger_id, opponent_id, game_types(name), challenger:challenger_id(username), opponent:opponent_id(username)")
+        .or(`challenger_id.eq.${userId},opponent_id.eq.${userId}`)
+        .in("status", ["open", "active"])
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      setLiveMatch((data as unknown as LiveMatch | null) ?? null);
+    };
+
+    poll();
+    const interval = setInterval(poll, 8_000);
+    return () => clearInterval(interval);
+  }, []);
+
   const accept = async (matchId: string) => {
     setAccepting(matchId);
     setAcceptError(null);
@@ -178,9 +219,9 @@ export default function MapView({ filter }: { filter: string }) {
     }
   };
 
-  const filteredMatches = filter === "All"
+  const filteredMatches = filter === "all"
     ? matches
-    : matches.filter((m) => m.game_type_name.replace(/_/g, " ").toLowerCase() === filter.toLowerCase());
+    : matches.filter((m) => m.game_type_name === filter);
 
   const externalMatches = filteredMatches.filter((m) => !m.is_own);
   const ownMatches = filteredMatches.filter((m) => m.is_own);
@@ -320,6 +361,33 @@ export default function MapView({ filter }: { filter: string }) {
           </Marker>
         ))}
       </MapContainer>
+
+      {/* Live match tracker pill */}
+      {liveMatch && (
+        <button
+          onClick={() => router.push(`/matches/${liveMatch.id}`)}
+          className="absolute top-3 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-2 bg-white/95 backdrop-blur border border-indigo-200 rounded-2xl px-4 py-2.5 shadow-lg shadow-indigo-100/60 cursor-pointer hover:border-indigo-400 transition-colors"
+        >
+          <span className="relative flex-shrink-0">
+            <span className="w-2 h-2 rounded-full bg-indigo-500 block" />
+            <span className="absolute inset-0 rounded-full bg-indigo-400 animate-ping opacity-75" />
+          </span>
+          <div className="text-left">
+            <p className="text-indigo-700 font-bold text-xs leading-none mb-0.5">
+              {liveMatch.status === "active" ? "Match läuft" : "Warten auf Gegner"}
+            </p>
+            <p className="text-stone-400 text-[10px] font-semibold capitalize leading-none">
+              {(liveMatch.game_types as unknown as { name: string } | null)?.name?.replace(/_/g, " ")}
+              {liveMatch.status === "active" && liveMatch.opponent_id && liveMatch.challenger_id !== liveUserId
+                ? ` · vs ${(liveMatch.challenger as unknown as { username: string } | null)?.username ?? "?"}`
+                : liveMatch.status === "active" && liveMatch.opponent_id
+                ? ` · vs ${(liveMatch.opponent as unknown as { username: string } | null)?.username ?? "?"}`
+                : ""}
+            </p>
+          </div>
+          <Zap size={12} className="text-indigo-400 flex-shrink-0" />
+        </button>
+      )}
 
       {/* Nearby count badge */}
       {externalMatches.length > 0 && (
