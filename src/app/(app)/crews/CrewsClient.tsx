@@ -176,7 +176,7 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
 
         {/* Create modal */}
         {showCreate && (
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end" onClick={() => { setShowCreate(false); setError(null); }}>
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] flex items-end" onClick={() => { setShowCreate(false); setError(null); }}>
             <form onSubmit={handleCreate} className="w-full max-w-lg mx-auto bg-white rounded-t-3xl p-6 border-t border-amber-100 shadow-2xl" onClick={(e) => e.stopPropagation()}>
               <div className="w-10 h-1 bg-stone-200 rounded-full mx-auto mb-6" />
               <div className="text-3xl mb-3">⚔️</div>
@@ -196,7 +196,7 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
 
         {/* Join modal */}
         {showJoin && (
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end" onClick={() => { setShowJoin(false); setError(null); }}>
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] flex items-end" onClick={() => { setShowJoin(false); setError(null); }}>
             <form onSubmit={handleJoin} className="w-full max-w-lg mx-auto bg-white rounded-t-3xl p-6 border-t border-amber-100 shadow-2xl" onClick={(e) => e.stopPropagation()}>
               <div className="w-10 h-1 bg-stone-200 rounded-full mx-auto mb-6" />
               <div className="text-3xl mb-3">👥</div>
@@ -365,7 +365,7 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
 
       {/* Challenge modal */}
       {showChallenge && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end" onClick={() => { setShowChallenge(false); setChallengeError(null); }}>
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] flex items-end" onClick={() => { setShowChallenge(false); setChallengeError(null); }}>
           <form onSubmit={handleChallenge} className="w-full max-w-lg mx-auto bg-white rounded-t-3xl p-6 border-t border-violet-100 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="w-10 h-1 bg-stone-200 rounded-full mx-auto mb-6" />
             <div className="text-3xl mb-3">⚔️</div>
