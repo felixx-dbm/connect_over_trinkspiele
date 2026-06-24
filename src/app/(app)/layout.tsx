@@ -1,5 +1,6 @@
 import BottomNav from "@/components/BottomNav";
 import Onboarding from "@/components/Onboarding";
+import InstallBanner from "@/components/InstallBanner";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -9,6 +10,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </div>
       <BottomNav />
       <Onboarding />
+      <InstallBanner />
     </div>
   );
 }

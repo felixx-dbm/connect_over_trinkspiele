@@ -22,13 +22,21 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   title: "Prost",
   description: "Challenge strangers to beer games at festivals, parties and bars.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Prost",
+  },
+  icons: {
+    apple: "/Icon_192.png",
+  },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#FFFBEB",
+  themeColor: "#F59E0B",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
