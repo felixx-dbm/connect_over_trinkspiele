@@ -5,9 +5,9 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("age gate", () => {
-  test("renders the TRINKSPIEL title and 18+ button", async ({ page }) => {
+  test("renders the PROST title and 18+ button", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("heading", { name: /trink/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /prost/i })).toBeVisible();
     await expect(page.getByRole("link", { name: /18 or older/i })).toBeVisible();
   });
 

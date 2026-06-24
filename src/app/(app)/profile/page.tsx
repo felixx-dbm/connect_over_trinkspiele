@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Settings, MapPin, Trophy, Swords, TrendingUp, Clock, ChevronRight, Users, QrCode } from "lucide-react";
+import { Settings, MapPin, Trophy, Swords, TrendingUp, Clock, ChevronRight, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/actions/auth";
 import { getT } from "@/lib/i18n-server";

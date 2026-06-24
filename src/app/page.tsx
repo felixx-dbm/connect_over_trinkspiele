@@ -63,8 +63,8 @@ export default function AgeGate() {
         </div>
 
         <h1 className="font-display text-6xl tracking-wide mb-1 leading-none">
-          <span className="text-stone-900">TRINK</span>
-          <span className="text-gradient">SPIEL</span>
+          <span className="text-stone-900">PR</span>
+          <span className="text-gradient">OST</span>
         </h1>
         <p className="text-stone-400 text-xs tracking-[0.22em] uppercase mb-10 font-bold">
           {t.ageGate.tagline}

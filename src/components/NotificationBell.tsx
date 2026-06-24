@@ -45,13 +45,14 @@ export default function NotificationBell() {
 
   useEffect(() => {
     const supabase = createClient();
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
     supabase.auth.getUser().then(({ data }) => {
       if (!data.user) return;
       setUserId(data.user.id);
       fetchNotifs(data.user.id);
 
-      // Real-time subscription for new notifications
-      const channel = supabase
+      channel = supabase
         .channel("notifications")
         .on("postgres_changes", {
           event: "INSERT",
@@ -62,9 +63,9 @@ export default function NotificationBell() {
           setNotifs((prev) => [payload.new as Notification, ...prev]);
         })
         .subscribe();
-
-      return () => { supabase.removeChannel(channel); };
     });
+
+    return () => { if (channel) supabase.removeChannel(channel); };
   }, []);
 
   // Close panel on outside click

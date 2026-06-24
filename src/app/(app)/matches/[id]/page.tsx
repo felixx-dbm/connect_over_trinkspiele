@@ -646,6 +646,22 @@ export default function MatchPage() {
               {(match.slots_challenger < 1 || match.slots_opponent < 1) && (
                 <p className="text-stone-400 text-xs font-semibold text-center">{t.matches.needBothTeams}</p>
               )}
+              <button onClick={shareMatch} className="w-full flex items-center justify-center gap-2 text-sm bg-stone-50 border border-stone-200 hover:bg-stone-100 text-stone-600 font-bold px-5 py-2.5 rounded-xl transition-all cursor-pointer">
+                {copied ? <><Check size={14} className="text-emerald-500" /> {t.common.copied}</> : <><Share2 size={14} /> {t.matches.shareLink}</>}
+              </button>
+              {cancelError && <p className="text-rose-600 text-xs font-semibold text-center">{cancelError}</p>}
+              <button
+                onClick={handleCancel}
+                disabled={cancelling}
+                className={`flex items-center gap-2 text-xs px-4 py-2 rounded-xl transition-all cursor-pointer mx-auto border font-bold ${
+                  cancelConfirm
+                    ? "text-rose-600 border-rose-300 bg-rose-50 hover:bg-rose-100"
+                    : "text-stone-400 border-stone-200 hover:text-stone-600 hover:border-stone-300"
+                }`}
+              >
+                {cancelling ? <Loader2 size={11} className="animate-spin" /> : <Trash2 size={11} />}
+                {cancelling ? t.matches.cancelling : cancelConfirm ? t.matches.cancelConfirm : t.matches.cancelChallenge}
+              </button>
             </div>
           )}
 
@@ -655,13 +671,6 @@ export default function MatchPage() {
               <Loader2 size={14} className="animate-spin text-amber-400" />
               {t.matches.waitingForHost}
             </div>
-          )}
-
-          {/* Share link for open lobby */}
-          {isOpenLobby && isChallenger && (
-            <button onClick={shareMatch} className="w-full flex items-center justify-center gap-2 text-sm bg-stone-50 border border-stone-200 hover:bg-stone-100 text-stone-600 font-bold px-5 py-2.5 rounded-xl transition-all cursor-pointer mt-2">
-              {copied ? <><Check size={14} className="text-emerald-500" /> {t.common.copied}</> : <><Share2 size={14} /> {t.matches.shareLink}</>}
-            </button>
           )}
         </div>
       )}
@@ -724,8 +733,8 @@ export default function MatchPage() {
         </>
       )}
 
-      {/* ── OPEN (team game): waiting + share for creator ── */}
-      {match.status === "open" && isTeamGame && currentUserId === match.challenger_id && (
+      {/* ── OPEN (non-open-lobby team game): waiting + share for creator ── */}
+      {match.status === "open" && isTeamGame && !isOpenLobby && currentUserId === match.challenger_id && (
         <div className="bg-white border border-amber-200 rounded-2xl p-5 mt-4 shadow-sm text-center">
           <div className="flex items-center justify-center gap-3 mb-3">
             <Users size={14} className="text-amber-400" />

@@ -9,12 +9,15 @@ export default async function globalSetup() {
   const password = process.env.TEST_USER_PASSWORD;
   const baseURL  = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
 
-  if (!email || !password) {
-    throw new Error("TEST_USER_EMAIL and TEST_USER_PASSWORD must be set.");
-  }
-
-  // Ensure the directory exists
   fs.mkdirSync(path.dirname(STORAGE_STATE), { recursive: true });
+
+  if (!email || !password) {
+    // Write an empty session so unauthenticated tests still run.
+    // Authenticated tests will redirect to /login and fail individually.
+    fs.writeFileSync(STORAGE_STATE, JSON.stringify({ cookies: [], origins: [] }));
+    console.warn("\n⚠️  TEST_USER_EMAIL / TEST_USER_PASSWORD not set — authenticated tests will fail.\n");
+    return;
+  }
 
   const browser = await chromium.launch();
   const page    = await browser.newPage();
@@ -24,6 +27,9 @@ export default async function globalSetup() {
   await page.locator('input[name="password"]').fill(password);
   await page.getByRole("button", { name: /sign in/i }).click();
   await page.waitForURL("**/home", { timeout: 15_000 });
+
+  // Dismiss the onboarding overlay so it doesn't block test interactions.
+  await page.evaluate(() => localStorage.setItem("onboarding_v1_done", "1"));
 
   await page.context().storageState({ path: STORAGE_STATE });
   await browser.close();

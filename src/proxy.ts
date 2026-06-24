@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { checkRateLimit } from "@/lib/ratelimit";
 
-const APP_ROUTES = ["/home", "/map", "/leaderboard", "/crews", "/matches", "/profile", "/settings"];
+const APP_ROUTES = ["/home", "/map", "/leaderboard", "/crews", "/matches", "/profile", "/settings", "/events", "/crew-matches", "/challenge"];
 const AUTH_ROUTES = ["/login", "/register"];
 
 const SECURITY_HEADERS: Record<string, string> = {
@@ -37,7 +37,7 @@ function getClientIp(request: NextRequest): string {
   );
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const ip = getClientIp(request);
 
