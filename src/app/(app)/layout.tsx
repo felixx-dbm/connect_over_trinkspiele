@@ -1,4 +1,5 @@
 import BottomNav from "@/components/BottomNav";
+import Onboarding from "@/components/Onboarding";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -7,6 +8,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         {children}
       </div>
       <BottomNav />
+      <Onboarding />
     </div>
   );
 }
