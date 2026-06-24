@@ -38,24 +38,27 @@ export default function EditProfileModal({ initialUsername, initialCity, onClose
 
   return (
     <div
-      className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center px-4"
+      className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center px-4"
       onClick={onClose}
     >
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-lg bg-zinc-900 border border-zinc-800 rounded-3xl p-6"
+        className="w-full max-w-sm bg-white border border-amber-100 rounded-3xl p-6 shadow-2xl shadow-amber-200/30 animate-bounce-in"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-5">
-          <h3 className="font-display text-lg text-zinc-100">Edit Profile</h3>
-          <button type="button" onClick={onClose} className="text-zinc-500 hover:text-zinc-300 cursor-pointer transition-colors">
-            <X size={18} />
+          <div>
+            <h3 className="font-display text-xl text-stone-900">Edit Profile</h3>
+            <p className="text-stone-400 text-xs font-semibold mt-0.5">Update your public details</p>
+          </div>
+          <button type="button" onClick={onClose} className="w-8 h-8 rounded-xl bg-stone-100 hover:bg-stone-200 flex items-center justify-center cursor-pointer transition-colors">
+            <X size={16} className="text-stone-500" />
           </button>
         </div>
 
         <div className="flex flex-col gap-3 mb-4">
           <div>
-            <label className="text-xs text-zinc-500 uppercase tracking-widest block mb-1.5">Username</label>
+            <label className="text-xs text-stone-400 font-bold uppercase tracking-widest block mb-1.5">Username</label>
             <input
               type="text"
               value={username}
@@ -63,34 +66,40 @@ export default function EditProfileModal({ initialUsername, initialCity, onClose
               minLength={2}
               maxLength={30}
               required
-              className="w-full h-14 bg-zinc-800 border border-zinc-700 rounded-xl px-4 text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500/50 text-sm"
+              className="w-full h-14 bg-amber-50 border border-amber-200 rounded-2xl px-4 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 text-sm font-semibold"
             />
           </div>
           <div>
-            <label className="text-xs text-zinc-500 uppercase tracking-widest block mb-1.5">City</label>
+            <label className="text-xs text-stone-400 font-bold uppercase tracking-widest block mb-1.5">City</label>
             <input
               type="text"
               value={city}
               onChange={(e) => setCity(e.target.value)}
               placeholder="Optional"
               maxLength={60}
-              className="w-full h-14 bg-zinc-800 border border-zinc-700 rounded-xl px-4 text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500/50 text-sm"
+              className="w-full h-14 bg-amber-50 border border-amber-200 rounded-2xl px-4 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 text-sm font-semibold"
             />
           </div>
         </div>
 
         {error && (
-          <div className="flex items-center gap-2 text-red-400 text-sm mb-4">
-            <AlertCircle size={14} />{error}
+          <div className="flex items-center gap-2 text-rose-600 text-sm mb-4 bg-rose-50 border border-rose-200 rounded-2xl px-3 py-2 font-semibold">
+            <AlertCircle size={14} className="flex-shrink-0" />{error}
           </div>
         )}
 
         <button
           type="submit"
           disabled={loading || saved}
-          className="w-full h-12 bg-amber-500 hover:bg-amber-400 disabled:bg-zinc-700 disabled:text-zinc-500 text-zinc-950 font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2"
+          className={`w-full h-12 rounded-2xl font-bold transition-all cursor-pointer flex items-center justify-center gap-2 ${
+            saved
+              ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+              : loading
+              ? "bg-amber-100 text-amber-400 cursor-not-allowed"
+              : "btn-gold"
+          }`}
         >
-          {saved ? <><Check size={16} /> Saved!</> : loading ? "Saving…" : "Save Changes"}
+          {saved ? <><Check size={16} className="text-emerald-600" /> Saved!</> : loading ? "Saving…" : "Save Changes"}
         </button>
       </form>
     </div>

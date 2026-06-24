@@ -8,7 +8,6 @@ import ProfileEditButton from "./ProfileEditButton";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
-
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
@@ -36,42 +35,46 @@ export default async function ProfilePage() {
 
   return (
     <div className="min-h-screen px-4 pt-12 pb-6">
+      {/* Header */}
       <div className="flex items-center justify-between mb-8">
-        <h1 className="font-display text-xl text-zinc-100">
-          MY <span className="text-amber-400">PROFILE</span>
+        <h1 className="font-display text-xl text-stone-900">
+          MY <span className="text-gradient">PROFILE</span>
         </h1>
         <Link
           href="/settings"
-          className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center hover:border-zinc-700 transition-colors cursor-pointer"
+          className="w-10 h-10 rounded-xl bg-white border border-amber-100 flex items-center justify-center hover:border-amber-300 transition-colors cursor-pointer shadow-sm"
         >
-          <Settings size={16} className="text-zinc-400" />
+          <Settings size={16} className="text-stone-500" />
         </Link>
       </div>
 
-      {/* Profile card */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 mb-5 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-amber-500/5 -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-        <div className="flex items-center gap-4 mb-5">
-          <div className="relative">
-            <div className="w-16 h-16 rounded-full bg-amber-500 flex items-center justify-center font-display text-zinc-950 text-xl">
-              {initials}
+      {/* Profile hero card */}
+      <div className="relative bg-white border border-amber-100 rounded-3xl p-5 mb-5 overflow-hidden shadow-md shadow-amber-100/40">
+        <div className="absolute top-0 right-0 w-40 h-40 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+        <div className="relative flex items-center gap-4 mb-5">
+          <div className="relative flex-shrink-0">
+            {/* Gradient ring avatar */}
+            <div className="w-18 h-18 ring-gradient rounded-2xl p-0.5 shadow-lg shadow-amber-200/50" style={{width: '72px', height: '72px'}}>
+              <div className="w-full h-full rounded-[14px] bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center font-display text-white text-2xl">
+                {initials}
+              </div>
             </div>
             <ProfileEditButton username={profile?.username ?? ""} city={profile?.city ?? ""} />
           </div>
           <div>
-            <h2 className="font-display text-2xl text-zinc-100">{profile?.username ?? "—"}</h2>
-            <div className="flex items-center gap-2 mt-1">
+            <h2 className="font-display text-2xl text-stone-900">{profile?.username ?? "—"}</h2>
+            <div className="flex flex-wrap items-center gap-2 mt-1">
               {profile?.city && (
-                <div className="flex items-center gap-1 text-zinc-500 text-xs">
-                  <MapPin size={11} />
+                <div className="flex items-center gap-1 text-stone-500 text-xs font-semibold">
+                  <MapPin size={11} className="text-amber-500" />
                   {profile.city}
                 </div>
               )}
               {crew && (
                 <>
-                  <span className="text-zinc-700">·</span>
-                  <div className="flex items-center gap-1 text-zinc-500 text-xs">
-                    <Users size={11} />
+                  <span className="text-stone-300">·</span>
+                  <div className="flex items-center gap-1 text-stone-500 text-xs font-semibold">
+                    <Users size={11} className="text-violet-500" />
                     {crew.name}
                   </div>
                 </>
@@ -80,60 +83,61 @@ export default async function ProfilePage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-2">
           {[
-            { label: "Wins", value: profile?.wins ?? 0, Icon: Trophy, color: "text-amber-400" },
-            { label: "Losses", value: profile?.losses ?? 0, Icon: Swords, color: "text-zinc-400" },
-            { label: "Win Rate", value: `${winRate}%`, Icon: TrendingUp, color: "text-green-400" },
-          ].map(({ label, value, Icon, color }) => (
-            <div key={label} className="bg-zinc-800 rounded-xl p-3 text-center">
-              <Icon size={14} className={`${color} mx-auto mb-1`} />
-              <p className={`font-display text-xl ${color}`}>{value}</p>
-              <p className="text-zinc-600 text-xs">{label}</p>
+            { label: "Wins",     value: profile?.wins ?? 0,   Icon: Trophy,    bg: "bg-amber-50",   border: "border-amber-200",   text: "text-amber-600",   icon: "text-amber-500"   },
+            { label: "Losses",   value: profile?.losses ?? 0, Icon: Swords,    bg: "bg-rose-50",    border: "border-rose-200",    text: "text-rose-600",    icon: "text-rose-400"    },
+            { label: "Win Rate", value: `${winRate}%`,        Icon: TrendingUp, bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-700", icon: "text-emerald-500" },
+          ].map(({ label, value, Icon, bg, border, text, icon }) => (
+            <div key={label} className={`${bg} border ${border} rounded-2xl p-3 text-center shadow-sm`}>
+              <Icon size={14} className={`${icon} mx-auto mb-1`} />
+              <p className={`font-display text-xl ${text}`}>{value}</p>
+              <p className="text-stone-500 text-xs font-semibold">{label}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* Quick links */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden mb-5">
+      <div className="bg-white border border-amber-100 rounded-2xl overflow-hidden mb-5 shadow-sm">
         {[
           crew
-            ? { label: "My Crew", sublabel: crew.name, Icon: Users, href: "/crews" }
-            : { label: "Create a Crew", sublabel: "Start your own team", Icon: Users, href: "/crews" },
-          { label: "Leaderboard", sublabel: profile?.city ? `Rankings in ${profile.city}` : "City rankings", Icon: Trophy, href: "/leaderboard" },
-          { label: "Settings", sublabel: "Account & preferences", Icon: Settings, href: "/settings" },
-        ].map(({ label, sublabel, Icon, href }, i) => (
+            ? { label: "My Crew",    sublabel: crew.name,                         Icon: Users,    href: "/crews",       color: "text-violet-500", bg: "bg-violet-50"  }
+            : { label: "Create Crew",sublabel: "Start your own team",              Icon: Users,    href: "/crews",       color: "text-violet-500", bg: "bg-violet-50"  },
+          {   label: "Leaderboard",  sublabel: profile?.city ? `Rankings in ${profile.city}` : "City rankings", Icon: Trophy, href: "/leaderboard", color: "text-amber-500",  bg: "bg-amber-50"   },
+          {   label: "Settings",     sublabel: "Account & preferences",            Icon: Settings, href: "/settings",    color: "text-stone-500",  bg: "bg-stone-100"  },
+        ].map(({ label, sublabel, Icon, href, color, bg }, i) => (
           <Link
             key={label}
             href={href}
-            className={`flex items-center gap-3 px-4 py-4 hover:bg-zinc-800 transition-colors cursor-pointer ${i !== 0 ? "border-t border-zinc-800" : ""}`}
+            className={`flex items-center gap-3 px-4 py-4 hover:bg-amber-50/60 transition-colors cursor-pointer ${i !== 0 ? "border-t border-amber-50" : ""}`}
           >
-            <div className="w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center flex-shrink-0">
-              <Icon size={15} className="text-amber-400" />
+            <div className={`w-9 h-9 rounded-xl ${bg} flex items-center justify-center flex-shrink-0`}>
+              <Icon size={15} className={color} />
             </div>
             <div className="flex-1">
-              <p className="text-zinc-200 text-sm font-medium">{label}</p>
-              <p className="text-zinc-600 text-xs">{sublabel}</p>
+              <p className="text-stone-800 text-sm font-bold">{label}</p>
+              <p className="text-stone-400 text-xs font-semibold">{sublabel}</p>
             </div>
-            <ChevronRight size={14} className="text-zinc-700" />
+            <ChevronRight size={14} className="text-stone-300" />
           </Link>
         ))}
       </div>
 
       {/* Recent matches */}
       {recentMatches && recentMatches.length === 0 && (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-6 text-center">
-          <Swords size={24} className="text-zinc-700 mx-auto mb-2" />
-          <p className="text-zinc-500 text-sm">No battles yet</p>
-          <Link href="/matches/new" className="text-amber-400 text-sm hover:text-amber-300 transition-colors mt-1 inline-block">
+        <div className="bg-white border border-amber-100 rounded-2xl p-6 mb-6 text-center shadow-sm">
+          <div className="text-4xl mb-2">⚔️</div>
+          <p className="text-stone-500 text-sm font-semibold">No battles yet</p>
+          <Link href="/matches/new" className="text-amber-600 font-bold text-sm hover:text-amber-700 transition-colors mt-1 inline-block">
             Start your first →
           </Link>
         </div>
       )}
+
       {recentMatches && recentMatches.length > 0 && (
         <div className="mb-6">
-          <p className="text-xs text-zinc-500 uppercase tracking-widest mb-3">Recent Battles</p>
+          <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">Recent Battles</p>
           <div className="flex flex-col gap-2">
             {(recentMatches as unknown as MatchRow[]).map((match) => {
               const isWin = match.winner_id === user.id;
@@ -144,22 +148,22 @@ export default async function ProfilePage() {
                 <Link
                   key={match.id}
                   href={`/matches/${match.id}`}
-                  className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-xl p-3 transition-all cursor-pointer"
+                  className="flex items-center gap-3 bg-white border border-amber-100 hover:border-amber-300 rounded-2xl p-3 transition-all cursor-pointer shadow-sm"
                 >
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-display text-xs flex-shrink-0 ${
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-display text-xs flex-shrink-0 ${
                     isWin
-                      ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                      : "bg-zinc-800 text-zinc-500 border border-zinc-700"
+                      ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                      : "bg-rose-50 text-rose-500 border border-rose-200"
                   }`}>
                     {isWin ? "W" : "L"}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-zinc-200 text-sm font-medium truncate">vs {opponentName ?? "Unknown"}</p>
-                    <p className="text-zinc-600 text-xs capitalize">{match.game_types?.name?.replace("_", " ")}</p>
+                    <p className="text-stone-800 text-sm font-bold truncate">vs {opponentName ?? "Unknown"}</p>
+                    <p className="text-stone-400 text-xs font-semibold capitalize">{match.game_types?.name?.replace("_", " ")}</p>
                   </div>
                   <div className="flex items-center gap-1.5 flex-shrink-0">
-                    <Clock size={11} className="text-zinc-700" />
-                    <span className="text-zinc-600 text-xs">
+                    <Clock size={11} className="text-stone-300" />
+                    <span className="text-stone-400 text-xs font-semibold">
                       {new Date(match.created_at).toLocaleDateString()}
                     </span>
                   </div>
@@ -174,7 +178,7 @@ export default async function ProfilePage() {
       <form action={signOut}>
         <button
           type="submit"
-          className="w-full h-12 flex items-center justify-center text-red-400 border border-red-500/20 hover:bg-red-500/5 rounded-2xl text-sm font-medium transition-all cursor-pointer"
+          className="w-full h-12 flex items-center justify-center text-rose-500 border border-rose-200 hover:bg-rose-50 rounded-2xl text-sm font-bold transition-all cursor-pointer"
         >
           Sign out
         </button>

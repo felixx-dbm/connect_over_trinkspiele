@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-chakra);
+  --font-sans: var(--font-nunito);
   --font-display: var(--font-russo);
 }
 
@@ -10,81 +10,195 @@ html {
 }
 
 body {
-  background-color: #09090b;
-  color: #f4f4f5;
+  background-color: #FFFBEB;
+  color: #1C1917;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-::-webkit-scrollbar {
-  width: 4px;
+/* ── Scrollbar ──────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #FEF3C7; }
+::-webkit-scrollbar-thumb { background: #FCD34D; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #F59E0B; }
+
+/* ── Gradient text ──────────────────────────────────────── */
+.text-gradient {
+  background: linear-gradient(130deg, #F59E0B 0%, #F97316 55%, #F43F5E 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
-::-webkit-scrollbar-track {
-  background: #09090b;
-}
-::-webkit-scrollbar-thumb {
-  background: #3f3f46;
-  border-radius: 2px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #f59e0b;
+.text-gradient-gold {
+  background: linear-gradient(130deg, #D97706 0%, #F59E0B 60%, #FCD34D 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-/* Grain texture overlay */
-.grain::after {
+/* ── Gradient border ring ───────────────────────────────── */
+.ring-gradient {
+  background: linear-gradient(white, white) padding-box,
+              linear-gradient(135deg, #F59E0B, #F43F5E) border-box;
+  border: 3px solid transparent;
+}
+
+/* ── Card ───────────────────────────────────────────────── */
+.card {
+  background: rgba(255,255,255,0.95);
+  border: 1px solid rgba(245,158,11,0.15);
+  box-shadow: 0 2px 12px rgba(120,53,15,0.07), 0 1px 3px rgba(0,0,0,0.04);
+}
+.card-hover {
+  transition: transform 0.22s cubic-bezier(0.34,1.3,0.64,1),
+              box-shadow 0.22s ease;
+}
+.card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 36px rgba(120,53,15,0.13), 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* ── Buttons ────────────────────────────────────────────── */
+.btn-gold {
+  background: linear-gradient(135deg, #F59E0B 0%, #F97316 100%);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 4px 20px rgba(245,158,11,0.5), 0 1px 4px rgba(0,0,0,0.1);
+  transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1),
+              box-shadow 0.18s ease,
+              filter 0.18s ease;
+}
+.btn-gold:hover {
+  transform: translateY(-2px) scale(1.015);
+  box-shadow: 0 8px 28px rgba(245,158,11,0.6), 0 2px 6px rgba(0,0,0,0.12);
+  filter: brightness(1.06);
+}
+.btn-gold:active {
+  transform: scale(0.965);
+  box-shadow: 0 2px 10px rgba(245,158,11,0.35);
+}
+
+.btn-outline {
+  background: rgba(255,255,255,0.9);
+  border: 1.5px solid rgba(245,158,11,0.3);
+  color: #B45309;
+  box-shadow: 0 2px 8px rgba(120,53,15,0.06);
+  transition: all 0.18s ease;
+}
+.btn-outline:hover {
+  background: #FFFBEB;
+  border-color: #F59E0B;
+  box-shadow: 0 4px 16px rgba(245,158,11,0.18);
+}
+
+/* ── Glow effects ───────────────────────────────────────── */
+.glow-gold {
+  box-shadow: 0 0 28px rgba(245,158,11,0.45), 0 4px 14px rgba(245,158,11,0.22);
+}
+.glow-rose {
+  box-shadow: 0 0 28px rgba(244,63,94,0.4), 0 4px 14px rgba(244,63,94,0.2);
+}
+.glow-emerald {
+  box-shadow: 0 0 28px rgba(16,185,129,0.35), 0 4px 14px rgba(16,185,129,0.18);
+}
+.glow-violet {
+  box-shadow: 0 0 28px rgba(139,92,246,0.35), 0 4px 14px rgba(139,92,246,0.18);
+}
+
+/* ── Mesh gradient background ───────────────────────────── */
+.mesh-bg::before {
   content: "";
   position: fixed;
   inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 5% 8%, rgba(251,191,36,0.18) 0%, transparent 58%),
+    radial-gradient(ellipse 60% 75% at 92% 15%, rgba(167,139,250,0.13) 0%, transparent 55%),
+    radial-gradient(ellipse 80% 50% at 78% 92%, rgba(52,211,153,0.11) 0%, transparent 55%),
+    radial-gradient(ellipse 65% 60% at 12% 82%, rgba(251,113,133,0.11) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 50% at 55% 48%, rgba(56,189,248,0.07) 0%, transparent 55%);
   pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  z-index: 9999;
-  opacity: 0.35;
+  z-index: 0;
 }
 
-/* Amber glow effect */
-.amber-glow {
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.15), 0 0 40px rgba(245, 158, 11, 0.05);
+/* ── Animations ─────────────────────────────────────────── */
+@keyframes blob-drift {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  20% { transform: translate(14px,-20px) scale(1.04); }
+  40% { transform: translate(-10px,-12px) scale(0.96); }
+  60% { transform: translate(18px,8px) scale(1.02); }
+  80% { transform: translate(-6px,16px) scale(0.98); }
 }
 
-.amber-glow-sm {
-  box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
+@keyframes bounce-in {
+  0% { transform: scale(0.25); opacity: 0; }
+  50% { transform: scale(1.12); opacity: 1; }
+  75% { transform: scale(0.93); }
+  100% { transform: scale(1); }
 }
 
-/* Bottom safe area */
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33% { transform: translateY(-7px) rotate(2.5deg); }
+  66% { transform: translateY(4px) rotate(-1.5deg); }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(14px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 12px rgba(245,158,11,0.3); }
+  50%       { box-shadow: 0 0 28px rgba(245,158,11,0.65); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-3deg); }
+  50%       { transform: rotate(3deg); }
+}
+
+@keyframes confetti-pop {
+  0%   { transform: scale(0) rotate(0deg);   opacity: 0; }
+  60%  { transform: scale(1.2) rotate(15deg); opacity: 1; }
+  100% { transform: scale(1)   rotate(10deg); opacity: 1; }
+}
+
+.animate-blob   { animation: blob-drift 10s ease-in-out infinite; }
+.animate-blob-2 { animation: blob-drift 14s ease-in-out 3.5s infinite; }
+.animate-blob-3 { animation: blob-drift 18s ease-in-out 7s   infinite; }
+.animate-bounce-in   { animation: bounce-in 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
+.animate-float       { animation: float-gentle 4s ease-in-out infinite; }
+.animate-slide-up    { animation: slide-up 0.3s ease-out both; }
+.animate-spin-slow   { animation: spin-slow 8s linear infinite; }
+.animate-pulse-glow  { animation: pulse-glow 2s ease-in-out infinite; }
+.animate-wiggle      { animation: wiggle 2.5s ease-in-out infinite; }
+.animate-confetti    { animation: confetti-pop 0.45s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+/* ── Bottom safe area ───────────────────────────────────── */
 .pb-safe {
-  padding-bottom: max(80px, calc(80px + env(safe-area-inset-bottom)));
+  padding-bottom: max(96px, calc(96px + env(safe-area-inset-bottom)));
 }
 
-/* Leaflet dark map tiles */
+/* ── Leaflet — natural colours on light bg ──────────────── */
 .leaflet-tile {
-  filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+  filter: saturate(0.85) brightness(1.03);
 }
-
-.leaflet-container {
-  background: #18181b;
-}
-
-/* Leaflet popup dark style */
+.leaflet-container { background: #E8F5E9; }
 .leaflet-popup-content-wrapper {
-  background: #18181b;
-  border: 1px solid #27272a;
-  border-radius: 12px;
+  background: rgba(255,255,255,0.97);
+  border: 1px solid rgba(245,158,11,0.2);
+  border-radius: 16px;
   padding: 0;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+  box-shadow: 0 4px 24px rgba(120,53,15,0.12);
 }
+.leaflet-popup-content { margin: 0; }
+.leaflet-popup-tip { background: rgba(245,158,11,0.15); }
 
-.leaflet-popup-content {
-  margin: 0;
-}
-
-.leaflet-popup-tip {
-  background: #27272a;
-}
-
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+/* ── No scrollbar ───────────────────────────────────────── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

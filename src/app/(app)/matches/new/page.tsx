@@ -9,11 +9,12 @@ import { fuzzCoords } from "@/lib/geo";
 
 type GameType = { id: string; name: string };
 
-const GAME_ICONS: Record<string, string> = {
-  beer_pong: "🏓",
-  flunky_ball: "⚽",
-  freestyle: "🎲",
+const GAME_META: Record<string, { emoji: string; desc: string; color: string; border: string; activeColor: string }> = {
+  beer_pong:  { emoji: "🏓", desc: "Classic cup-clearing table battle",  color: "bg-amber-50",   border: "border-amber-200",  activeColor: "bg-amber-100 border-amber-500" },
+  flunky_ball:{ emoji: "⚽", desc: "Outdoor team relay drinking game",  color: "bg-emerald-50", border: "border-emerald-200", activeColor: "bg-emerald-100 border-emerald-500" },
+  freestyle:  { emoji: "🎲", desc: "Your rules, your game, anything goes", color: "bg-violet-50",  border: "border-violet-200",  activeColor: "bg-violet-100 border-violet-500" },
 };
+const FALLBACK = { emoji: "🍺", desc: "Ready to battle?", color: "bg-amber-50", border: "border-amber-200", activeColor: "bg-amber-100 border-amber-500" };
 
 export default function NewMatchPage() {
   const router = useRouter();
@@ -65,56 +66,67 @@ export default function NewMatchPage() {
     router.push(`/matches/${match.id}`);
   };
 
+  const selectedGame = gameTypes.find((g) => g.id === gameTypeId);
+
   return (
     <div className="min-h-screen px-4 pt-12 pb-6">
       <div className="flex items-center gap-3 mb-8">
-        <Link href="/home" className="text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer">
-          <ArrowLeft size={20} />
+        <Link href="/home" className="w-9 h-9 rounded-xl bg-white border border-amber-100 flex items-center justify-center text-stone-500 hover:border-amber-300 transition-colors cursor-pointer shadow-sm">
+          <ArrowLeft size={18} />
         </Link>
-        <h1 className="font-display text-xl text-zinc-100">
-          NEW <span className="text-amber-400">BATTLE</span>
+        <h1 className="font-display text-xl text-stone-900">
+          NEW <span className="text-gradient">BATTLE</span>
         </h1>
       </div>
 
-      <p className="text-xs text-zinc-500 uppercase tracking-widest mb-3">Choose Game</p>
-      <div className="flex flex-col gap-2 mb-8">
+      <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">Choose your game</p>
+
+      <div className="flex flex-col gap-3 mb-8">
         {gameTypes.length === 0 && (
           [1, 2, 3].map((i) => (
-            <div key={i} className="h-16 bg-zinc-900 border border-zinc-800 rounded-2xl animate-pulse" />
+            <div key={i} className="h-20 bg-white border border-amber-100 rounded-2xl animate-pulse shadow-sm" />
           ))
         )}
-        {gameTypes.map((g) => (
-          <button
-            key={g.id}
-            onClick={() => setGameTypeId(g.id)}
-            className={`flex items-center gap-4 p-4 rounded-2xl border transition-all duration-200 cursor-pointer text-left ${
-              gameTypeId === g.id
-                ? "bg-amber-500/10 border-amber-500/40 amber-glow-sm"
-                : "bg-zinc-900 border-zinc-800 hover:border-zinc-700"
-            }`}
-          >
-            <span className="text-2xl select-none">{GAME_ICONS[g.name] ?? "🎮"}</span>
-            <p className={`flex-1 font-semibold text-sm ${gameTypeId === g.id ? "text-amber-300" : "text-zinc-200"}`}>
-              {g.name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
-            </p>
-            {gameTypeId === g.id && (
-              <div className="w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0">
-                <div className="w-2 h-2 rounded-full bg-zinc-950" />
+        {gameTypes.map((g) => {
+          const meta = GAME_META[g.name] ?? FALLBACK;
+          const active = gameTypeId === g.id;
+          return (
+            <button
+              key={g.id}
+              onClick={() => setGameTypeId(g.id)}
+              className={`flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer text-left shadow-sm ${
+                active
+                  ? meta.activeColor + " shadow-md"
+                  : meta.color + " " + meta.border + " hover:shadow-md"
+              }`}
+            >
+              <span className="text-4xl select-none">{meta.emoji}</span>
+              <div className="flex-1">
+                <p className={`font-extrabold text-sm ${active ? "text-stone-900" : "text-stone-700"}`}>
+                  {g.name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+                </p>
+                <p className="text-stone-500 text-xs font-semibold mt-0.5">{meta.desc}</p>
               </div>
-            )}
-          </button>
-        ))}
+              {active && (
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0 shadow-md shadow-amber-200/50">
+                  <div className="w-2.5 h-2.5 rounded-full bg-white" />
+                </div>
+              )}
+            </button>
+          );
+        })}
       </div>
 
-      <div className="bg-blue-500/5 border border-blue-500/20 rounded-xl p-3 mb-6 flex items-start gap-3">
-        <Navigation size={14} className="text-blue-400 mt-0.5 flex-shrink-0" />
-        <p className="text-xs text-zinc-500 leading-relaxed">
+      {/* Location info */}
+      <div className="bg-sky-50 border border-sky-200 rounded-2xl p-4 mb-6 flex items-start gap-3">
+        <Navigation size={15} className="text-sky-500 mt-0.5 flex-shrink-0" />
+        <p className="text-xs text-stone-500 leading-relaxed font-semibold">
           Your location will be requested so your challenge appears on the map. Coordinates are fuzzed to ±200 m for privacy.
         </p>
       </div>
 
       {error && (
-        <div className="text-red-400 text-sm bg-red-500/5 border border-red-500/20 rounded-xl px-4 py-3 mb-4">
+        <div className="text-rose-600 text-sm bg-rose-50 border border-rose-200 rounded-2xl px-4 py-3 mb-4 font-semibold">
           {error}
         </div>
       )}
@@ -122,14 +134,20 @@ export default function NewMatchPage() {
       <button
         onClick={handlePost}
         disabled={!gameTypeId || posting}
-        className={`w-full h-14 flex items-center justify-center gap-3 font-bold text-base rounded-2xl transition-all duration-200 cursor-pointer ${
+        className={`w-full h-14 flex items-center justify-center gap-3 text-base rounded-2xl cursor-pointer ${
           gameTypeId && !posting
-            ? "bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-zinc-950 active:scale-[0.98] amber-glow"
-            : "bg-zinc-800 text-zinc-600 cursor-not-allowed"
+            ? "btn-gold"
+            : "bg-amber-100 text-amber-400 cursor-not-allowed font-bold"
         }`}
       >
-        {posting ? <Loader2 size={18} className="animate-spin" /> : <ChevronRight size={18} />}
-        {posting ? "Posting…" : "Post to Map"}
+        {posting
+          ? <Loader2 size={18} className="animate-spin" />
+          : <ChevronRight size={18} />}
+        {posting
+          ? "Posting…"
+          : selectedGame
+            ? `Post ${selectedGame.name.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())} Challenge`
+            : "Post to Map"}
       </button>
     </div>
   );

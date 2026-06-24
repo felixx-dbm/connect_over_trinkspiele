@@ -25,22 +25,13 @@ function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       const supabase = createClient();
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email: form.email,
         password: form.password,
       });
-
-      if (signInError) {
-        setError(signInError.message);
-        setLoading(false);
-        return;
-      }
-
-      // Full reload ensures the server reads the newly set session cookies.
-      // router.push does a soft nav that can miss cookies Supabase just wrote.
+      if (signInError) { setError(signInError.message); setLoading(false); return; }
       window.location.href = safeRedirect(next);
     } catch {
       setError("Network error — please try again");
@@ -57,30 +48,29 @@ function LoginForm() {
         redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeRedirect(next))}`,
       },
     });
-    // Page redirects to Google; no cleanup needed
   };
 
   return (
     <div className="flex-1 flex flex-col px-6 py-8">
       <Link
         href="/"
-        className="flex items-center gap-2 text-zinc-400 hover:text-zinc-200 transition-colors w-fit mb-10 cursor-pointer"
+        className="flex items-center gap-2 text-stone-500 hover:text-stone-800 transition-colors w-fit mb-10 cursor-pointer"
       >
         <ArrowLeft size={18} />
-        <span className="text-sm">Back</span>
+        <span className="text-sm font-bold">Back</span>
       </Link>
 
       <div className="mb-10">
-        <h1 className="font-display text-4xl text-zinc-100 mb-2">
-          WELCOME<br />
-          <span className="text-amber-400">BACK</span>
+        <div className="text-5xl mb-4 animate-bounce-in">👋</div>
+        <h1 className="font-display text-4xl text-stone-900 leading-tight mb-1">
+          WELCOME <span className="text-gradient">BACK</span>
         </h1>
-        <p className="text-zinc-500 text-sm">Sign in to continue your battles</p>
+        <p className="text-stone-500 text-sm font-semibold">Sign in to continue your battles</p>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 flex-1">
         <div className="relative">
-          <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" />
+          <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-amber-400" />
           <input
             name="email"
             type="email"
@@ -89,12 +79,12 @@ function LoginForm() {
             onChange={handleChange}
             autoComplete="email"
             required
-            className="w-full h-14 bg-zinc-900 border border-zinc-800 rounded-xl pl-11 pr-4 text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-all text-sm"
+            className="w-full h-14 bg-white border border-amber-100 rounded-2xl pl-11 pr-4 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 transition-all text-sm font-semibold shadow-sm"
           />
         </div>
 
         <div className="relative">
-          <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" />
+          <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-amber-400" />
           <input
             name="password"
             type={showPassword ? "text" : "password"}
@@ -103,25 +93,25 @@ function LoginForm() {
             onChange={handleChange}
             autoComplete="current-password"
             required
-            className="w-full h-14 bg-zinc-900 border border-zinc-800 rounded-xl pl-11 pr-12 text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-all text-sm"
+            className="w-full h-14 bg-white border border-amber-100 rounded-2xl pl-11 pr-12 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 transition-all text-sm font-semibold shadow-sm"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors cursor-pointer"
           >
             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         </div>
 
         <div className="flex justify-end">
-          <button type="button" className="text-sm text-amber-400 hover:text-amber-300 transition-colors cursor-pointer">
+          <button type="button" className="text-sm font-bold text-amber-600 hover:text-amber-700 transition-colors cursor-pointer">
             Forgot password?
           </button>
         </div>
 
         {error && (
-          <div className="flex items-center gap-2 text-red-400 text-sm bg-red-500/5 border border-red-500/20 rounded-xl px-4 py-3">
+          <div className="flex items-center gap-2 text-rose-600 text-sm bg-rose-50 border border-rose-200 rounded-2xl px-4 py-3 font-semibold">
             <AlertCircle size={14} className="flex-shrink-0" />
             {error}
           </div>
@@ -130,26 +120,24 @@ function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className={`w-full h-14 flex items-center justify-center text-zinc-950 font-bold text-base rounded-2xl transition-all duration-200 active:scale-[0.98] cursor-pointer ${
-            !loading
-              ? "bg-amber-500 hover:bg-amber-400 active:bg-amber-600 amber-glow"
-              : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+          className={`w-full h-14 flex items-center justify-center text-base rounded-2xl cursor-pointer gap-2 ${
+            !loading ? "btn-gold" : "bg-amber-100 text-amber-400 cursor-not-allowed font-bold"
           }`}
         >
-          {loading ? "Signing in…" : "SIGN IN"}
+          {loading ? "Signing in…" : "SIGN IN 🍺"}
         </button>
 
-        <div className="flex items-center gap-3 my-2">
-          <div className="flex-1 h-px bg-zinc-800" />
-          <span className="text-xs text-zinc-600">OR</span>
-          <div className="flex-1 h-px bg-zinc-800" />
+        <div className="flex items-center gap-3 my-1">
+          <div className="flex-1 h-px bg-amber-100" />
+          <span className="text-xs text-stone-400 font-bold tracking-wider">OR</span>
+          <div className="flex-1 h-px bg-amber-100" />
         </div>
 
         <button
           type="button"
           onClick={handleGoogle}
           disabled={oauthLoading}
-          className="w-full h-14 flex items-center justify-center gap-3 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800 text-zinc-300 font-medium text-sm rounded-2xl transition-all duration-200 cursor-pointer disabled:opacity-50"
+          className="w-full h-14 flex items-center justify-center gap-3 bg-white border border-amber-100 hover:border-amber-300 hover:bg-amber-50/60 text-stone-700 font-bold text-sm rounded-2xl transition-all cursor-pointer disabled:opacity-50 shadow-sm"
         >
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
             <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
@@ -161,17 +149,16 @@ function LoginForm() {
         </button>
       </form>
 
-      <p className="text-center text-sm text-zinc-500 mt-6">
+      <p className="text-center text-sm text-stone-500 mt-6 font-semibold">
         No account?{" "}
-        <Link href="/register" className="text-amber-400 hover:text-amber-300 font-medium transition-colors cursor-pointer">
-          Register here
+        <Link href="/register" className="text-amber-600 hover:text-amber-700 font-extrabold transition-colors cursor-pointer">
+          Register here →
         </Link>
       </p>
     </div>
   );
 }
 
-// Suspense required because LoginForm uses useSearchParams()
 export default function LoginPage() {
   return (
     <Suspense>

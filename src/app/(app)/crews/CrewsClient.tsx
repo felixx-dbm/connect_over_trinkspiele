@@ -67,73 +67,61 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
     router.refresh();
   };
 
+  const inputClass = "w-full h-14 bg-amber-50 border border-amber-200 rounded-2xl px-4 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 text-sm font-semibold";
+
   if (!crew) {
     return (
       <div className="min-h-screen px-4 pt-12 pb-6 flex flex-col">
-        <h1 className="font-display text-xl text-zinc-100 mb-2">
-          MY <span className="text-amber-400">CREW</span>
-        </h1>
-        <p className="text-zinc-500 text-sm mb-10">Join forces with friends to battle crews</p>
+        <div className="mb-8">
+          <h1 className="font-display text-xl text-stone-900 mb-1">
+            MY <span className="text-gradient">CREW</span>
+          </h1>
+          <p className="text-stone-500 text-sm font-semibold">Join forces with friends to battle crews</p>
+        </div>
 
         <div className="flex flex-col gap-4 flex-1">
           <button
             onClick={() => setShowCreate(true)}
-            className="flex-1 max-h-48 bg-amber-500/10 border-2 border-dashed border-amber-500/30 hover:border-amber-500/50 hover:bg-amber-500/15 rounded-2xl p-8 flex flex-col items-center justify-center gap-3 transition-all cursor-pointer group"
+            className="flex-1 max-h-48 bg-amber-50 border-2 border-dashed border-amber-300 hover:border-amber-500 hover:bg-amber-100/60 rounded-3xl p-8 flex flex-col items-center justify-center gap-3 transition-all cursor-pointer group"
           >
-            <div className="w-14 h-14 rounded-full bg-amber-500/20 flex items-center justify-center group-hover:bg-amber-500/30 transition-all">
-              <Plus size={24} className="text-amber-400" />
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-200/60 group-hover:scale-105 transition-transform">
+              <Plus size={26} className="text-white" />
             </div>
             <div className="text-center">
-              <p className="text-zinc-200 font-semibold">Create a Crew</p>
-              <p className="text-zinc-500 text-sm">Start your own team</p>
+              <p className="text-stone-800 font-extrabold text-base">Create a Crew</p>
+              <p className="text-stone-500 text-sm font-semibold">Start your own team</p>
             </div>
           </button>
 
           <button
             onClick={() => setShowJoin(true)}
-            className="flex-1 max-h-48 bg-zinc-900 border-2 border-dashed border-zinc-700 hover:border-zinc-600 rounded-2xl p-8 flex flex-col items-center justify-center gap-3 transition-all cursor-pointer group"
+            className="flex-1 max-h-48 bg-white border-2 border-dashed border-violet-200 hover:border-violet-400 hover:bg-violet-50/60 rounded-3xl p-8 flex flex-col items-center justify-center gap-3 transition-all cursor-pointer group shadow-sm"
           >
-            <div className="w-14 h-14 rounded-full bg-zinc-800 flex items-center justify-center group-hover:bg-zinc-700 transition-all">
-              <LogIn size={24} className="text-zinc-400" />
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center shadow-lg shadow-violet-200/60 group-hover:scale-105 transition-transform">
+              <LogIn size={24} className="text-white" />
             </div>
             <div className="text-center">
-              <p className="text-zinc-200 font-semibold">Join a Crew</p>
-              <p className="text-zinc-500 text-sm">Enter an invite code</p>
+              <p className="text-stone-800 font-extrabold text-base">Join a Crew</p>
+              <p className="text-stone-500 text-sm font-semibold">Enter an invite code</p>
             </div>
           </button>
         </div>
 
         {/* Create modal */}
         {showCreate && (
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-end" onClick={() => { setShowCreate(false); setError(null); }}>
-            <form onSubmit={handleCreate} className="w-full max-w-lg mx-auto bg-zinc-900 border border-zinc-800 rounded-t-3xl p-6" onClick={(e) => e.stopPropagation()}>
-              <div className="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-6" />
-              <h3 className="font-display text-lg text-zinc-100 mb-1">Create a Crew</h3>
-              <p className="text-zinc-500 text-sm mb-5">Your crew&apos;s invite code is auto-generated</p>
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end" onClick={() => { setShowCreate(false); setError(null); }}>
+            <form onSubmit={handleCreate} className="w-full max-w-lg mx-auto bg-white rounded-t-3xl p-6 border-t border-amber-100 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+              <div className="w-10 h-1 bg-stone-200 rounded-full mx-auto mb-6" />
+              <div className="text-3xl mb-3">⚔️</div>
+              <h3 className="font-display text-xl text-stone-900 mb-1">Create a Crew</h3>
+              <p className="text-stone-500 text-sm font-semibold mb-5">Your crew&apos;s invite code is auto-generated</p>
               <div className="flex flex-col gap-3 mb-4">
-                <input
-                  type="text"
-                  placeholder="Crew name"
-                  value={crewName}
-                  onChange={(e) => setCrewName(e.target.value)}
-                  required
-                  className="w-full h-14 bg-zinc-800 border border-zinc-700 rounded-xl px-4 text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500/50 text-sm"
-                />
-                <input
-                  type="text"
-                  placeholder="City (optional)"
-                  value={crewCity}
-                  onChange={(e) => setCrewCity(e.target.value)}
-                  className="w-full h-14 bg-zinc-800 border border-zinc-700 rounded-xl px-4 text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500/50 text-sm"
-                />
+                <input type="text" placeholder="Crew name" value={crewName} onChange={(e) => setCrewName(e.target.value)} required className={inputClass} />
+                <input type="text" placeholder="City (optional)" value={crewCity} onChange={(e) => setCrewCity(e.target.value)} className={inputClass} />
               </div>
-              {error && (
-                <div className="flex items-center gap-2 text-red-400 text-sm mb-4">
-                  <AlertCircle size={14} />{error}
-                </div>
-              )}
-              <button type="submit" disabled={loading} className="w-full h-12 bg-amber-500 hover:bg-amber-400 disabled:bg-zinc-700 disabled:text-zinc-500 text-zinc-950 font-bold rounded-xl transition-all cursor-pointer">
-                {loading ? "Creating…" : "Create Crew"}
+              {error && <div className="flex items-center gap-2 text-rose-600 text-sm mb-4 font-semibold"><AlertCircle size={14} />{error}</div>}
+              <button type="submit" disabled={loading} className="w-full h-13 btn-gold rounded-2xl h-12 flex items-center justify-center cursor-pointer">
+                {loading ? "Creating…" : "Create Crew 🍻"}
               </button>
             </form>
           </div>
@@ -141,25 +129,22 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
 
         {/* Join modal */}
         {showJoin && (
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-end" onClick={() => { setShowJoin(false); setError(null); }}>
-            <form onSubmit={handleJoin} className="w-full max-w-lg mx-auto bg-zinc-900 border border-zinc-800 rounded-t-3xl p-6" onClick={(e) => e.stopPropagation()}>
-              <div className="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-6" />
-              <h3 className="font-display text-lg text-zinc-100 mb-1">Join a Crew</h3>
-              <p className="text-zinc-500 text-sm mb-5">Enter the invite code your captain shared</p>
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end" onClick={() => { setShowJoin(false); setError(null); }}>
+            <form onSubmit={handleJoin} className="w-full max-w-lg mx-auto bg-white rounded-t-3xl p-6 border-t border-amber-100 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+              <div className="w-10 h-1 bg-stone-200 rounded-full mx-auto mb-6" />
+              <div className="text-3xl mb-3">👥</div>
+              <h3 className="font-display text-xl text-stone-900 mb-1">Join a Crew</h3>
+              <p className="text-stone-500 text-sm font-semibold mb-5">Enter the invite code your captain shared</p>
               <input
                 type="text"
                 placeholder="e.g. BIER-4821"
                 value={inviteCode}
                 onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
                 required
-                className="w-full h-14 bg-zinc-800 border border-zinc-700 rounded-xl px-4 text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500/50 text-sm font-display tracking-widest mb-4"
+                className={`${inputClass} tracking-widest font-display mb-4`}
               />
-              {error && (
-                <div className="flex items-center gap-2 text-red-400 text-sm mb-4">
-                  <AlertCircle size={14} />{error}
-                </div>
-              )}
-              <button type="submit" disabled={loading} className="w-full h-12 bg-amber-500 hover:bg-amber-400 disabled:bg-zinc-700 disabled:text-zinc-500 text-zinc-950 font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2">
+              {error && <div className="flex items-center gap-2 text-rose-600 text-sm mb-4 font-semibold"><AlertCircle size={14} />{error}</div>}
+              <button type="submit" disabled={loading} className="w-full h-12 bg-gradient-to-r from-violet-500 to-purple-600 text-white font-bold rounded-2xl transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-violet-200/60 hover:shadow-violet-300/60">
                 <LogIn size={16} />
                 {loading ? "Joining…" : "Join Crew"}
               </button>
@@ -172,81 +157,86 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
 
   return (
     <div className="min-h-screen px-4 pt-12 pb-6">
-      <h1 className="font-display text-xl text-zinc-100 mb-6">
-        MY <span className="text-amber-400">CREW</span>
+      <h1 className="font-display text-xl text-stone-900 mb-6">
+        MY <span className="text-gradient">CREW</span>
       </h1>
 
-      {/* Crew card */}
-      <div className="bg-zinc-900 border border-amber-500/20 rounded-2xl p-5 mb-5 amber-glow-sm">
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <h2 className="font-display text-2xl text-zinc-100">{crew.name}</h2>
-            {crew.city && <p className="text-zinc-500 text-sm">{crew.city}</p>}
+      {/* Crew hero card */}
+      <div className="relative bg-gradient-to-br from-amber-400 to-orange-500 rounded-3xl p-5 mb-5 overflow-hidden shadow-xl shadow-amber-300/40">
+        <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white/10 -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-white/8 translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+        <div className="relative">
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <h2 className="font-display text-2xl text-white">{crew.name}</h2>
+              {crew.city && <p className="text-amber-100 text-sm font-semibold">{crew.city}</p>}
+            </div>
+            <div className="text-right">
+              <p className="font-display text-4xl text-white">{totalWins}</p>
+              <p className="text-amber-100 text-xs font-bold uppercase tracking-wider">Total Wins</p>
+            </div>
           </div>
-          <div className="text-right">
-            <p className="font-display text-3xl text-amber-400">{totalWins}</p>
-            <p className="text-zinc-600 text-xs">Total Wins</p>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <div className="flex-1 bg-zinc-800 rounded-xl p-3">
-            <p className="text-zinc-500 text-xs mb-1">Members</p>
-            <p className="text-zinc-200 font-semibold flex items-center gap-2">
-              <Users size={14} className="text-amber-400" />
-              {members.length}
-            </p>
-          </div>
-          <div className="flex-1 bg-zinc-800 rounded-xl p-3">
-            <p className="text-zinc-500 text-xs mb-1">Role</p>
-            <p className="text-zinc-200 font-semibold flex items-center gap-2">
-              <Shield size={14} className="text-amber-400" />
-              {crew.captain_id === currentUserId ? "Captain" : "Member"}
-            </p>
+          <div className="flex gap-2">
+            <div className="flex-1 bg-white/20 backdrop-blur rounded-2xl p-3">
+              <p className="text-amber-100 text-xs font-bold mb-1">Members</p>
+              <p className="text-white font-extrabold flex items-center gap-2">
+                <Users size={14} />
+                {members.length}
+              </p>
+            </div>
+            <div className="flex-1 bg-white/20 backdrop-blur rounded-2xl p-3">
+              <p className="text-amber-100 text-xs font-bold mb-1">Role</p>
+              <p className="text-white font-extrabold flex items-center gap-2">
+                <Shield size={14} />
+                {crew.captain_id === currentUserId ? "Captain" : "Member"}
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Invite code */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 mb-5">
-        <p className="text-zinc-500 text-xs uppercase tracking-widest mb-2">Invite Code</p>
+      <div className="bg-white border border-amber-100 rounded-2xl p-4 mb-5 shadow-sm">
+        <p className="text-stone-400 text-xs font-bold uppercase tracking-widest mb-2">Invite Code</p>
         <div className="flex items-center gap-3">
-          <span className="flex-1 font-display text-xl text-amber-400 tracking-widest">{crew.invite_code}</span>
+          <span className="flex-1 font-display text-2xl text-gradient-gold tracking-widest">{crew.invite_code}</span>
           <button
             onClick={copyCode}
-            className="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-4 py-2 rounded-xl text-sm text-zinc-300 transition-all cursor-pointer"
+            className="flex items-center gap-2 bg-amber-50 border border-amber-200 hover:bg-amber-100 px-4 py-2 rounded-xl text-sm font-bold text-amber-700 transition-all cursor-pointer"
           >
-            {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
+            {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
             {copied ? "Copied!" : "Copy"}
           </button>
         </div>
       </div>
 
-      <div className="bg-zinc-900/60 border border-dashed border-zinc-700 rounded-2xl p-5 mb-5 text-center">
-        <Swords size={22} className="text-zinc-600 mx-auto mb-2" />
-        <p className="text-zinc-400 font-semibold text-sm mb-1">Crew Battles</p>
-        <p className="text-zinc-600 text-xs leading-relaxed">Challenge other crews to organized matches — coming soon</p>
+      {/* Coming soon */}
+      <div className="bg-violet-50 border border-dashed border-violet-200 rounded-2xl p-5 mb-5 text-center">
+        <Swords size={22} className="text-violet-400 mx-auto mb-2" />
+        <p className="text-violet-700 font-bold text-sm mb-1">Crew Battles</p>
+        <p className="text-violet-500 text-xs leading-relaxed font-semibold">Challenge other crews to organized matches — coming soon</p>
       </div>
 
       {/* Members */}
-      <p className="text-xs text-zinc-500 uppercase tracking-widest mb-3">Members</p>
+      <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">Members</p>
       <div className="flex flex-col gap-2">
         {members.map((member) => (
-          <div key={member.id} className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 rounded-xl p-3">
-            <div className={`w-9 h-9 rounded-full flex items-center justify-center font-display text-sm flex-shrink-0 ${
+          <div key={member.id} className="flex items-center gap-3 bg-white border border-amber-100 rounded-2xl p-3 shadow-sm">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-display text-sm flex-shrink-0 ${
               member.role === "captain"
-                ? "bg-amber-500/10 border border-amber-500/30 text-amber-400"
-                : "bg-zinc-800 text-zinc-400"
+                ? "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-md shadow-amber-200/50"
+                : "bg-stone-100 border border-stone-200 text-stone-600"
             }`}>
               {member.users?.username.slice(0, 2).toUpperCase() ?? "??"}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <p className="text-zinc-200 text-sm font-medium truncate">{member.users?.username ?? "Unknown"}</p>
-                {member.role === "captain" && <Crown size={12} className="text-amber-400 flex-shrink-0" />}
+                <p className="text-stone-800 text-sm font-bold truncate">{member.users?.username ?? "Unknown"}</p>
+                {member.role === "captain" && <Crown size={12} className="text-amber-500 flex-shrink-0" />}
               </div>
-              <p className="text-zinc-600 text-xs capitalize">{member.role}</p>
+              <p className="text-stone-400 text-xs font-semibold capitalize">{member.role}</p>
             </div>
-            <p className="text-zinc-400 text-sm font-medium flex-shrink-0">{member.users?.wins ?? 0}W</p>
+            <p className="text-stone-600 text-sm font-bold flex-shrink-0">{member.users?.wins ?? 0}W</p>
           </div>
         ))}
       </div>

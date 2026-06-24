@@ -13,10 +13,10 @@ export default function ProfileEditButton({ username, city }: Props) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center cursor-pointer hover:border-zinc-600 transition-colors"
+        className="absolute -bottom-1 -right-1 w-7 h-7 rounded-xl bg-white border border-amber-200 shadow-sm flex items-center justify-center cursor-pointer hover:border-amber-400 hover:bg-amber-50 transition-all"
         aria-label="Edit profile"
       >
-        <Edit3 size={10} className="text-zinc-400" />
+        <Edit3 size={11} className="text-amber-500" />
       </button>
       {open && <EditProfileModal initialUsername={username} initialCity={city} onClose={() => setOpen(false)} />}
     </>

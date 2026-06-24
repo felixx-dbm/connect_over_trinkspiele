@@ -20,10 +20,10 @@ type Match = {
 };
 
 const STATUS_CONFIG = {
-  open: { label: "Waiting", color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/20" },
-  active: { label: "In Progress", color: "text-green-400", bg: "bg-green-500/10 border-green-500/20" },
-  completed: { label: "Completed", color: "text-zinc-400", bg: "bg-zinc-500/10 border-zinc-500/20" },
-  cancelled: { label: "Cancelled", color: "text-red-400", bg: "bg-red-500/10 border-red-500/20" },
+  open:      { label: "Waiting",     color: "text-sky-600",     bg: "bg-sky-50 border-sky-200"     },
+  active:    { label: "In Progress", color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-200" },
+  completed: { label: "Completed",   color: "text-stone-500",   bg: "bg-stone-50 border-stone-200"  },
+  cancelled: { label: "Cancelled",   color: "text-rose-600",    bg: "bg-rose-50 border-rose-200"    },
 };
 
 export default function MatchPage() {
@@ -76,13 +76,8 @@ export default function MatchPage() {
           setTimeout(() => setOpponentJoined(false), 3500);
         }
         prevOpponentId.current = data.opponent_id;
-
-        // Opponent submitted first (we didn't submit locally but match completed)
-        if (prevStatus.current === "active" && data.status === "completed") {
-          setOpponentSubmittedFirst(true);
-        }
+        if (prevStatus.current === "active" && data.status === "completed") setOpponentSubmittedFirst(true);
         prevStatus.current = data.status;
-
         setMatch((prev) => prev ? { ...prev, ...data } : prev);
         if (data.status === "completed" || data.status === "cancelled") clearInterval(interval);
       }
@@ -95,12 +90,7 @@ export default function MatchPage() {
     const url = `${window.location.origin}/matches/${id}`;
     let usedShare = false;
     if (navigator.share) {
-      try {
-        await navigator.share({ title: "Join my battle!", url });
-        usedShare = true;
-      } catch {
-        // Fallthrough to clipboard
-      }
+      try { await navigator.share({ title: "Join my battle!", url }); usedShare = true; } catch {}
     }
     if (!usedShare) {
       await navigator.clipboard.writeText(url);
@@ -113,12 +103,8 @@ export default function MatchPage() {
     setJoining(true);
     setJoinError(null);
     const res = await fetch(`/api/matches/${id}/accept`, { method: "POST" });
-    if (res.ok) {
-      fetchMatch();
-    } else {
-      const data = await res.json() as { error?: string };
-      setJoinError(data.error ?? "Failed to join match");
-    }
+    if (res.ok) { fetchMatch(); }
+    else { const data = await res.json() as { error?: string }; setJoinError(data.error ?? "Failed to join match"); }
     setJoining(false);
   };
 
@@ -128,43 +114,28 @@ export default function MatchPage() {
     setCancelError(null);
     try {
       const res = await fetch(`/api/matches/${id}/cancel`, { method: "POST" });
-      if (res.ok) {
-        router.push("/home");
-      } else {
-        const data = await res.json() as { error?: string };
-        setCancelError(data.error ?? "Failed to cancel");
-        setCancelConfirm(false);
-      }
-    } catch {
-      setCancelError("Network error — try again");
-      setCancelConfirm(false);
-    } finally {
-      setCancelling(false);
-    }
+      if (res.ok) { router.push("/home"); }
+      else { const data = await res.json() as { error?: string }; setCancelError(data.error ?? "Failed to cancel"); setCancelConfirm(false); }
+    } catch { setCancelError("Network error — try again"); setCancelConfirm(false); }
+    finally { setCancelling(false); }
   };
 
   const handleSubmit = async () => {
     if (!result || !match || !currentUserId) return;
     setSubmitting(true);
     setSubmitError(null);
-
-    const winnerId = result === "win" ? currentUserId : (
-      match.challenger_id === currentUserId ? match.opponent_id : match.challenger_id
-    );
-
+    const winnerId = result === "win" ? currentUserId
+      : (match.challenger_id === currentUserId ? match.opponent_id : match.challenger_id);
     const res = await fetch(`/api/matches/${id}/result`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ winner_id: winnerId }),
     });
-
     setSubmitting(false);
-
     if (res.ok) {
       setSubmitted(true);
       setMatch((prev) => prev ? { ...prev, status: "completed", winner_id: winnerId } : prev);
     } else if (res.status === 409) {
-      // Another player already submitted — fetch latest state and show outcome
       await fetchMatch();
     } else {
       const data = await res.json() as { error?: string };
@@ -175,7 +146,7 @@ export default function MatchPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 size={32} className="text-amber-400 animate-spin" />
+        <Loader2 size={32} className="text-amber-500 animate-spin" />
       </div>
     );
   }
@@ -184,17 +155,18 @@ export default function MatchPage() {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 text-center">
         <div>
-          <p className="text-zinc-400 mb-4">Match not found.</p>
-          <Link href="/home" className="text-amber-400 text-sm hover:text-amber-300">← Back to home</Link>
+          <div className="text-5xl mb-4">🤔</div>
+          <p className="text-stone-500 font-semibold mb-4">Match not found.</p>
+          <Link href="/home" className="text-amber-600 font-bold hover:text-amber-700">← Back to home</Link>
         </div>
       </div>
     );
   }
 
-  const challengerName = match.challenger?.username ?? "Unknown";
-  const opponentName = match.opponent?.username ?? "Waiting…";
+  const challengerName   = match.challenger?.username ?? "Unknown";
+  const opponentName     = match.opponent?.username ?? "Waiting…";
   const challengerInitials = challengerName.slice(0, 2).toUpperCase();
-  const opponentInitials = match.opponent ? opponentName.slice(0, 2).toUpperCase() : "?";
+  const opponentInitials   = match.opponent ? opponentName.slice(0, 2).toUpperCase() : "?";
   const isChallenger = match.challenger_id === currentUserId;
   const isParticipant = currentUserId === match.challenger_id || currentUserId === match.opponent_id;
   const isWinner = match.winner_id === currentUserId;
@@ -203,72 +175,61 @@ export default function MatchPage() {
 
   if (submitted || match.status === "completed") {
     const gameLabel = match.game_types?.name?.replace(/_/g, " ") ?? "match";
-
     return (
       <div className="min-h-screen px-4 pt-12 pb-6 flex flex-col items-center justify-center text-center gap-6">
         {opponentSubmittedFirst && !submitted && (
-          <div className="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2 text-zinc-400 text-xs mb-2">
+          <div className="bg-stone-50 border border-stone-200 rounded-2xl px-4 py-2 text-stone-500 text-xs font-semibold">
             Your opponent submitted results first
           </div>
         )}
 
-        <div className={`w-24 h-24 rounded-full flex items-center justify-center ${
+        <div className={`w-28 h-28 rounded-3xl flex items-center justify-center ${
           !isParticipant
-            ? "bg-zinc-800 border-2 border-zinc-700"
+            ? "bg-stone-100 border-2 border-stone-200"
             : isWinner
-            ? "bg-amber-500/10 border-2 border-amber-500/40"
-            : "bg-zinc-800 border-2 border-zinc-700"
-        }`}>
+            ? "bg-gradient-to-br from-amber-400 to-orange-500 shadow-2xl shadow-amber-300/50"
+            : "bg-stone-100 border-2 border-stone-200"
+        } animate-bounce-in`}>
           {!isParticipant
-            ? <Trophy size={40} className="text-zinc-500" />
+            ? <Trophy size={44} className="text-stone-400" />
             : isWinner
-            ? <Trophy size={40} className="text-amber-400" />
-            : <XCircle size={40} className="text-zinc-500" />}
+            ? <Trophy size={44} className="text-white" />
+            : <XCircle size={44} className="text-stone-400" />}
         </div>
 
         <div>
           {!isParticipant ? (
             <>
-              <h2 className="font-display text-3xl text-zinc-100 mb-2">
-                <span className="text-amber-400">{winnerName.toUpperCase()}</span> WINS!
+              <h2 className="font-display text-3xl text-stone-900 mb-1">
+                <span className="text-gradient">{winnerName.toUpperCase()}</span> WINS!
               </h2>
-              <p className="text-zinc-500 text-sm capitalize">{gameLabel}</p>
+              <p className="text-stone-500 text-sm font-semibold capitalize">{gameLabel}</p>
             </>
           ) : isWinner ? (
             <>
-              <h2 className="font-display text-3xl text-zinc-100 mb-2">
-                YOU <span className="text-amber-400">WIN!</span>
+              <h2 className="font-display text-3xl text-stone-900 mb-1">
+                YOU <span className="text-gradient">WIN!</span> 🎉
               </h2>
-              <p className="text-zinc-500 text-sm">Win added to your record!</p>
+              <p className="text-stone-500 text-sm font-semibold">Win added to your record!</p>
             </>
           ) : match.winner_id ? (
             <>
-              <h2 className="font-display text-3xl text-zinc-100 mb-2">
-                BETTER LUCK<br /><span className="text-zinc-400">NEXT TIME</span>
-              </h2>
-              <p className="text-zinc-500 text-sm">
-                <span className="text-zinc-300">{winnerName}</span> took this one
+              <h2 className="font-display text-3xl text-stone-900 mb-1">BETTER LUCK<br />NEXT TIME</h2>
+              <p className="text-stone-500 text-sm font-semibold">
+                <span className="text-stone-700 font-bold">{winnerName}</span> took this one
               </p>
             </>
           ) : (
-            <h2 className="font-display text-3xl text-zinc-100 mb-2">MATCH ENDED</h2>
+            <h2 className="font-display text-3xl text-stone-900 mb-1">MATCH ENDED</h2>
           )}
         </div>
 
         <div className="flex flex-col gap-3 w-full max-w-xs">
-          <Link
-            href="/matches/new"
-            className="h-12 px-8 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer amber-glow"
-          >
-            <RefreshCw size={16} />
-            Rematch
+          <Link href="/matches/new" className="h-13 px-8 btn-gold rounded-2xl flex items-center justify-center gap-2 cursor-pointer h-12">
+            <RefreshCw size={16} /> Rematch
           </Link>
-          <Link
-            href="/home"
-            className="h-12 px-8 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-300 font-medium rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer"
-          >
-            <Swords size={16} />
-            Back to Home
+          <Link href="/home" className="h-12 px-8 bg-white border border-amber-200 hover:border-amber-400 text-stone-700 font-bold rounded-2xl flex items-center justify-center gap-2 cursor-pointer transition-all shadow-sm">
+            <Swords size={16} className="text-amber-500" /> Back to Home
           </Link>
         </div>
       </div>
@@ -278,115 +239,120 @@ export default function MatchPage() {
   return (
     <div className="min-h-screen px-4 pt-12 pb-6">
       <div className="flex items-center gap-3 mb-8">
-        <Link href="/home" className="text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer">
-          <ArrowLeft size={20} />
+        <Link href="/home" className="w-9 h-9 rounded-xl bg-white border border-amber-100 flex items-center justify-center text-stone-500 hover:border-amber-300 transition-colors cursor-pointer shadow-sm">
+          <ArrowLeft size={18} />
         </Link>
-        <h1 className="font-display text-xl text-zinc-100">
-          MATCH <span className="text-amber-400">LOBBY</span>
+        <h1 className="font-display text-xl text-stone-900">
+          MATCH <span className="text-gradient">LOBBY</span>
         </h1>
       </div>
 
+      {/* Status badges */}
       <div className="flex flex-wrap items-center gap-2 mb-6">
-        <span className={`flex items-center gap-1.5 text-xs px-3 py-1 rounded-full border ${statusConfig.bg} ${statusConfig.color}`}>
-          {match.status === "active" && <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />}
+        <span className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border font-bold ${statusConfig.bg} ${statusConfig.color}`}>
+          {match.status === "active" && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />}
           {statusConfig.label}
         </span>
-        <span className="text-xs bg-zinc-900 border border-zinc-800 px-3 py-1 rounded-full text-zinc-400 capitalize">
+        <span className="text-xs bg-white border border-amber-100 px-3 py-1.5 rounded-full text-stone-600 font-bold capitalize shadow-sm">
           {match.game_types?.name?.replace(/_/g, " ")}
         </span>
-        <span className="text-xs bg-zinc-900 border border-zinc-800 px-3 py-1 rounded-full text-zinc-400 capitalize">
+        <span className="text-xs bg-white border border-amber-100 px-3 py-1.5 rounded-full text-stone-600 font-bold capitalize shadow-sm">
           {match.mode}
         </span>
       </div>
 
       {opponentJoined && (
-        <div className="bg-green-500/10 border border-green-500/30 rounded-xl px-4 py-3 mb-4 flex items-center gap-2 text-green-400 text-sm font-medium">
-          <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
-          Opponent joined — battle is on!
+        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-4 py-3 mb-4 flex items-center gap-2 text-emerald-700 text-sm font-bold">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
+          Opponent joined — battle is on! ⚔️
         </div>
       )}
 
       {/* VS card */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-5 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-zinc-800/30 pointer-events-none" />
+      <div className="relative bg-white border border-amber-100 rounded-3xl p-6 mb-5 overflow-hidden shadow-md shadow-amber-100/40">
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-50/80 to-orange-50/40 pointer-events-none" />
         <div className="relative flex items-center justify-between gap-4">
           <div className="flex flex-col items-center gap-2 flex-1">
-            <div className={`w-16 h-16 rounded-full flex items-center justify-center font-display text-lg ${
-              isChallenger ? "bg-amber-500 text-zinc-950" : "bg-zinc-700 text-zinc-300"
+            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center font-display text-lg shadow-md ${
+              isChallenger
+                ? "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-amber-200/60"
+                : "bg-stone-100 border border-stone-200 text-stone-600"
             }`}>
               {challengerInitials}
             </div>
-            <p className="text-zinc-200 font-semibold text-sm text-center">{challengerName}</p>
-            {isChallenger && <span className="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full">You</span>}
+            <p className="text-stone-800 font-bold text-sm text-center">{challengerName}</p>
+            {isChallenger && <span className="text-xs bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full font-bold">You</span>}
           </div>
           <div className="flex flex-col items-center gap-1">
-            <span className="font-display text-2xl text-amber-400">VS</span>
-            <Swords size={16} className="text-zinc-600" />
+            <span className="font-display text-2xl text-gradient">VS</span>
+            <Swords size={16} className="text-stone-300" />
           </div>
           <div className="flex flex-col items-center gap-2 flex-1">
-            <div className={`w-16 h-16 rounded-full flex items-center justify-center font-display text-lg ${
-              !isChallenger && match.opponent ? "bg-amber-500 text-zinc-950" : "bg-zinc-700 text-zinc-300"
+            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center font-display text-lg shadow-md ${
+              !isChallenger && match.opponent
+                ? "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-amber-200/60"
+                : "bg-stone-100 border border-stone-200 text-stone-600"
             }`}>
               {opponentInitials}
             </div>
-            <p className="text-zinc-200 font-semibold text-sm text-center">{opponentName}</p>
-            {!isChallenger && match.opponent && <span className="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full">You</span>}
+            <p className="text-stone-800 font-bold text-sm text-center">{opponentName}</p>
+            {!isChallenger && match.opponent && <span className="text-xs bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full font-bold">You</span>}
           </div>
         </div>
       </div>
 
+      {/* Match info */}
       <div className="grid grid-cols-2 gap-3 mb-6">
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-3 flex items-center gap-2">
-          <Clock size={14} className="text-zinc-600" />
+        <div className="bg-white border border-amber-100 rounded-2xl p-3 flex items-center gap-2 shadow-sm">
+          <Clock size={14} className="text-amber-400" />
           <div>
-            <p className="text-zinc-500 text-xs">Started</p>
-            <p className="text-zinc-300 text-sm font-medium">
+            <p className="text-stone-400 text-xs font-bold">Started</p>
+            <p className="text-stone-700 text-sm font-extrabold">
               {new Date(match.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
             </p>
           </div>
         </div>
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-3 flex items-center gap-2">
-          <MapPin size={14} className="text-zinc-600" />
+        <div className="bg-white border border-amber-100 rounded-2xl p-3 flex items-center gap-2 shadow-sm">
+          <MapPin size={14} className="text-amber-400" />
           <div>
-            <p className="text-zinc-500 text-xs">Mode</p>
-            <p className="text-zinc-300 text-sm font-medium capitalize">{match.mode}</p>
+            <p className="text-stone-400 text-xs font-bold">Mode</p>
+            <p className="text-stone-700 text-sm font-extrabold capitalize">{match.mode}</p>
           </div>
         </div>
       </div>
 
+      {/* Submit result (active match) */}
       {match.status === "active" && (
         <div>
-          <p className="text-xs text-zinc-500 uppercase tracking-widest mb-3">Submit Your Result</p>
-          <p className="text-zinc-600 text-xs mb-3">Report what actually happened — first submission counts.</p>
+          <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-2">Submit your result</p>
+          <p className="text-stone-400 text-xs font-semibold mb-3">Report what actually happened — first submission counts.</p>
           <div className="grid grid-cols-2 gap-3 mb-4">
             {(["win", "loss"] as const).map((r) => (
               <button
                 key={r}
                 onClick={() => setResult(r)}
-                className={`h-14 rounded-2xl border flex items-center justify-center gap-2 font-bold text-sm transition-all cursor-pointer ${
+                className={`h-14 rounded-2xl border-2 flex items-center justify-center gap-2 font-bold text-sm transition-all cursor-pointer ${
                   result === r
                     ? r === "win"
-                      ? "bg-amber-500 border-amber-500 text-zinc-950 amber-glow"
-                      : "bg-zinc-700 border-zinc-600 text-zinc-200"
-                    : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-700"
+                      ? "bg-gradient-to-br from-emerald-400 to-green-500 border-emerald-400 text-white shadow-lg shadow-emerald-200/60"
+                      : "bg-rose-50 border-rose-400 text-rose-600 shadow-sm"
+                    : "bg-white border-amber-100 text-stone-500 hover:border-amber-300 shadow-sm"
                 }`}
               >
-                {r === "win" ? <><Trophy size={16} /> I Won</> : <><XCircle size={16} /> I Lost</>}
+                {r === "win"
+                  ? <><Trophy size={16} /> I Won 🏆</>
+                  : <><XCircle size={16} /> I Lost</>}
               </button>
             ))}
           </div>
           {submitError && (
-            <div className="text-red-400 text-sm bg-red-500/5 border border-red-500/20 rounded-xl px-4 py-3 mb-4">
-              {submitError}
-            </div>
+            <div className="text-rose-600 text-sm bg-rose-50 border border-rose-200 rounded-2xl px-4 py-3 mb-4 font-semibold">{submitError}</div>
           )}
           <button
             onClick={handleSubmit}
             disabled={!result || submitting}
-            className={`w-full h-14 flex items-center justify-center gap-2 font-bold text-base rounded-2xl transition-all cursor-pointer ${
-              result && !submitting
-                ? "bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-zinc-950 active:scale-[0.98] amber-glow"
-                : "bg-zinc-800 text-zinc-600 cursor-not-allowed"
+            className={`w-full h-14 flex items-center justify-center gap-2 font-bold text-base rounded-2xl cursor-pointer ${
+              result && !submitting ? "btn-gold" : "bg-amber-100 text-amber-400 cursor-not-allowed"
             }`}
           >
             {submitting ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle size={18} />}
@@ -395,62 +361,59 @@ export default function MatchPage() {
         </div>
       )}
 
+      {/* Join challenge */}
       {match.status === "open" && currentUserId && currentUserId !== match.challenger_id && !match.opponent_id && (
-        <div className="bg-zinc-900 border border-amber-500/20 rounded-2xl p-6 text-center">
-          <Swords size={28} className="text-amber-400 mx-auto mb-3" />
-          <p className="text-zinc-200 font-semibold mb-1">You&apos;re invited to battle</p>
-          <p className="text-zinc-500 text-sm mb-5">
+        <div className="bg-amber-50 border border-amber-200 rounded-3xl p-6 text-center shadow-sm">
+          <div className="text-4xl mb-3">⚔️</div>
+          <p className="text-stone-800 font-extrabold mb-1">You&apos;re invited to battle</p>
+          <p className="text-stone-500 text-sm font-semibold mb-5">
             {match.challenger?.username} is challenging you to {match.game_types?.name?.replace(/_/g, " ")}
           </p>
-          {joinError && (
-            <p className="text-red-400 text-sm mb-3">{joinError}</p>
-          )}
+          {joinError && <p className="text-rose-600 text-sm font-semibold mb-3">{joinError}</p>}
           <button
             onClick={handleJoin}
             disabled={joining}
-            className="w-full h-14 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-zinc-950 font-bold text-base rounded-2xl transition-all cursor-pointer disabled:opacity-60 amber-glow"
+            className="w-full h-14 flex items-center justify-center gap-2 btn-gold rounded-2xl cursor-pointer disabled:opacity-60"
           >
             {joining ? <Loader2 size={18} className="animate-spin" /> : <Swords size={18} />}
-            {joining ? "Joining…" : "Accept Challenge"}
+            {joining ? "Joining…" : "Accept Challenge 🍺"}
           </button>
         </div>
       )}
 
+      {/* Waiting for opponent */}
       {match.status === "open" && (currentUserId === match.challenger_id || !currentUserId) && (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 text-center">
-          <Loader2 size={24} className="text-amber-400 animate-spin mx-auto mb-3" />
-          <p className="text-zinc-300 font-medium">Waiting for opponent…</p>
-          <p className="text-zinc-500 text-sm mt-1">Share this link so your opponent can join</p>
-          <button
-            onClick={shareMatch}
-            className="mt-4 flex items-center gap-2 text-sm bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-300 px-4 py-2.5 rounded-xl transition-all cursor-pointer mx-auto"
-          >
-            {copied
-              ? <><Check size={14} className="text-green-400" /> Copied!</>
-              : <><Share2 size={14} /> Share Match Link</>}
-          </button>
-          <button
-            onClick={() => navigator.clipboard.writeText(`${window.location.origin}/matches/${id}`).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); })}
-            className="mt-2 flex items-center gap-2 text-xs text-zinc-600 hover:text-zinc-400 px-4 py-1.5 rounded-xl transition-all cursor-pointer mx-auto"
-          >
-            <Copy size={12} />
-            Copy link
-          </button>
+        <div className="bg-white border border-amber-200 rounded-3xl p-6 text-center shadow-sm">
+          <Loader2 size={28} className="text-amber-500 animate-spin mx-auto mb-3" />
+          <p className="text-stone-800 font-bold mb-1">Waiting for opponent…</p>
+          <p className="text-stone-500 text-sm font-semibold mt-1">Share this link so your opponent can join</p>
+          <div className="flex flex-col items-center gap-2 mt-4">
+            <button
+              onClick={shareMatch}
+              className="flex items-center gap-2 text-sm bg-amber-50 border border-amber-200 hover:bg-amber-100 text-amber-700 font-bold px-5 py-2.5 rounded-xl transition-all cursor-pointer"
+            >
+              {copied ? <><Check size={14} className="text-emerald-500" /> Copied!</> : <><Share2 size={14} /> Share Match Link</>}
+            </button>
+            <button
+              onClick={() => navigator.clipboard.writeText(`${window.location.origin}/matches/${id}`).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); })}
+              className="flex items-center gap-2 text-xs text-stone-400 hover:text-stone-600 px-4 py-1.5 rounded-xl transition-all cursor-pointer"
+            >
+              <Copy size={11} /> Copy link
+            </button>
+          </div>
           {currentUserId === match.challenger_id && (
             <div className="mt-5">
-              {cancelError && (
-                <p className="text-red-400 text-xs mb-2 text-center">{cancelError}</p>
-              )}
+              {cancelError && <p className="text-rose-600 text-xs mb-2 font-semibold">{cancelError}</p>}
               <button
                 onClick={handleCancel}
                 disabled={cancelling}
-                className={`flex items-center gap-2 text-xs px-4 py-2 rounded-xl transition-all cursor-pointer mx-auto border ${
+                className={`flex items-center gap-2 text-xs px-4 py-2 rounded-xl transition-all cursor-pointer mx-auto border font-bold ${
                   cancelConfirm
-                    ? "text-red-400 border-red-500/40 bg-red-500/10 hover:bg-red-500/20"
-                    : "text-zinc-600 border-zinc-800 hover:text-zinc-400 hover:border-zinc-700"
+                    ? "text-rose-600 border-rose-300 bg-rose-50 hover:bg-rose-100"
+                    : "text-stone-400 border-stone-200 hover:text-stone-600 hover:border-stone-300"
                 }`}
               >
-                {cancelling ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+                {cancelling ? <Loader2 size={11} className="animate-spin" /> : <Trash2 size={11} />}
                 {cancelling ? "Cancelling…" : cancelConfirm ? "Tap again to confirm" : "Cancel challenge"}
               </button>
             </div>

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Russo_One, Chakra_Petch } from "next/font/google";
+import { Russo_One, Nunito } from "next/font/google";
 import "./globals.css";
 
 const russo = Russo_One({
@@ -9,10 +9,10 @@ const russo = Russo_One({
   display: "swap",
 });
 
-const chakra = Chakra_Petch({
-  weight: ["300", "400", "500", "600", "700"],
+const nunito = Nunito({
+  weight: ["400", "500", "600", "700", "800", "900"],
   subsets: ["latin"],
-  variable: "--font-chakra",
+  variable: "--font-nunito",
   display: "swap",
 });
 
@@ -25,13 +25,13 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#09090b",
+  themeColor: "#FFFBEB",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${russo.variable} ${chakra.variable}`}>
-      <body className="bg-zinc-950 text-zinc-100 antialiased">{children}</body>
+    <html lang="en" className={`${russo.variable} ${nunito.variable}`}>
+      <body className="bg-amber-50 text-stone-900 antialiased">{children}</body>
     </html>
   );
 }

@@ -160,20 +160,22 @@ export default function MapView({ filter }: { filter: string }) {
 
   if (!location && !locationError) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center gap-3 bg-zinc-900">
-        <Loader2 size={28} className="text-amber-400 animate-spin" />
-        <p className="text-zinc-400 text-sm">Getting your location…</p>
+      <div className="flex-1 flex flex-col items-center justify-center gap-3 bg-amber-50">
+        <Loader2 size={28} className="text-amber-500 animate-spin" />
+        <p className="text-stone-500 text-sm font-semibold">Getting your location…</p>
       </div>
     );
   }
 
   if (locationError && !location) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center gap-4 bg-zinc-900 px-6 text-center">
-        <AlertCircle size={32} className="text-zinc-600" />
+      <div className="flex-1 flex flex-col items-center justify-center gap-4 bg-amber-50 px-6 text-center">
+        <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center">
+          <AlertCircle size={24} className="text-rose-400" />
+        </div>
         <div>
-          <p className="text-zinc-300 font-medium text-sm mb-1">Location access required</p>
-          <p className="text-zinc-500 text-sm">Enable GPS in your browser settings to see nearby battles.</p>
+          <p className="text-stone-700 font-bold text-sm mb-1">Location access required</p>
+          <p className="text-stone-400 text-sm font-semibold">Enable GPS in your browser settings to see nearby battles.</p>
         </div>
       </div>
     );
@@ -205,33 +207,33 @@ export default function MapView({ filter }: { filter: string }) {
         {filteredMatches.map((m) => (
           <Marker key={m.id} position={[m.lat, m.lng]} icon={m.is_own ? ownChallengeIcon : challengeIcon}>
             <Popup>
-              <div className="bg-zinc-900 rounded-xl p-3 min-w-[180px]">
+              <div style={{background:"#fff",borderRadius:"12px",padding:"12px",minWidth:"180px",border:"1px solid #fde68a",boxShadow:"0 4px 20px rgba(245,158,11,0.15)"}}>
                 {m.is_own ? (
                   <>
-                    <p className="text-indigo-400 font-bold text-sm mb-1">Your Challenge</p>
-                    <p className="text-zinc-400 text-xs capitalize mb-1">{m.game_type_name.replace(/_/g, " ")}</p>
-                    <p className="text-zinc-600 text-xs capitalize mb-3">{m.mode} · Waiting for opponent</p>
+                    <p style={{color:"#7c3aed",fontWeight:800,fontSize:"13px",marginBottom:"4px"}}>Your Challenge</p>
+                    <p style={{color:"#78716c",fontSize:"11px",textTransform:"capitalize",marginBottom:"2px"}}>{m.game_type_name.replace(/_/g, " ")}</p>
+                    <p style={{color:"#a8a29e",fontSize:"11px",textTransform:"capitalize",marginBottom:"12px"}}>{m.mode} · Waiting</p>
                     <button
                       onClick={() => router.push(`/matches/${m.id}`)}
-                      className="w-full h-9 bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-indigo-300 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                      style={{width:"100%",height:"34px",background:"linear-gradient(135deg,#a78bfa,#8b5cf6)",border:"none",color:"#fff",fontSize:"11px",fontWeight:700,borderRadius:"8px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:"4px"}}
                     >
                       View Lobby
                     </button>
                   </>
                 ) : (
                   <>
-                    <p className="text-amber-400 font-bold text-sm mb-1">{m.challenger_username}</p>
-                    <p className="text-zinc-400 text-xs capitalize mb-1">{m.game_type_name.replace(/_/g, " ")}</p>
-                    <p className="text-zinc-600 text-xs capitalize mb-3">{m.mode} · {Math.round(m.distance_m)}m away</p>
+                    <p style={{color:"#d97706",fontWeight:800,fontSize:"13px",marginBottom:"4px"}}>{m.challenger_username}</p>
+                    <p style={{color:"#78716c",fontSize:"11px",textTransform:"capitalize",marginBottom:"2px"}}>{m.game_type_name.replace(/_/g, " ")}</p>
+                    <p style={{color:"#a8a29e",fontSize:"11px",marginBottom:"12px"}}>{m.mode} · {Math.round(m.distance_m)}m away</p>
                     {acceptError && accepting === null && (
-                      <p className="text-red-400 text-xs mb-2 flex items-center gap-1">
+                      <p style={{color:"#e11d48",fontSize:"10px",marginBottom:"6px",display:"flex",alignItems:"center",gap:"4px"}}>
                         <AlertCircle size={10} />{acceptError}
                       </p>
                     )}
                     <button
                       onClick={() => accept(m.id)}
                       disabled={accepting !== null}
-                      className="w-full h-9 bg-amber-500 hover:bg-amber-400 text-zinc-950 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-60"
+                      style={{width:"100%",height:"34px",background:"linear-gradient(135deg,#f59e0b,#f97316)",border:"none",color:"#fff",fontSize:"11px",fontWeight:700,borderRadius:"8px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:"4px",opacity:accepting !== null ? 0.6 : 1}}
                     >
                       {accepting === m.id ? <Loader2 size={12} className="animate-spin" /> : <Swords size={12} />}
                       Accept Challenge
@@ -246,18 +248,18 @@ export default function MapView({ filter }: { filter: string }) {
         {queue.map((q) => (
           <Marker key={q.id} position={[q.lat, q.lng]} icon={userIcon} opacity={q.is_own ? 0.45 : 1}>
             <Popup>
-              <div className="bg-zinc-900 rounded-xl p-3 min-w-[160px]">
+              <div style={{background:"#fff",borderRadius:"12px",padding:"12px",minWidth:"160px",border:"1px solid #e7e5e4"}}>
                 {q.is_own ? (
                   <>
-                    <p className="text-zinc-400 font-bold text-sm mb-1">You (searching)</p>
-                    <p className="text-zinc-500 text-xs capitalize mb-1">{q.game_type_name.replace(/_/g, " ")}</p>
-                    <p className="text-zinc-600 text-xs">Looking for a match nearby</p>
+                    <p style={{color:"#78716c",fontWeight:700,fontSize:"12px",marginBottom:"4px"}}>You (searching)</p>
+                    <p style={{color:"#a8a29e",fontSize:"11px",textTransform:"capitalize",marginBottom:"2px"}}>{q.game_type_name.replace(/_/g, " ")}</p>
+                    <p style={{color:"#d6d3d1",fontSize:"11px"}}>Looking for a match nearby</p>
                   </>
                 ) : (
                   <>
-                    <p className="text-zinc-200 font-bold text-sm mb-1">{q.username}</p>
-                    <p className="text-zinc-400 text-xs capitalize mb-1">{q.game_type_name.replace(/_/g, " ")}</p>
-                    <p className="text-zinc-600 text-xs">{Math.round(q.distance_m)}m away · In queue</p>
+                    <p style={{color:"#1c1917",fontWeight:700,fontSize:"12px",marginBottom:"4px"}}>{q.username}</p>
+                    <p style={{color:"#78716c",fontSize:"11px",textTransform:"capitalize",marginBottom:"2px"}}>{q.game_type_name.replace(/_/g, " ")}</p>
+                    <p style={{color:"#a8a29e",fontSize:"11px"}}>{Math.round(q.distance_m)}m away · In queue</p>
                   </>
                 )}
               </div>
@@ -268,21 +270,21 @@ export default function MapView({ filter }: { filter: string }) {
 
       {/* Nearby count badge */}
       {externalMatches.length > 0 && (
-        <div className="absolute top-3 right-3 z-[1000] bg-zinc-900/90 backdrop-blur border border-amber-500/20 rounded-xl px-3 py-2 flex items-center gap-2">
-          <Users size={12} className="text-amber-400" />
-          <span className="text-amber-400 text-xs font-bold">{externalMatches.length} nearby</span>
+        <div className="absolute top-3 right-3 z-[1000] bg-white/92 backdrop-blur border border-amber-200 rounded-xl px-3 py-2 flex items-center gap-2 shadow-sm shadow-amber-100/50">
+          <Users size={12} className="text-amber-500" />
+          <span className="text-amber-600 text-xs font-bold">{externalMatches.length} nearby</span>
         </div>
       )}
 
       {/* Empty state overlay */}
       {!hasNearby && lastRefresh && (
         <div className="absolute inset-0 z-[999] pointer-events-none flex items-end justify-center pb-32">
-          <div className="pointer-events-auto bg-zinc-900/95 backdrop-blur border border-zinc-800 rounded-2xl px-5 py-4 mx-4 text-center max-w-xs">
-            <p className="text-zinc-300 font-medium text-sm mb-1">No battles nearby</p>
-            <p className="text-zinc-500 text-xs mb-3">Post an Open Challenge and let others find you</p>
+          <div className="pointer-events-auto bg-white/95 backdrop-blur border border-amber-100 rounded-2xl px-5 py-4 mx-4 text-center max-w-xs shadow-lg shadow-amber-100/40">
+            <p className="text-stone-700 font-bold text-sm mb-1">No battles nearby</p>
+            <p className="text-stone-400 text-xs font-semibold mb-3">Post an Open Challenge and let others find you</p>
             <button
               onClick={() => location && fetchChallenges(location)}
-              className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-200 mx-auto cursor-pointer transition-colors"
+              className="flex items-center gap-1.5 text-xs text-amber-600 hover:text-amber-700 mx-auto cursor-pointer transition-colors font-bold"
             >
               <RefreshCw size={11} />
               Refresh
@@ -293,9 +295,9 @@ export default function MapView({ filter }: { filter: string }) {
 
       {/* Last refreshed indicator */}
       {lastRefresh && (
-        <div className="absolute bottom-24 left-3 z-[1000] bg-zinc-900/80 backdrop-blur rounded-lg px-2.5 py-1.5 flex items-center gap-1.5">
-          <RefreshCw size={10} className="text-zinc-600" />
-          <span className="text-zinc-600 text-[10px]">
+        <div className="absolute bottom-24 left-3 z-[1000] bg-white/80 backdrop-blur rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 border border-amber-100 shadow-sm">
+          <RefreshCw size={10} className="text-stone-400" />
+          <span className="text-stone-400 text-[10px] font-semibold">
             {lastRefresh.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
           </span>
         </div>
@@ -309,50 +311,50 @@ export default function MapView({ filter }: { filter: string }) {
         {/* Sheet handle / toggle bar */}
         <button
           onClick={() => setListOpen((v) => !v)}
-          className="w-full bg-zinc-900/95 backdrop-blur border-t border-zinc-800 px-4 py-3 flex items-center justify-between cursor-pointer"
+          className="w-full bg-white/95 backdrop-blur border-t border-amber-100 px-4 py-3 flex items-center justify-between cursor-pointer shadow-md shadow-amber-100/30"
           style={{ position: "relative", zIndex: 1 }}
         >
           <div className="flex items-center gap-2">
-            <Swords size={14} className="text-amber-400" />
-            <span className="text-zinc-200 text-sm font-semibold">
+            <Swords size={14} className="text-amber-500" />
+            <span className="text-stone-800 text-sm font-bold">
               {externalMatches.length === 0
                 ? "No battles nearby"
                 : `${externalMatches.length} battle${externalMatches.length !== 1 ? "s" : ""} nearby`}
             </span>
             {ownMatches.length > 0 && (
-              <span className="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full">
+              <span className="text-[10px] bg-violet-50 text-violet-600 border border-violet-200 px-2 py-0.5 rounded-full font-bold">
                 {ownMatches.length} yours
               </span>
             )}
           </div>
-          {listOpen ? <ChevronDown size={16} className="text-zinc-500" /> : <ChevronUp size={16} className="text-zinc-500" />}
+          {listOpen ? <ChevronDown size={16} className="text-stone-400" /> : <ChevronUp size={16} className="text-stone-400" />}
         </button>
 
         {/* Sheet content */}
         {listOpen && (
-          <div className="bg-zinc-950 border-t border-zinc-800 max-h-[55vh] overflow-y-auto">
+          <div className="bg-white border-t border-amber-50 max-h-[55vh] overflow-y-auto">
             {/* Own challenges */}
             {ownMatches.length > 0 && (
               <div className="px-4 pt-4 pb-2">
-                <p className="text-[10px] text-indigo-400 uppercase tracking-widest mb-2">Your Challenges</p>
+                <p className="text-[10px] text-violet-500 uppercase tracking-widest mb-2 font-bold">Your Challenges</p>
                 <div className="flex flex-col gap-2">
                   {ownMatches.map((m) => (
                     <button
                       key={m.id}
                       onClick={() => router.push(`/matches/${m.id}`)}
-                      className="flex items-center gap-3 bg-zinc-900 border border-indigo-500/20 rounded-xl p-3 text-left cursor-pointer hover:border-indigo-500/40 transition-colors w-full"
+                      className="flex items-center gap-3 bg-violet-50 border border-violet-200 rounded-xl p-3 text-left cursor-pointer hover:border-violet-400 transition-colors w-full"
                     >
                       <span className="text-xl flex-shrink-0">{GAME_ICONS[m.game_type_name] ?? "🎮"}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-indigo-300 text-sm font-semibold capitalize">
+                        <p className="text-violet-700 text-sm font-bold capitalize">
                           {m.game_type_name.replace(/_/g, " ")}
                         </p>
-                        <p className="text-zinc-600 text-xs flex items-center gap-1 mt-0.5">
+                        <p className="text-stone-400 text-xs font-semibold flex items-center gap-1 mt-0.5">
                           <Navigation size={9} />
                           Waiting for opponent
                         </p>
                       </div>
-                      <span className="text-xs text-indigo-400 font-medium flex-shrink-0">View →</span>
+                      <span className="text-xs text-violet-500 font-bold flex-shrink-0">View →</span>
                     </button>
                   ))}
                 </div>
@@ -362,17 +364,17 @@ export default function MapView({ filter }: { filter: string }) {
             {/* Nearby battles */}
             {externalMatches.length > 0 && (
               <div className="px-4 pt-3 pb-2">
-                <p className="text-[10px] text-amber-400 uppercase tracking-widest mb-2">Nearby Battles</p>
+                <p className="text-[10px] text-amber-500 uppercase tracking-widest mb-2 font-bold">Nearby Battles</p>
                 <div className="flex flex-col gap-2">
                   {externalMatches.map((m) => (
                     <div
                       key={m.id}
-                      className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 rounded-xl p-3"
+                      className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl p-3"
                     >
                       <span className="text-xl flex-shrink-0">{GAME_ICONS[m.game_type_name] ?? "🎮"}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-zinc-200 text-sm font-semibold">{m.challenger_username}</p>
-                        <p className="text-zinc-500 text-xs capitalize flex items-center gap-1 mt-0.5">
+                        <p className="text-stone-800 text-sm font-bold">{m.challenger_username}</p>
+                        <p className="text-stone-400 text-xs font-semibold capitalize flex items-center gap-1 mt-0.5">
                           <MapPin size={9} />
                           {m.game_type_name.replace(/_/g, " ")} · {Math.round(m.distance_m)}m
                         </p>
@@ -380,7 +382,7 @@ export default function MapView({ filter }: { filter: string }) {
                       <button
                         onClick={() => accept(m.id)}
                         disabled={accepting !== null}
-                        className="flex-shrink-0 h-8 px-3 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-zinc-950 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center gap-1"
+                        className="flex-shrink-0 h-8 px-3 bg-gradient-to-r from-amber-400 to-orange-500 disabled:opacity-50 text-white text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1 shadow-sm shadow-amber-200/60"
                       >
                         {accepting === m.id ? <Loader2 size={11} className="animate-spin" /> : <Swords size={11} />}
                         Accept
@@ -393,7 +395,7 @@ export default function MapView({ filter }: { filter: string }) {
 
             {filteredMatches.length === 0 && (
               <div className="px-4 py-8 text-center">
-                <p className="text-zinc-600 text-sm">No battles match your filter</p>
+                <p className="text-stone-400 text-sm font-semibold">No battles match your filter</p>
               </div>
             )}
 
