@@ -22,7 +22,7 @@ export async function POST(
 
   const { data: match } = await supabase
     .from("matches")
-    .select("id, status, team_size, slots_challenger, slots_opponent, challenger_id")
+    .select("id, status, team_size, slots_challenger, slots_opponent, challenger_id, is_open_lobby")
     .eq("id", matchId)
     .single();
 

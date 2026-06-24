@@ -1,19 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ArrowLeft, Navigation, ChevronRight, Loader2 } from "lucide-react";
+import { ArrowLeft, Navigation, ChevronRight, Loader2, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { fuzzCoords } from "@/lib/geo";
 import { useT } from "@/components/LanguageProvider";
+import { containsSlur } from "@/lib/filter";
 
 type GameType = { id: string; name: string; team_size: number };
 
 const GAME_STYLE: Record<string, { emoji: string; color: string; border: string; activeColor: string }> = {
-  beer_pong:  { emoji: "🏓", color: "bg-amber-50",   border: "border-amber-200",  activeColor: "bg-amber-100 border-amber-500" },
-  flunky_ball:{ emoji: "⚽", color: "bg-emerald-50", border: "border-emerald-200", activeColor: "bg-emerald-100 border-emerald-500" },
-  freestyle:  { emoji: "🎲", color: "bg-violet-50",  border: "border-violet-200",  activeColor: "bg-violet-100 border-violet-500" },
+  beer_pong:   { emoji: "🏓", color: "bg-amber-50",   border: "border-amber-200",  activeColor: "bg-amber-100 border-amber-500" },
+  flunky_ball: { emoji: "⚽", color: "bg-emerald-50", border: "border-emerald-200", activeColor: "bg-emerald-100 border-emerald-500" },
+  freestyle:   { emoji: "🎲", color: "bg-violet-50",  border: "border-violet-200",  activeColor: "bg-violet-100 border-violet-500" },
 };
 const FALLBACK_STYLE = { emoji: "🍺", color: "bg-amber-50", border: "border-amber-200", activeColor: "bg-amber-100 border-amber-500" };
 
@@ -23,6 +24,7 @@ export default function NewMatchPage() {
   const [gameTypes, setGameTypes] = useState<GameType[]>([]);
   const [gameTypeId, setGameTypeId] = useState<string | null>(null);
   const [meetingHint, setMeetingHint] = useState("");
+  const [customGameName, setCustomGameName] = useState("");
   const [posting, setPosting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,8 +35,18 @@ export default function NewMatchPage() {
     });
   }, []);
 
+  const selectedGame = gameTypes.find((g) => g.id === gameTypeId);
+  const isFlunkyBall = selectedGame?.name === "flunky_ball";
+  const isFreestyle  = selectedGame?.name === "freestyle";
+
   const handlePost = async () => {
     if (!gameTypeId) return;
+
+    if (isFreestyle) {
+      if (!customGameName.trim()) { setError(t.matches.customGameNameRequired); return; }
+      if (containsSlur(customGameName)) { setError(t.matches.customGameNameSlur); return; }
+    }
+
     setPosting(true);
     setError(null);
 
@@ -53,8 +65,7 @@ export default function NewMatchPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setPosting(false); setError("Not logged in"); return; }
 
-    const selectedType = gameTypes.find((g) => g.id === gameTypeId);
-    const teamSize = selectedType?.team_size ?? 1;
+    const teamSize = selectedGame?.team_size ?? 1;
 
     const { data: match, error: matchError } = await supabase
       .from("matches")
@@ -66,6 +77,8 @@ export default function NewMatchPage() {
         challenger_type: "user",
         team_size: teamSize,
         slots_challenger: teamSize > 1 ? 0 : 1,
+        is_open_lobby: isFlunkyBall,
+        ...(isFreestyle && customGameName.trim() ? { custom_game_name: customGameName.trim() } : {}),
         ...(meetingHint.trim() ? { meeting_hint: meetingHint.trim() } : {}),
         ...(coords ? {
           location: `POINT(${coords.lng} ${coords.lat})`,
@@ -79,7 +92,6 @@ export default function NewMatchPage() {
     setPosting(false);
     if (matchError) { setError(matchError.message); return; }
 
-    // For team games auto-add creator to challenger team
     if (teamSize > 1) {
       await supabase
         .from("match_members")
@@ -88,8 +100,6 @@ export default function NewMatchPage() {
 
     router.push(`/matches/${match.id}`);
   };
-
-  const selectedGame = gameTypes.find((g) => g.id === gameTypeId);
 
   return (
     <div className="min-h-screen px-4 pt-12 pb-6">
@@ -104,7 +114,7 @@ export default function NewMatchPage() {
 
       <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">{t.matches.chooseGame}</p>
 
-      <div className="flex flex-col gap-3 mb-8">
+      <div className="flex flex-col gap-3 mb-6">
         {gameTypes.length === 0 && (
           [1, 2, 3].map((i) => (
             <div key={i} className="h-20 bg-white border border-amber-100 rounded-2xl animate-pulse shadow-sm" />
@@ -114,10 +124,11 @@ export default function NewMatchPage() {
           const style = GAME_STYLE[g.name] ?? FALLBACK_STYLE;
           const desc = (t.matches.gameDesc as Record<string, string>)[g.name] ?? "";
           const active = gameTypeId === g.id;
+          const openLobby = g.name === "flunky_ball";
           return (
             <button
               key={g.id}
-              onClick={() => setGameTypeId(g.id)}
+              onClick={() => { setGameTypeId(g.id); setError(null); }}
               className={`flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer text-left shadow-sm ${
                 active
                   ? style.activeColor + " shadow-md"
@@ -126,15 +137,19 @@ export default function NewMatchPage() {
             >
               <span className="text-4xl select-none">{style.emoji}</span>
               <div className="flex-1">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <p className={`font-extrabold text-sm ${active ? "text-stone-900" : "text-stone-700"}`}>
                     {g.name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
                   </p>
-                  {g.team_size > 1 && (
+                  {openLobby ? (
+                    <span className="text-[10px] bg-emerald-100 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded-full font-bold flex items-center gap-1">
+                      <Users size={9} />{t.matches.openLobbyBadge}
+                    </span>
+                  ) : g.team_size > 1 ? (
                     <span className="text-[10px] bg-violet-100 text-violet-600 border border-violet-200 px-1.5 py-0.5 rounded-full font-bold">
                       {g.team_size}v{g.team_size}
                     </span>
-                  )}
+                  ) : null}
                 </div>
                 <p className="text-stone-500 text-xs font-semibold mt-0.5">{desc}</p>
               </div>
@@ -147,6 +162,31 @@ export default function NewMatchPage() {
           );
         })}
       </div>
+
+      {/* Open lobby explanation */}
+      {isFlunkyBall && (
+        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-4 flex items-start gap-3">
+          <Users size={15} className="text-emerald-500 mt-0.5 flex-shrink-0" />
+          <p className="text-xs text-stone-600 leading-relaxed font-semibold">{t.matches.openLobbyHint}</p>
+        </div>
+      )}
+
+      {/* Freestyle: custom game name */}
+      {isFreestyle && (
+        <div className="mb-4">
+          <label className="text-xs text-stone-400 font-bold uppercase tracking-widest block mb-2">
+            {t.matches.customGameNameLabel}
+          </label>
+          <input
+            type="text"
+            maxLength={50}
+            value={customGameName}
+            onChange={(e) => { setCustomGameName(e.target.value); setError(null); }}
+            placeholder={t.matches.customGameNamePlaceholder}
+            className="w-full h-12 px-4 bg-white border border-violet-200 rounded-2xl text-sm text-stone-800 font-semibold placeholder:text-stone-300 focus:outline-none focus:border-violet-400 transition-colors shadow-sm"
+          />
+        </div>
+      )}
 
       {/* Location info */}
       <div className="bg-sky-50 border border-sky-200 rounded-2xl p-4 mb-4 flex items-start gap-3">

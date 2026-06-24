@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, MapPin, Clock, CheckCircle, XCircle, Trophy, Swords, Loader2, Share2, Copy, Check, RefreshCw, Trash2, Users, UserPlus, Navigation, Timer } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, CheckCircle, XCircle, Trophy, Swords, Loader2, Share2, Copy, Check, RefreshCw, Trash2, Users, UserPlus, Navigation, Timer, Play } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useT } from "@/components/LanguageProvider";
 
@@ -25,6 +25,8 @@ type Match = {
   meeting_hint: string | null;
   fuzzy_lat: number | null;
   fuzzy_lng: number | null;
+  is_open_lobby: boolean;
+  custom_game_name: string | null;
   game_types: { name: string } | null;
   challenger: { username: string } | null;
   opponent: { username: string } | null;
@@ -63,6 +65,8 @@ export default function MatchPage() {
   const [cancelling, setCancelling] = useState(false);
   const [cancelConfirm, setCancelConfirm] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
+  const [starting, setStarting] = useState(false);
+  const [startError, setStartError] = useState<string | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState<string | null>(null);
   const prevOpponentId = useRef<string | null | undefined>(undefined);
@@ -81,7 +85,7 @@ export default function MatchPage() {
     const supabase = createClient();
     const { data } = await supabase
       .from("matches")
-      .select("id, status, mode, winner_id, challenger_id, opponent_id, created_at, expires_at, team_size, slots_challenger, slots_opponent, challenger_result, opponent_result, disputed, meeting_hint, fuzzy_lat, fuzzy_lng, game_types(name), challenger:challenger_id(username), opponent:opponent_id(username)")
+      .select("id, status, mode, winner_id, challenger_id, opponent_id, created_at, expires_at, team_size, slots_challenger, slots_opponent, challenger_result, opponent_result, disputed, meeting_hint, fuzzy_lat, fuzzy_lng, is_open_lobby, custom_game_name, game_types(name), challenger:challenger_id(username), opponent:opponent_id(username)")
       .eq("id", id)
       .single();
     if (data) setMatch(data as unknown as Match);
@@ -186,6 +190,15 @@ export default function MatchPage() {
     finally { setCancelling(false); }
   };
 
+  const handleStart = async () => {
+    setStarting(true);
+    setStartError(null);
+    const res = await fetch(`/api/matches/${id}/start`, { method: "POST" });
+    setStarting(false);
+    if (res.ok) { await fetchMatch(); }
+    else { const d = await res.json() as { error?: string }; setStartError(d.error ?? "Failed to start"); }
+  };
+
   const handleSubmit = async () => {
     if (!myResult || !match || !currentUserId) return;
     setSubmitting(true);
@@ -236,6 +249,7 @@ export default function MatchPage() {
   }
 
   const isTeamGame      = match.team_size > 1;
+  const isOpenLobby     = match.is_open_lobby;
   const challengerName  = match.challenger?.username ?? "Unknown";
   const opponentName    = match.opponent?.username ?? "Waiting…";
   const isChallenger    = match.challenger_id === currentUserId;
@@ -245,7 +259,8 @@ export default function MatchPage() {
   const winnerName      = match.winner_id === match.challenger_id ? challengerName : opponentName;
   const statusStyle     = STATUS_STYLE[match.status] ?? STATUS_STYLE.open;
   const statusLabel     = t.matches.status[match.status] ?? match.status;
-  const gameName        = match.game_types?.name?.replace(/_/g, " ") ?? "match";
+  const rawGameName     = match.game_types?.name?.replace(/_/g, " ") ?? "match";
+  const gameName        = match.custom_game_name ?? rawGameName;
 
   // Which side did I submit?
   const mySubmittedResult = isChallenger ? match.challenger_result : match.opponent_result;
@@ -338,7 +353,12 @@ export default function MatchPage() {
         <span className="text-xs bg-white border border-amber-100 px-3 py-1.5 rounded-full text-stone-600 font-bold capitalize shadow-sm">
           {gameName}
         </span>
-        {isTeamGame && (
+        {isOpenLobby && (
+          <span className="text-xs bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full text-emerald-700 font-bold shadow-sm flex items-center gap-1">
+            <Users size={10} />{t.matches.openLobbyBadge}
+          </span>
+        )}
+        {isTeamGame && !isOpenLobby && (
           <span className="text-xs bg-violet-50 border border-violet-200 px-3 py-1.5 rounded-full text-violet-700 font-bold shadow-sm">
             {match.team_size}v{match.team_size}
           </span>
@@ -561,30 +581,86 @@ export default function MatchPage() {
       )}
 
       {/* ── OPEN (team game): join slots ── */}
-      {match.status === "open" && isTeamGame && currentUserId && !alreadyJoined && (
+      {match.status === "open" && isTeamGame && currentUserId && (
         <div className="bg-white border border-amber-200 rounded-3xl p-6 mb-5 shadow-sm">
           <div className="text-4xl mb-3 text-center">⚔️</div>
-          <p className="text-stone-800 font-extrabold text-center mb-1">{match.team_size}v{match.team_size} · {gameName}</p>
-          <p className="text-stone-500 text-sm font-semibold text-center mb-5">{t.matches.shareHint}</p>
+
+          {/* Player counts for open lobby */}
+          {isOpenLobby && (
+            <p className="text-stone-600 font-bold text-center text-sm mb-4">
+              {t.matches.playersReady
+                .replace("{c}", String(match.slots_challenger))
+                .replace("{o}", String(match.slots_opponent))}
+            </p>
+          )}
+
+          {!isOpenLobby && (
+            <>
+              <p className="text-stone-800 font-extrabold text-center mb-1">{match.team_size}v{match.team_size} · {gameName}</p>
+              <p className="text-stone-500 text-sm font-semibold text-center mb-5">{t.matches.shareHint}</p>
+            </>
+          )}
+
           {joinError && <p className="text-rose-600 text-sm font-semibold mb-3 text-center">{joinError}</p>}
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => handleJoinTeam("challenger")}
-              disabled={joining !== null || match.slots_challenger >= match.team_size}
-              className="h-12 flex items-center justify-center gap-2 bg-amber-50 border-2 border-amber-300 hover:border-amber-500 text-amber-700 font-bold rounded-2xl cursor-pointer disabled:opacity-50 transition-all text-sm"
-            >
-              {joining === "challenger" ? <Loader2 size={14} className="animate-spin" /> : <UserPlus size={14} />}
-              {match.slots_challenger >= match.team_size ? t.matches.teamFull : t.matches.joinChallengers}
+
+          {/* Join buttons — always shown for team games while open */}
+          {!alreadyJoined && (
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <button
+                onClick={() => handleJoinTeam("challenger")}
+                disabled={joining !== null || (!isOpenLobby && match.slots_challenger >= match.team_size)}
+                className="h-12 flex items-center justify-center gap-2 bg-amber-50 border-2 border-amber-300 hover:border-amber-500 text-amber-700 font-bold rounded-2xl cursor-pointer disabled:opacity-50 transition-all text-sm"
+              >
+                {joining === "challenger" ? <Loader2 size={14} className="animate-spin" /> : <UserPlus size={14} />}
+                {!isOpenLobby && match.slots_challenger >= match.team_size ? t.matches.teamFull : t.matches.joinChallengers}
+              </button>
+              <button
+                onClick={() => handleJoinTeam("opponent")}
+                disabled={joining !== null || (!isOpenLobby && match.slots_opponent >= match.team_size)}
+                className="h-12 flex items-center justify-center gap-2 bg-violet-50 border-2 border-violet-300 hover:border-violet-500 text-violet-700 font-bold rounded-2xl cursor-pointer disabled:opacity-50 transition-all text-sm"
+              >
+                {joining === "opponent" ? <Loader2 size={14} className="animate-spin" /> : <Swords size={14} />}
+                {!isOpenLobby && match.slots_opponent >= match.team_size ? t.matches.teamFull : t.matches.acceptChallenge}
+              </button>
+            </div>
+          )}
+
+          {/* Open lobby host controls */}
+          {isOpenLobby && isChallenger && (
+            <div className="flex flex-col gap-2 mt-2">
+              {startError && <p className="text-rose-600 text-xs font-semibold text-center">{startError}</p>}
+              <button
+                onClick={handleStart}
+                disabled={starting || match.slots_challenger < 1 || match.slots_opponent < 1}
+                className={`w-full h-14 flex items-center justify-center gap-2 font-bold text-base rounded-2xl cursor-pointer ${
+                  !starting && match.slots_challenger >= 1 && match.slots_opponent >= 1
+                    ? "btn-gold"
+                    : "bg-amber-100 text-amber-400 cursor-not-allowed"
+                }`}
+              >
+                {starting ? <Loader2 size={18} className="animate-spin" /> : <Play size={18} />}
+                {starting ? t.matches.starting : t.matches.startBattle}
+              </button>
+              {(match.slots_challenger < 1 || match.slots_opponent < 1) && (
+                <p className="text-stone-400 text-xs font-semibold text-center">{t.matches.needBothTeams}</p>
+              )}
+            </div>
+          )}
+
+          {/* Open lobby non-host: waiting message */}
+          {isOpenLobby && !isChallenger && alreadyJoined && (
+            <div className="flex items-center justify-center gap-2 mt-2 text-stone-500 text-sm font-semibold">
+              <Loader2 size={14} className="animate-spin text-amber-400" />
+              {t.matches.waitingForHost}
+            </div>
+          )}
+
+          {/* Share link for open lobby */}
+          {isOpenLobby && isChallenger && (
+            <button onClick={shareMatch} className="w-full flex items-center justify-center gap-2 text-sm bg-stone-50 border border-stone-200 hover:bg-stone-100 text-stone-600 font-bold px-5 py-2.5 rounded-xl transition-all cursor-pointer mt-2">
+              {copied ? <><Check size={14} className="text-emerald-500" /> {t.common.copied}</> : <><Share2 size={14} /> {t.matches.shareLink}</>}
             </button>
-            <button
-              onClick={() => handleJoinTeam("opponent")}
-              disabled={joining !== null || match.slots_opponent >= match.team_size}
-              className="h-12 flex items-center justify-center gap-2 bg-violet-50 border-2 border-violet-300 hover:border-violet-500 text-violet-700 font-bold rounded-2xl cursor-pointer disabled:opacity-50 transition-all text-sm"
-            >
-              {joining === "opponent" ? <Loader2 size={14} className="animate-spin" /> : <Swords size={14} />}
-              {match.slots_opponent >= match.team_size ? t.matches.teamFull : t.matches.acceptChallenge}
-            </button>
-          </div>
+          )}
         </div>
       )}
 
