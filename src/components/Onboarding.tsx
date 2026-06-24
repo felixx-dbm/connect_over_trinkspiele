@@ -115,7 +115,7 @@ export default function Onboarding() {
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex flex-col bg-gradient-to-b from-amber-50 to-white"
+      className="fixed inset-0 z-[9999] flex flex-col bg-gradient-to-b from-amber-50 to-white"
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
