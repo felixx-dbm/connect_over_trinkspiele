@@ -22,6 +22,9 @@ Free tier project sleeps after 7 days. If server-side fetch times out ("fetch fa
 ## All migrations already run (001–005)
 Migration 005 is critical: trigger on auth.users that creates public.users row with id, username, birth_date (all three required — birth_date is NOT NULL).
 
+## Git workflow
+Always push to GitHub after every fix, bug, or feature — no exceptions. Commit first, then `git push` before reporting done.
+
 ## Deployment
 GitHub: https://github.com/felixx-dbm/connect_over_trinkspiele.git
 Vercel plugin installed. Deploy via `vercel` CLI or vercel.com browser UI.
