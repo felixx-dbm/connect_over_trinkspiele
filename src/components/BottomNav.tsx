@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, MapPin, Plus, Trophy, User } from "lucide-react";
+import { Home, MapPin, Plus, CalendarDays, User } from "lucide-react";
 import { useT } from "@/components/LanguageProvider";
 
 export default function BottomNav() {
@@ -10,11 +10,11 @@ export default function BottomNav() {
   const t = useT();
 
   const tabs = [
-    { href: "/home",        label: t.nav.home,  Icon: Home,   activeColor: "text-amber-500",   dotColor: "bg-amber-500"   },
-    { href: "/map",         label: t.nav.map,   Icon: MapPin, activeColor: "text-rose-500",    dotColor: "bg-rose-500"    },
-    { href: "/matches/new", label: null,         Icon: Plus,   activeColor: "",                 dotColor: "",              isCTA: true },
-    { href: "/leaderboard", label: t.nav.ranks, Icon: Trophy, activeColor: "text-violet-500",  dotColor: "bg-violet-500"  },
-    { href: "/profile",     label: t.nav.me,    Icon: User,   activeColor: "text-emerald-500", dotColor: "bg-emerald-500" },
+    { href: "/home",        label: t.nav.home,   Icon: Home,         activeColor: "text-amber-500",   dotColor: "bg-amber-500"   },
+    { href: "/map",         label: t.nav.map,    Icon: MapPin,       activeColor: "text-rose-500",    dotColor: "bg-rose-500"    },
+    { href: "/matches/new", label: null,          Icon: Plus,         activeColor: "",                 dotColor: "",              isCTA: true },
+    { href: "/events",      label: t.nav.events, Icon: CalendarDays, activeColor: "text-violet-500",  dotColor: "bg-violet-500"  },
+    { href: "/profile",     label: t.nav.me,     Icon: User,         activeColor: "text-emerald-500", dotColor: "bg-emerald-500" },
   ];
 
   return (

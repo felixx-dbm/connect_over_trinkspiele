@@ -1,11 +1,12 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Settings, MapPin, Trophy, Swords, TrendingUp, Clock, ChevronRight, Users } from "lucide-react";
+import { Settings, MapPin, Trophy, Swords, TrendingUp, Clock, ChevronRight, Users, QrCode } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/actions/auth";
 import { getT } from "@/lib/i18n-server";
-import type { MatchRow } from "@/lib/types";
+import type { MatchRow, UserAchievementRow } from "@/lib/types";
 import ProfileEditButton from "./ProfileEditButton";
+import ProfileChallengeQR from "./ProfileChallengeQR";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -14,7 +15,7 @@ export default async function ProfilePage() {
 
   const t = await getT();
 
-  const [{ data: profile }, { data: recentMatches }, { data: crewMember }] = await Promise.all([
+  const [{ data: profile }, { data: recentMatches }, { data: crewMember }, { data: achievementsData }] = await Promise.all([
     supabase.from("users").select("*").eq("id", user.id).single(),
     supabase
       .from("matches")
@@ -28,7 +29,13 @@ export default async function ProfilePage() {
       .select("role, crews(id, name)")
       .eq("user_id", user.id)
       .single(),
+    supabase
+      .from("user_achievements")
+      .select("achievement, earned_at")
+      .eq("user_id", user.id),
   ]);
+
+  const achievements = (achievementsData ?? []) as Pick<UserAchievementRow, "achievement" | "earned_at">[];
 
   const initials = profile?.username?.slice(0, 2).toUpperCase() ?? "??";
   const winRate = profile && (profile.wins + profile.losses) > 0
@@ -176,6 +183,36 @@ export default async function ProfilePage() {
           </div>
         </div>
       )}
+
+      {/* Achievements */}
+      {achievements.length > 0 && (
+        <div className="mb-5">
+          <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">{t.achievements.title}</p>
+          <div className="flex flex-wrap gap-2">
+            {achievements.map(({ achievement }) => {
+              const def = (t.achievements as Record<string, unknown>)[achievement] as { label: string; desc: string } | undefined;
+              if (!def) return null;
+              return (
+                <div key={achievement} title={def.desc} className="flex items-center gap-1.5 bg-white border border-amber-200 rounded-xl px-3 py-1.5 shadow-sm">
+                  <span className="text-sm">{
+                    achievement === "first_win"     ? "🩸" :
+                    achievement === "five_wins"     ? "⚡" :
+                    achievement === "loss_accepted" ? "🍺" :
+                    achievement === "honest_10"     ? "🤝" :
+                    achievement === "legend_20"     ? "👑" :
+                    achievement === "on_fire"       ? "🔥" :
+                    achievement === "crew_champion" ? "🏆" : "✨"
+                  }</span>
+                  <span className="text-stone-700 text-xs font-bold">{def.label}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Challenge Me QR */}
+      <ProfileChallengeQR userId={user.id} t={t} />
 
       {/* Sign out */}
       <form action={signOut}>

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Bell, Swords, Trophy, TrendingUp, Clock, ChevronRight, Flame, Users, MapPin } from "lucide-react";
+import { Bell, Swords, Trophy, TrendingUp, Clock, ChevronRight, Flame, Users, MapPin, CalendarDays, Zap } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getT } from "@/lib/i18n-server";
 import type { MatchRow } from "@/lib/types";
@@ -12,7 +12,7 @@ export default async function HomePage() {
 
   const t = await getT();
 
-  const [{ data: profile }, { data: recentMatches }, { data: activeMatch }] = await Promise.all([
+  const [{ data: profile }, { data: recentMatches }, { data: activeMatch }, { data: pendingChallenges }, { data: activeMembership }] = await Promise.all([
     supabase.from("users").select("username, wins, losses, city").eq("id", user.id).single(),
     supabase
       .from("matches")
@@ -27,7 +27,22 @@ export default async function HomePage() {
       .or(`challenger_id.eq.${user.id},opponent_id.eq.${user.id}`)
       .eq("status", "active")
       .maybeSingle(),
+    supabase
+      .from("matches")
+      .select("id, game_types(name), challenger:challenger_id(username)")
+      .eq("direct_opponent_id", user.id)
+      .eq("status", "open")
+      .order("created_at", { ascending: false })
+      .limit(5),
+    supabase
+      .from("event_members")
+      .select("events(id, name)")
+      .eq("user_id", user.id)
+      .eq("is_active", true)
+      .maybeSingle(),
   ]);
+
+  const activeEvent = (activeMembership?.events as unknown as { id: string; name: string } | null) ?? null;
 
   const hour = new Date().getHours();
   const greeting =
@@ -133,6 +148,56 @@ export default async function HomePage() {
             >
               {t.home.goToMatch}
             </Link>
+          </div>
+        </div>
+      )}
+
+      {/* ── Active event ── */}
+      {activeEvent && (
+        <Link
+          href={`/events/${activeEvent.id}`}
+          className="flex items-center gap-3 bg-violet-50 border border-violet-200 rounded-2xl p-4 mb-6 hover:bg-violet-100 transition-colors cursor-pointer shadow-sm"
+        >
+          <div className="w-9 h-9 rounded-xl bg-violet-100 flex items-center justify-center flex-shrink-0">
+            <Zap size={16} className="text-violet-600" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] text-violet-500 uppercase tracking-widest font-bold mb-0.5">Active Event</p>
+            <p className="text-stone-800 font-bold text-sm truncate">{activeEvent.name}</p>
+          </div>
+          <ChevronRight size={14} className="text-violet-400" />
+        </Link>
+      )}
+
+      {/* ── Pending direct challenges ── */}
+      {pendingChallenges && pendingChallenges.length > 0 && (
+        <div className="mb-6">
+          <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">Challenges for you</p>
+          <div className="flex flex-col gap-2">
+            {(pendingChallenges as unknown as Array<{
+              id: string;
+              game_types: { name: string } | null;
+              challenger: { username: string } | null;
+            }>).map((m) => (
+              <Link
+                key={m.id}
+                href={`/matches/${m.id}`}
+                className="flex items-center gap-3 bg-white border border-amber-300 rounded-2xl p-3 hover:bg-amber-50 transition-colors cursor-pointer shadow-sm"
+              >
+                <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
+                  <Swords size={14} className="text-amber-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-stone-800 text-sm font-bold truncate">
+                    {m.challenger?.username ?? "?"} challenged you!
+                  </p>
+                  <p className="text-stone-400 text-xs font-semibold capitalize">
+                    {m.game_types?.name?.replace("_", " ")}
+                  </p>
+                </div>
+                <span className="text-amber-500 text-xs font-bold flex-shrink-0">Accept →</span>
+              </Link>
+            ))}
           </div>
         </div>
       )}

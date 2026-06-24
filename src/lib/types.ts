@@ -69,3 +69,29 @@ export type CrewMemberRow = {
   role: "captain" | "member";
   users: { username: string; wins: number } | null;
 };
+
+export type EventRow = {
+  id: string;
+  name: string;
+  join_code: string;
+  created_by: string;
+  city: string | null;
+  created_at: string;
+};
+
+export type EventMemberRow = {
+  id: string;
+  event_id: string;
+  user_id: string;
+  is_active: boolean;
+  joined_at: string;
+  events: EventRow | null;
+  users: { username: string } | null;
+};
+
+export type UserAchievementRow = {
+  id: string;
+  user_id: string;
+  achievement: string;
+  earned_at: string;
+};
