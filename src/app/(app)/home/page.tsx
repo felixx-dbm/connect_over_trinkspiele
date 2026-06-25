@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Swords, Trophy, TrendingUp, Clock, ChevronRight, Flame, Users, MapPin, CalendarDays, Zap } from "lucide-react";
+import Image from "next/image";
 import NotificationBell from "@/components/NotificationBell";
 import { createClient } from "@/lib/supabase/server";
 import { getT } from "@/lib/i18n-server";
@@ -14,7 +15,7 @@ export default async function HomePage() {
   const t = await getT();
 
   const [{ data: profile }, { data: recentMatches }, { data: activeMatch }, { data: pendingChallenges }, { data: activeMembership }] = await Promise.all([
-    supabase.from("users").select("username, wins, losses, city").eq("id", user.id).single(),
+    supabase.from("users").select("username, wins, losses, city, avatar_url").eq("id", user.id).single(),
     supabase
       .from("matches")
       .select("id, status, mode, created_at, winner_id, game_types(name), opponent:opponent_id(username), challenger:challenger_id(username)")
@@ -84,8 +85,11 @@ export default async function HomePage() {
         <div className="flex items-center gap-3">
           <NotificationBell />
           <Link href="/profile">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center font-display text-white text-sm cursor-pointer shadow-md shadow-amber-200/60">
-              {initials}
+            <div className="w-10 h-10 rounded-2xl overflow-hidden bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center font-display text-white text-sm cursor-pointer shadow-md shadow-amber-200/60 relative">
+              {(profile as { avatar_url?: string | null } | null)?.avatar_url
+                ? <Image src={(profile as { avatar_url: string }).avatar_url} alt="Avatar" fill className="object-cover" unoptimized />
+                : initials
+              }
             </div>
           </Link>
         </div>

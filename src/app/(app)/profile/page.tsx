@@ -7,6 +7,7 @@ import { getT } from "@/lib/i18n-server";
 import type { MatchRow, UserAchievementRow } from "@/lib/types";
 import ProfileEditButton from "./ProfileEditButton";
 import ProfileChallengeQR from "./ProfileChallengeQR";
+import AvatarUpload from "./AvatarUpload";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -16,7 +17,7 @@ export default async function ProfilePage() {
   const t = await getT();
 
   const [{ data: profile }, { data: recentMatches }, { data: crewMember }, { data: achievementsData }] = await Promise.all([
-    supabase.from("users").select("*").eq("id", user.id).single(),
+    supabase.from("users").select("username, wins, losses, city, avatar_url").eq("id", user.id).single(),
     supabase
       .from("matches")
       .select("id, status, mode, created_at, winner_id, game_types(name), opponent:opponent_id(username), challenger:challenger_id(username)")
@@ -63,12 +64,11 @@ export default async function ProfilePage() {
         <div className="absolute top-0 right-0 w-40 h-40 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 -translate-y-1/2 translate-x-1/2 pointer-events-none" />
         <div className="relative flex items-center gap-4 mb-5">
           <div className="relative flex-shrink-0">
-            {/* Gradient ring avatar */}
-            <div className="w-18 h-18 ring-gradient rounded-2xl p-0.5 shadow-lg shadow-amber-200/50" style={{width: '72px', height: '72px'}}>
-              <div className="w-full h-full rounded-[14px] bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center font-display text-white text-2xl">
-                {initials}
-              </div>
-            </div>
+            <AvatarUpload
+              userId={user.id}
+              initials={initials}
+              avatarUrl={(profile as { avatar_url?: string | null } | null)?.avatar_url ?? null}
+            />
             <ProfileEditButton username={profile?.username ?? ""} city={profile?.city ?? ""} />
           </div>
           <div>

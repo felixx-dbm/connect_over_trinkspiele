@@ -6,6 +6,7 @@ import { signOut } from "@/app/actions/auth";
 import { getT, getLocale } from "@/lib/i18n-server";
 import EditAccountButton from "./EditAccountButton";
 import LanguageSwitcher from "./LanguageSwitcher";
+import DeleteAccountButton from "./DeleteAccountButton";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
@@ -90,7 +91,7 @@ export default async function SettingsPage() {
             </div>
             <span className="text-stone-500 text-sm font-semibold">{t.settings.deleteAccount}</span>
           </div>
-          <span className="text-xs bg-stone-100 text-stone-400 border border-stone-200 px-2.5 py-1 rounded-full font-bold">{t.common.comingSoon}</span>
+          <DeleteAccountButton />
         </div>
       </div>
 
