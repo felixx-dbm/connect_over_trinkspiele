@@ -91,19 +91,41 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* ── Stats ── */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        {[
-          { label: t.home.wins,    value: wins,          Icon: Trophy,    bg: "bg-amber-50",   border: "border-amber-200",   text: "text-amber-600",   icon: "text-amber-500"   },
-          { label: t.home.losses,  value: losses,        Icon: Swords,    bg: "bg-rose-50",    border: "border-rose-200",    text: "text-rose-600",    icon: "text-rose-400"    },
-          { label: t.home.winRate, value: `${winRate}%`, Icon: TrendingUp, bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-700", icon: "text-emerald-500" },
-        ].map(({ label, value, Icon, bg, border, text, icon }) => (
-          <div key={label} className={`${bg} border ${border} rounded-2xl p-3 flex flex-col items-center gap-1 shadow-sm`}>
-            <Icon size={16} className={icon} />
-            <span className={`font-display text-xl ${text}`}>{value}</span>
-            <span className="text-stone-500 text-xs font-semibold">{label}</span>
-          </div>
-        ))}
+      {/* ── Stats + streak ── */}
+      <div className="mb-6">
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            { label: t.home.wins,    value: wins,          Icon: Trophy,    bg: "bg-amber-50",   border: "border-amber-200",   text: "text-amber-600",   icon: "text-amber-500"   },
+            { label: t.home.losses,  value: losses,        Icon: Swords,    bg: "bg-rose-50",    border: "border-rose-200",    text: "text-rose-600",    icon: "text-rose-400"    },
+            { label: t.home.winRate, value: `${winRate}%`, Icon: TrendingUp, bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-700", icon: "text-emerald-500" },
+          ].map(({ label, value, Icon, bg, border, text, icon }) => (
+            <div key={label} className={`${bg} border ${border} rounded-2xl p-3 flex flex-col items-center gap-1 shadow-sm`}>
+              <Icon size={16} className={icon} />
+              <span className={`font-display text-xl ${text}`}>{value}</span>
+              <span className="text-stone-500 text-xs font-semibold">{label}</span>
+            </div>
+          ))}
+        </div>
+
+        {streak >= 2 && (
+          <Link
+            href="/matches/new"
+            className="mt-3 relative flex items-center gap-3 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl px-4 py-3.5 overflow-hidden shadow-md shadow-orange-200/60 cursor-pointer group active:scale-[0.98] transition-transform"
+          >
+            <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors" />
+            <div className="relative flex-shrink-0 w-11 h-11 rounded-xl bg-white/20 flex flex-col items-center justify-center">
+              <span className="font-display text-white text-lg leading-none">{streak}</span>
+              <Flame size={10} className="text-orange-200" />
+            </div>
+            <div className="relative flex-1 min-w-0">
+              <p className="text-white font-extrabold text-sm leading-snug">
+                {t.home.streak.replace("{n}", String(streak))}
+              </p>
+              <p className="text-orange-100 text-xs font-semibold mt-0.5">{t.home.streakHint}</p>
+            </div>
+            <ChevronRight size={16} className="relative text-white/60 group-hover:text-white group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+          </Link>
+        )}
       </div>
 
       {/* ── Active match ── */}
@@ -235,20 +257,6 @@ export default async function HomePage() {
           {t.home.myCrew}
         </Link>
       </div>
-
-      {/* ── Win streak ── */}
-      {streak >= 2 && (
-        <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4 mb-6 flex items-center gap-3 shadow-sm">
-          <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center">
-            <Flame size={20} className="text-orange-500" />
-          </div>
-          <div className="flex-1">
-            <p className="text-stone-800 font-extrabold text-sm">{t.home.streak.replace("{n}", String(streak))}</p>
-            <p className="text-stone-500 text-xs font-semibold">{t.home.streakHint}</p>
-          </div>
-          <ChevronRight size={16} className="text-stone-400" />
-        </div>
-      )}
 
       {/* ── Recent matches ── */}
       {allCompleted.length > 0 && (

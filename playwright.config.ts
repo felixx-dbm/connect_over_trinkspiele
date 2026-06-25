@@ -1,5 +1,19 @@
 import { defineConfig, devices } from "@playwright/test";
 import path from "path";
+import fs from "fs";
+
+// Load .env.test into process.env without overriding existing vars
+try {
+  const envFile = fs.readFileSync(path.join(__dirname, ".env.test"), "utf8");
+  for (const line of envFile.split("\n")) {
+    const match = line.match(/^([^#=]+)=(.*)$/);
+    if (match) {
+      const key = match[1].trim();
+      const value = match[2].trim().replace(/^["']|["']$/g, "");
+      if (!(key in process.env)) process.env[key] = value;
+    }
+  }
+} catch {}
 
 export const STORAGE_STATE = path.join(__dirname, "tests/.auth/user.json");
 
@@ -7,7 +21,6 @@ export default defineConfig({
   testDir: "./tests",
   testIgnore: /global-setup\.ts/,
   globalSetup: "./tests/global-setup.ts",
-  dotenv: { path: ".env.test" },
 
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
