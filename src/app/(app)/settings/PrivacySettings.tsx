@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Trophy, Swords, MapPin, Loader2 } from "lucide-react";
+import { Trophy, Swords, MapPin } from "lucide-react";
 
 type Key = "show_on_leaderboard" | "allow_direct_challenges" | "share_location";
 
@@ -59,18 +59,18 @@ export default function PrivacySettings({ showOnLeaderboard, allowDirectChalleng
               type="button"
               onClick={() => toggle(key)}
               disabled={saving === key}
-              aria-checked={values[key]}
               role="switch"
-              className={`relative w-11 h-6 rounded-full transition-colors duration-200 flex-shrink-0 cursor-pointer ${
+              aria-checked={values[key]}
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
                 values[key] ? "bg-amber-500" : "bg-stone-200"
-              }`}
+              } ${saving === key ? "opacity-70" : ""}`}
             >
-              <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-md transition-transform duration-200 ${
-                values[key] ? "translate-x-5" : "translate-x-0.5"
-              }`} />
-              {saving === key && (
-                <Loader2 size={10} className="absolute inset-0 m-auto text-white/60 animate-spin" />
-              )}
+              <span
+                aria-hidden="true"
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                  values[key] ? "translate-x-5" : "translate-x-0"
+                }`}
+              />
             </button>
           </div>
         </div>
