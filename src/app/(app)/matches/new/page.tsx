@@ -27,11 +27,21 @@ export default function NewMatchPage() {
   const [customGameName, setCustomGameName] = useState("");
   const [posting, setPosting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [shareLocation, setShareLocation] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.from("game_types").select("id, name, team_size").then(({ data }) => {
-      if (data) setGameTypes(data);
+    Promise.all([
+      supabase.from("game_types").select("id, name, team_size"),
+      supabase.auth.getUser().then(async ({ data }) => {
+        if (!data.user) return;
+        const { data: priv } = await supabase
+          .from("users").select("share_location").eq("id", data.user.id).single();
+        const p = priv as { share_location?: boolean } | null;
+        if (p && p.share_location === false) setShareLocation(false);
+      }),
+    ]).then(([games]) => {
+      if (games.data) setGameTypes(games.data);
     });
   }, []);
 
@@ -51,7 +61,7 @@ export default function NewMatchPage() {
     setError(null);
 
     let coords: { lat: number; lng: number } | null = null;
-    if (navigator.geolocation) {
+    if (shareLocation && navigator.geolocation) {
       coords = await new Promise((resolve) =>
         navigator.geolocation.getCurrentPosition(
           (pos) => resolve(fuzzCoords(pos.coords.latitude, pos.coords.longitude)),

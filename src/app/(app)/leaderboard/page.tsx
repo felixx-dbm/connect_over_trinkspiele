@@ -22,11 +22,13 @@ export default async function LeaderboardPage() {
           .from("users")
           .select("id, username, wins, losses")
           .eq("city", city)
+          .eq("show_on_leaderboard", true)
           .order("wins", { ascending: false })
           .limit(50)
       : supabase
           .from("users")
           .select("id, username, wins, losses")
+          .eq("show_on_leaderboard", true)
           .order("wins", { ascending: false })
           .limit(50),
     city

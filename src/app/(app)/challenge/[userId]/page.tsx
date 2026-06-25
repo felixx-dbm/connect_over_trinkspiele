@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useT } from "@/components/LanguageProvider";
 import { createClient } from "@/lib/supabase/client";
 
-type TargetUser = { username: string; city: string | null; wins: number };
+type TargetUser = { username: string; city: string | null; wins: number; allow_direct_challenges: boolean };
 type GameType = { id: string; name: string; team_size: number };
 
 export default function ChallengePage() {
@@ -27,12 +27,12 @@ export default function ChallengePage() {
   const load = useCallback(async () => {
     const [authResult, { data: user }, { data: games }] = await Promise.all([
       supabase.auth.getUser(),
-      supabase.from("users").select("username, city, wins").eq("id", userId).single(),
+      supabase.from("users").select("username, city, wins, allow_direct_challenges").eq("id", userId).single(),
       supabase.from("game_types").select("id, name, team_size").order("name"),
     ]);
 
     if (authResult.data.user?.id === userId) { setSelfChallenge(true); return; }
-    if (!user) { setNotFound(true); return; }
+    if (!user || user.allow_direct_challenges === false) { setNotFound(true); return; }
 
     setTarget(user);
     setGameTypes(games ?? []);

@@ -1,12 +1,13 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Trash2, User, Mail, MapPin } from "lucide-react";
+import { ArrowLeft, Trash2, User, Mail, MapPin, Shield } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/actions/auth";
 import { getT, getLocale } from "@/lib/i18n-server";
 import EditAccountButton from "./EditAccountButton";
 import LanguageSwitcher from "./LanguageSwitcher";
 import DeleteAccountButton from "./DeleteAccountButton";
+import PrivacySettings from "./PrivacySettings";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
@@ -14,15 +15,24 @@ export default async function SettingsPage() {
   if (!user) redirect("/login");
 
   const [{ data: profile }, t, locale] = await Promise.all([
-    supabase.from("users").select("username, city").eq("id", user.id).single(),
+    supabase
+      .from("users")
+      .select("username, city, show_on_leaderboard, allow_direct_challenges, share_location")
+      .eq("id", user.id)
+      .single(),
     getT(),
     getLocale(),
   ]);
 
+  const p = profile as {
+    username: string | null; city: string | null;
+    show_on_leaderboard: boolean; allow_direct_challenges: boolean; share_location: boolean;
+  } | null;
+
   const accountRows = [
-    { Icon: User,   label: t.settings.username, value: profile?.username ?? "—" },
-    { Icon: MapPin, label: t.settings.city,      value: profile?.city ?? null    },
-    { Icon: Mail,   label: t.settings.email,     value: user.email ?? "—"        },
+    { Icon: User,   label: t.settings.username, value: p?.username ?? "—" },
+    { Icon: MapPin, label: t.settings.city,      value: p?.city ?? null    },
+    { Icon: Mail,   label: t.settings.email,     value: user.email ?? "—"  },
   ];
 
   return (
@@ -40,7 +50,7 @@ export default async function SettingsPage() {
       <div className="bg-white border border-amber-100 rounded-3xl p-5 mb-4 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <p className="text-xs text-stone-400 font-bold uppercase tracking-widest">{t.settings.account}</p>
-          <EditAccountButton username={profile?.username ?? ""} city={profile?.city ?? ""} />
+          <EditAccountButton username={p?.username ?? ""} city={p?.city ?? ""} />
         </div>
         <div className="flex flex-col">
           {accountRows.map(({ Icon, label, value }, i) => (
@@ -59,13 +69,34 @@ export default async function SettingsPage() {
           ))}
         </div>
         <div className="mt-2 pt-3 border-t border-amber-50">
-          <EditAccountButton username={profile?.username ?? ""} city={profile?.city ?? ""} fullWidth />
+          <EditAccountButton username={p?.username ?? ""} city={p?.city ?? ""} fullWidth />
         </div>
       </div>
 
       {/* Language switcher */}
       <div className="bg-white border border-amber-100 rounded-3xl p-5 mb-4 shadow-sm">
         <LanguageSwitcher currentLocale={locale} />
+      </div>
+
+      {/* Privacy settings */}
+      <div className="bg-white border border-amber-100 rounded-3xl p-5 mb-4 shadow-sm">
+        <div className="flex items-center gap-2 mb-1">
+          <Shield size={13} className="text-amber-500" />
+          <p className="text-xs text-stone-400 font-bold uppercase tracking-widest">{t.settings.privacy}</p>
+        </div>
+        <PrivacySettings
+          showOnLeaderboard={p?.show_on_leaderboard ?? true}
+          allowDirectChallenges={p?.allow_direct_challenges ?? true}
+          shareLocation={p?.share_location ?? true}
+          labels={{
+            leaderboard:     t.settings.privacyLeaderboard,
+            leaderboardHint: t.settings.privacyLeaderboardHint,
+            challenges:      t.settings.privacyChallenges,
+            challengesHint:  t.settings.privacyChallengesHint,
+            location:        t.settings.privacyLocation,
+            locationHint:    t.settings.privacyLocationHint,
+          }}
+        />
       </div>
 
       {/* Coming soon */}
