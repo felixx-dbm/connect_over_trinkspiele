@@ -7,6 +7,7 @@ export default defineConfig({
   testDir: "./tests",
   testIgnore: /global-setup\.ts/,
   globalSetup: "./tests/global-setup.ts",
+  dotenv: { path: ".env.test" },
 
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
