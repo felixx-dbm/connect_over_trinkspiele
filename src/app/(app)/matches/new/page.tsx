@@ -36,19 +36,31 @@ export default function NewMatchPage() {
 
   useEffect(() => {
     const supabase = createClient();
-    Promise.all([
-      supabase.from("game_types").select("id, name, team_size"),
-      supabase.auth.getUser().then(async ({ data }) => {
-        if (!data.user) return;
-        const { data: priv } = await supabase
-          .from("users").select("share_location").eq("id", data.user.id).single();
-        const p = priv as { share_location?: boolean } | null;
-        if (p && p.share_location === false) setShareLocation(false);
-      }),
-    ]).then(([games]) => {
-      if (games.data) setGameTypes(games.data);
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) return;
+      const userId = data.user.id;
+
+      // Redirect to existing live match if one exists
+      const { data: live } = await supabase
+        .from("matches")
+        .select("id")
+        .eq("challenger_id", userId)
+        .in("status", ["open", "active"])
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (live) { router.replace(`/matches/${live.id}`); return; }
+
+      const { data: priv } = await supabase
+        .from("users").select("share_location").eq("id", userId).single();
+      const p = priv as { share_location?: boolean } | null;
+      if (p && p.share_location === false) setShareLocation(false);
     });
-  }, []);
+
+    supabase.from("game_types").select("id, name, team_size").then(({ data }) => {
+      if (data) setGameTypes(data);
+    });
+  }, [router]);
 
   const selectedGame = gameTypes.find((g) => g.id === gameTypeId);
   const isBeerPong  = selectedGame?.name === "beer_pong";
@@ -81,6 +93,24 @@ export default function NewMatchPage() {
 
     setPosting(true);
     setError(null);
+
+    const supabaseCheck = createClient();
+    const { data: { user: checkUser } } = await supabaseCheck.auth.getUser();
+    if (checkUser) {
+      const { data: live } = await supabaseCheck
+        .from("matches")
+        .select("id")
+        .eq("challenger_id", checkUser.id)
+        .in("status", ["open", "active"])
+        .limit(1)
+        .maybeSingle();
+      if (live) {
+        setPosting(false);
+        setError(t.matches.alreadyLive);
+        router.push(`/matches/${live.id}`);
+        return;
+      }
+    }
 
     let coords: { lat: number; lng: number } | null = null;
     if (shareLocation && navigator.geolocation) {

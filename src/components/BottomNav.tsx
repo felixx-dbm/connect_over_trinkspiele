@@ -2,12 +2,41 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, MapPin, Plus, CalendarDays, User } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Home, MapPin, Plus, CalendarDays, User, Swords } from "lucide-react";
 import { useT } from "@/components/LanguageProvider";
+import { createClient } from "@/lib/supabase/client";
 
 export default function BottomNav() {
   const pathname = usePathname();
   const t = useT();
+  const [liveMatchId, setLiveMatchId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    let userId = "";
+
+    const check = async () => {
+      if (!userId) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        userId = user.id;
+      }
+      const { data } = await supabase
+        .from("matches")
+        .select("id")
+        .eq("challenger_id", userId)
+        .in("status", ["open", "active"])
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      setLiveMatchId(data?.id ?? null);
+    };
+
+    check();
+    const interval = setInterval(check, 10_000);
+    return () => clearInterval(interval);
+  }, [pathname]);
 
   const tabs = [
     { href: "/home",        label: t.nav.home,   Icon: Home,         activeColor: "text-amber-500",   dotColor: "bg-amber-500"   },
@@ -25,6 +54,22 @@ export default function BottomNav() {
             const active = pathname === href || (href !== "/home" && pathname.startsWith(href));
 
             if (isCTA) {
+              if (liveMatchId) {
+                const liveActive = pathname === `/matches/${liveMatchId}`;
+                return (
+                  <Link
+                    key="live-match"
+                    href={`/matches/${liveMatchId}`}
+                    className="relative flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-green-500 cursor-pointer shrink-0 shadow-lg shadow-emerald-200/60"
+                    aria-label="View live match"
+                  >
+                    <Swords size={20} className="text-white" strokeWidth={2.5} />
+                    {!liveActive && (
+                      <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-emerald-400 border-2 border-white animate-pulse" />
+                    )}
+                  </Link>
+                );
+              }
               return (
                 <Link
                   key={href}
