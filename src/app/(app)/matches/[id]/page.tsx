@@ -114,6 +114,7 @@ export default function MatchPage() {
         // Opponent joined (1v1) or team slot filled
         if (prevOpponentId.current === null && data.opponent_id) {
           showNotif(t.matches.opponentJoined);
+          fetchMatch();
           fetchMembers();
         }
         // Team slots changed
