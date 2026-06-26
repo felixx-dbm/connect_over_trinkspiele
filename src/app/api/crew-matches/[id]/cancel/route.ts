@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { adminClient } from "@/lib/supabase/admin";
 import { isUUID } from "@/lib/validate";
 
 export async function POST(
@@ -24,7 +25,7 @@ export async function POST(
   if (match.status !== "open") return NextResponse.json({ error: "Only open challenges can be cancelled" }, { status: 409 });
   if (match.created_by !== user.id) return NextResponse.json({ error: "Only the creator can cancel" }, { status: 403 });
 
-  const { error } = await supabase
+  const { error } = await adminClient
     .from("crew_matches")
     .update({ status: "cancelled" })
     .eq("id", matchId)

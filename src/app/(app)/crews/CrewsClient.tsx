@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Users, Crown, Copy, Plus, LogIn, Swords, Check, AlertCircle, Shield, Loader2, Trophy } from "lucide-react";
 import { createCrew, joinCrew } from "@/app/actions/crews";
 import { createClient } from "@/lib/supabase/client";
+import { fuzzCoords } from "@/lib/geo";
 import { useT } from "@/components/LanguageProvider";
 
 type Member = {
@@ -90,10 +91,25 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
     e.preventDefault();
     setChallengePosting(true);
     setChallengeError(null);
+
+    let coords: { lat: number; lng: number } | null = null;
+    if (navigator.geolocation) {
+      coords = await new Promise((resolve) =>
+        navigator.geolocation.getCurrentPosition(
+          (pos) => resolve(fuzzCoords(pos.coords.latitude, pos.coords.longitude)),
+          () => resolve(null),
+          { timeout: 8000 }
+        )
+      );
+    }
+
     const res = await fetch("/api/crew-matches", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ game_type_id: selectedGameType }),
+      body: JSON.stringify({
+        game_type_id: selectedGameType,
+        ...(coords ? { lat: coords.lat, lng: coords.lng } : {}),
+      }),
     });
     setChallengePosting(false);
     if (res.ok) {
