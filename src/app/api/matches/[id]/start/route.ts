@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { adminClient } from "@/lib/supabase/admin";
 import { isUUID } from "@/lib/validate";
 
 export async function POST(
@@ -28,7 +29,7 @@ export async function POST(
     return NextResponse.json({ error: "Both teams need at least one player" }, { status: 400 });
   }
 
-  const { error } = await supabase
+  const { error } = await adminClient
     .from("matches")
     .update({ status: "active" })
     .eq("id", matchId)
