@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic";
 import { useState } from "react";
-import { Filter } from "lucide-react";
 import { useT } from "@/components/LanguageProvider";
 
 const MapView = dynamic(() => import("@/components/MapView"), {
@@ -32,10 +31,6 @@ export default function MapPage() {
           <h1 className="font-display text-xl text-stone-900">
             {t.map.title} <span className="text-gradient">{t.map.titleAccent}</span>
           </h1>
-          <button className="flex items-center gap-2 bg-amber-50 border border-amber-200 px-3 py-2 rounded-xl text-xs text-stone-600 hover:border-amber-400 transition-colors cursor-pointer font-bold">
-            <Filter size={12} className="text-amber-500" />
-            {t.map.filter}
-          </button>
         </div>
         <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
           {GAME_TYPES.map(({ label, value }) => (

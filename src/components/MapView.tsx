@@ -227,7 +227,8 @@ export default function MapView({ filter }: { filter: string }) {
   const ownMatches = filteredMatches.filter((m) => m.is_own);
   const externalQueue = queue.filter((q) => !q.is_own);
   const externalCrewMatches = crewMatches.filter((cm) => !cm.is_own);
-  const hasNearby = filteredMatches.length > 0 || externalQueue.length > 0 || externalCrewMatches.length > 0;
+  const totalExternal = externalMatches.length + externalCrewMatches.length;
+  const hasNearby = totalExternal > 0 || externalQueue.length > 0;
 
   if (!location && !locationError) {
     return (
@@ -390,10 +391,10 @@ export default function MapView({ filter }: { filter: string }) {
       )}
 
       {/* Nearby count badge */}
-      {externalMatches.length > 0 && (
+      {totalExternal > 0 && (
         <div className="absolute top-3 right-3 z-[1000] bg-white/92 backdrop-blur border border-amber-200 rounded-xl px-3 py-2 flex items-center gap-2 shadow-sm shadow-amber-100/50">
           <Users size={12} className="text-amber-500" />
-          <span className="text-amber-600 text-xs font-bold">{externalMatches.length} {t.map.nearby}</span>
+          <span className="text-amber-600 text-xs font-bold">{totalExternal} {t.map.nearby}</span>
         </div>
       )}
 
@@ -441,9 +442,9 @@ export default function MapView({ filter }: { filter: string }) {
           <div className="flex items-center gap-2">
             <Swords size={14} className="text-amber-500" />
             <span className="text-stone-800 text-sm font-bold">
-              {externalMatches.length === 0
+              {totalExternal === 0
                 ? t.map.noBattles
-                : `${externalMatches.length} ${externalMatches.length !== 1 ? t.map.battlePlural : t.map.battleSingular} ${t.map.nearby}`}
+                : `${totalExternal} ${totalExternal !== 1 ? t.map.battlePlural : t.map.battleSingular} ${t.map.nearby}`}
             </span>
             {ownMatches.length > 0 && (
               <span className="text-[10px] bg-violet-50 text-violet-600 border border-violet-200 px-2 py-0.5 rounded-full font-bold">
