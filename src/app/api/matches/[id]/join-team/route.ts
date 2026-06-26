@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { adminClient } from "@/lib/supabase/admin";
 import { isUUID } from "@/lib/validate";
 
 export async function POST(
@@ -38,6 +39,15 @@ export async function POST(
   // Challenger can't join opponent team if they created the match
   if (team === "opponent" && match.challenger_id === user.id) {
     return NextResponse.json({ error: "Cannot join the opposing team of your own challenge" }, { status: 400 });
+  }
+
+  // Cancel any open/active match the user owns as challenger before joining this one
+  if (match.challenger_id !== user.id) {
+    await adminClient
+      .from("matches")
+      .update({ status: "cancelled" })
+      .eq("challenger_id", user.id)
+      .in("status", ["open", "active"]);
   }
 
   const { error } = await supabase

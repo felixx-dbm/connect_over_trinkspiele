@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { adminClient } from "@/lib/supabase/admin";
 import { isUUID } from "@/lib/validate";
 
 export async function POST(
@@ -24,6 +25,13 @@ export async function POST(
   if (!match) return NextResponse.json({ error: "Match not found" }, { status: 404 });
   if (match.status !== "open") return NextResponse.json({ error: "Match is not open" }, { status: 409 });
   if (match.challenger_id === user.id) return NextResponse.json({ error: "Cannot accept your own match" }, { status: 400 });
+
+  // Cancel any open/active match the user owns as challenger before joining this one
+  await adminClient
+    .from("matches")
+    .update({ status: "cancelled" })
+    .eq("challenger_id", user.id)
+    .in("status", ["open", "active"]);
 
   // .is("opponent_id", null) prevents IDOR overwrite; count=0 means another player beat us to it
   const { data: updated, error } = await supabase
