@@ -309,7 +309,7 @@ export default function NewMatchPage() {
 
       <button
         onClick={handlePost}
-        disabled={!gameTypeId || posting}
+        disabled={!gameTypeId || posting || (isFreestyle && !customGameName.trim())}
         className={`w-full h-14 flex items-center justify-center gap-3 text-base rounded-2xl cursor-pointer ${
           gameTypeId && !posting
             ? "btn-gold"

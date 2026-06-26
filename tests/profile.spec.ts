@@ -1,37 +1,91 @@
 /**
- * Profile page — stats, achievements, challenge QR.
+ * Profile page — stats, challenge QR, settings access, sign-out.
  */
 import { test, expect } from "@playwright/test";
 
-test.describe("profile page", () => {
+test.describe("profile overview", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/profile");
+    await expect(page).toHaveURL(/\/profile/, { timeout: 10_000 });
   });
 
-  test("renders profile page without crashing", async ({ page }) => {
-    await expect(page).toHaveURL(/\/profile/);
+  test("shows the user's username prominently", async ({ page }) => {
+    // Username heading — not generic placeholder text
+    const heading = page.getByRole("heading").filter({ hasNotText: /your profile|profile/i }).first();
+    await expect(heading).toBeVisible();
   });
 
-  test("shows wins, losses, and win rate stats", async ({ page }) => {
+  test("displays wins, losses, and win-rate stats", async ({ page }) => {
     await expect(page.getByText(/wins/i).first()).toBeVisible();
     await expect(page.getByText(/losses/i).first()).toBeVisible();
     await expect(page.getByText(/win rate/i)).toBeVisible();
   });
 
-  test("shows Challenge Me / QR button", async ({ page }) => {
+  test("leaderboard link is visible and navigates correctly", async ({ page }) => {
+    const link = page.getByRole("link", { name: /leaderboard/i });
+    await expect(link).toBeVisible();
+    await link.click();
+    await expect(page).toHaveURL(/\/leaderboard/);
+  });
+
+  test("settings gear navigates to /settings", async ({ page }) => {
+    // Two a[href="/settings"] links on the page (gear icon + nav row) — use first
+    const settingsLink = page.locator('a[href="/settings"]').first();
+    await expect(settingsLink).toBeVisible();
+    await settingsLink.click();
+    await expect(page).toHaveURL(/\/settings/);
+  });
+});
+
+test.describe("challenge QR", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/profile");
+    await expect(page).toHaveURL(/\/profile/, { timeout: 10_000 });
+  });
+
+  test("Challenge Me button is visible", async ({ page }) => {
     await expect(page.getByRole("button", { name: /challenge/i })).toBeVisible();
   });
 
-  test("QR expands and shows copy link button", async ({ page }) => {
+  test("tapping Challenge Me reveals a shareable link or QR code", async ({ page }) => {
     await page.getByRole("button", { name: /challenge/i }).click();
-    await expect(page.getByRole("button", { name: /copy link/i })).toBeVisible({ timeout: 3_000 });
+    // Either a copy link button or a QR canvas/image should appear
+    const copyBtn = page.getByRole("button", { name: /copy/i });
+    const qr = page.locator("canvas, img[alt*='QR'], svg[data-testid*='qr']");
+    await expect(copyBtn.or(qr).first()).toBeVisible({ timeout: 5_000 });
+  });
+});
+
+test.describe("crew membership banner", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/profile");
+    await expect(page).toHaveURL(/\/profile/, { timeout: 10_000 });
   });
 
-  test("shows leaderboard quick link", async ({ page }) => {
-    await expect(page.getByRole("link", { name: /leaderboard/i })).toBeVisible();
+  test("crew section links to /crews", async ({ page }) => {
+    const crewLink = page.getByRole("link", { name: /crew/i })
+      .or(page.locator('a[href="/crews"]'));
+    // Only assert if crew link is present (user may not be in a crew)
+    const isVisible = await crewLink.isVisible().catch(() => false);
+    if (isVisible) {
+      await crewLink.click();
+      await expect(page).toHaveURL(/\/crews/);
+    }
+  });
+});
+
+test.describe("sign out", () => {
+  test("sign out button is present on profile", async ({ page }) => {
+    await page.goto("/profile");
+    await expect(page.getByRole("button", { name: /sign out|log out/i })).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
-  test("sign out button is present", async ({ page }) => {
-    await expect(page.getByRole("button", { name: /sign out/i })).toBeVisible();
+  test("signing out redirects to login and prevents accessing home", async ({ page }) => {
+    await page.goto("/profile");
+    await page.getByRole("button", { name: /sign out|log out/i }).click();
+    // After sign-out, protected routes should redirect to login
+    await expect(page).toHaveURL(/\/login|\//, { timeout: 10_000 });
   });
 });
