@@ -196,9 +196,9 @@ export default function MatchPage() {
     setStarting(true);
     setStartError(null);
     const res = await fetch(`/api/matches/${id}/start`, { method: "POST" });
-    setStarting(false);
     if (res.ok) { await fetchMatch(); }
     else { const d = await res.json() as { error?: string }; setStartError(d.error ?? "Failed to start"); }
+    setStarting(false);
   };
 
   const handleSubmit = async () => {
@@ -539,6 +539,14 @@ export default function MatchPage() {
               {t.matches.navigate}
             </a>
           )}
+        </div>
+      )}
+
+      {/* ── ACTIVE: match started banner ── */}
+      {match.status === "active" && isParticipant && (
+        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-4 py-3 mb-4 flex items-center gap-2 text-emerald-700 text-sm font-bold">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
+          {t.matches.matchStarted}
         </div>
       )}
 
