@@ -416,7 +416,7 @@ export default function MapView({ filter }: { filter: string }) {
 
       {/* Last refreshed indicator */}
       {lastRefresh && (
-        <div className="absolute bottom-24 left-3 z-[1000] bg-white/80 backdrop-blur rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 border border-amber-100 shadow-sm">
+        <div className="absolute bottom-16 left-3 z-[1000] bg-white/80 backdrop-blur rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 border border-amber-100 shadow-sm">
           <RefreshCw size={10} className="text-stone-400" />
           <span className="text-stone-400 text-[10px] font-semibold">
             {lastRefresh.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
@@ -428,6 +428,9 @@ export default function MapView({ filter }: { filter: string }) {
       <div
         className="absolute left-0 right-0 bottom-0 z-[1001] transition-transform duration-300 ease-in-out"
         style={{ transform: listOpen ? "translateY(0)" : "translateY(calc(100% - 56px))" }}
+        onTouchStart={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
+        onTouchEnd={(e) => e.stopPropagation()}
       >
         {/* Sheet handle / toggle bar */}
         <button

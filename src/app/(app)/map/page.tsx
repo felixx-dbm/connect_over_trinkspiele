@@ -25,7 +25,7 @@ export default function MapPage() {
   const [filter, setFilter] = useState<string>("all");
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-screen flex flex-col pb-safe">
       {/* Header */}
       <div className="px-4 pt-12 pb-4 bg-white/92 backdrop-blur-md flex-shrink-0 z-10 border-b border-amber-100/80 shadow-sm shadow-amber-100/40">
         <div className="flex items-center justify-between mb-4">
