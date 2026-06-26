@@ -18,11 +18,16 @@ const GAME_STYLE: Record<string, { emoji: string; color: string; border: string;
 };
 const FALLBACK_STYLE = { emoji: "🍺", color: "bg-amber-50", border: "border-amber-200", activeColor: "bg-amber-100 border-amber-500" };
 
+const BEER_PONG_SIZES  = [1, 2, 3];
+const FLUNKY_SIZES     = [3, 10];
+const FREESTYLE_SIZES  = [1, 2, 3, 4];
+
 export default function NewMatchPage() {
   const t = useT();
   const router = useRouter();
   const [gameTypes, setGameTypes] = useState<GameType[]>([]);
   const [gameTypeId, setGameTypeId] = useState<string | null>(null);
+  const [teamSize, setTeamSize] = useState<number>(1);
   const [meetingHint, setMeetingHint] = useState("");
   const [customGameName, setCustomGameName] = useState("");
   const [posting, setPosting] = useState(false);
@@ -46,8 +51,25 @@ export default function NewMatchPage() {
   }, []);
 
   const selectedGame = gameTypes.find((g) => g.id === gameTypeId);
+  const isBeerPong  = selectedGame?.name === "beer_pong";
   const isFlunkyBall = selectedGame?.name === "flunky_ball";
   const isFreestyle  = selectedGame?.name === "freestyle";
+
+  // Reset team size to a sensible default when game changes
+  useEffect(() => {
+    if (isBeerPong)   setTeamSize(2);
+    else if (isFlunkyBall) setTeamSize(10);
+    else              setTeamSize(1);
+  }, [gameTypeId, isBeerPong, isFlunkyBall]);
+
+  const teamSizeOptions: number[] | null =
+    isBeerPong   ? BEER_PONG_SIZES  :
+    isFlunkyBall ? FLUNKY_SIZES     :
+    isFreestyle  ? FREESTYLE_SIZES  :
+    null;
+
+  // Open lobby: flunky always, freestyle when teamSize > 1
+  const isOpenLobby = isFlunkyBall || (isFreestyle && teamSize > 1);
 
   const handlePost = async () => {
     if (!gameTypeId) return;
@@ -75,8 +97,6 @@ export default function NewMatchPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setPosting(false); setError("Not logged in"); return; }
 
-    const teamSize = selectedGame?.team_size ?? 1;
-
     const { data: match, error: matchError } = await supabase
       .from("matches")
       .insert({
@@ -87,7 +107,7 @@ export default function NewMatchPage() {
         challenger_type: "user",
         team_size: teamSize,
         slots_challenger: teamSize > 1 ? 0 : 1,
-        is_open_lobby: isFlunkyBall,
+        is_open_lobby: isOpenLobby,
         ...(isFreestyle && customGameName.trim() ? { custom_game_name: customGameName.trim() } : {}),
         ...(meetingHint.trim() ? { meeting_hint: meetingHint.trim() } : {}),
         ...(coords ? {
@@ -134,7 +154,8 @@ export default function NewMatchPage() {
           const style = GAME_STYLE[g.name] ?? FALLBACK_STYLE;
           const desc = (t.matches.gameDesc as Record<string, string>)[g.name] ?? "";
           const active = gameTypeId === g.id;
-          const openLobby = g.name === "flunky_ball";
+          const isFlunky = g.name === "flunky_ball";
+          const isFlexSize = g.name === "beer_pong" || g.name === "freestyle";
           return (
             <button
               key={g.id}
@@ -151,13 +172,13 @@ export default function NewMatchPage() {
                   <p className={`font-extrabold text-sm ${active ? "text-stone-900" : "text-stone-700"}`}>
                     {g.name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
                   </p>
-                  {openLobby ? (
+                  {isFlunky ? (
                     <span className="text-[10px] bg-emerald-100 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded-full font-bold flex items-center gap-1">
                       <Users size={9} />{t.matches.openLobbyBadge}
                     </span>
-                  ) : g.team_size > 1 ? (
-                    <span className="text-[10px] bg-violet-100 text-violet-600 border border-violet-200 px-1.5 py-0.5 rounded-full font-bold">
-                      {g.team_size}v{g.team_size}
+                  ) : isFlexSize ? (
+                    <span className="text-[10px] bg-stone-100 text-stone-500 border border-stone-200 px-1.5 py-0.5 rounded-full font-bold">
+                      flexible
                     </span>
                   ) : null}
                 </div>
@@ -173,11 +194,39 @@ export default function NewMatchPage() {
         })}
       </div>
 
-      {/* Open lobby explanation */}
+      {/* Team size picker */}
+      {teamSizeOptions && selectedGame && (
+        <div className="mb-5">
+          <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">{t.matches.teamSizeLabel}</p>
+          <div className="flex gap-2">
+            {teamSizeOptions.map((n) => (
+              <button
+                key={n}
+                onClick={() => setTeamSize(n)}
+                className={`flex-1 h-11 rounded-2xl border-2 font-bold text-sm transition-all cursor-pointer ${
+                  teamSize === n
+                    ? "bg-gradient-to-br from-amber-400 to-orange-500 border-amber-400 text-white shadow-md shadow-amber-200/50"
+                    : "bg-white border-stone-200 text-stone-600 hover:border-amber-300"
+                }`}
+              >
+                {n === 1 ? "1v1" : `${n}v${n}`}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Open lobby explanation: flunky always, freestyle when team > 1 */}
       {isFlunkyBall && (
         <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-4 flex items-start gap-3">
           <Users size={15} className="text-emerald-500 mt-0.5 flex-shrink-0" />
           <p className="text-xs text-stone-600 leading-relaxed font-semibold">{t.matches.openLobbyHint}</p>
+        </div>
+      )}
+      {isFreestyle && teamSize > 1 && (
+        <div className="bg-violet-50 border border-violet-200 rounded-2xl p-4 mb-4 flex items-start gap-3">
+          <Users size={15} className="text-violet-500 mt-0.5 flex-shrink-0" />
+          <p className="text-xs text-stone-600 leading-relaxed font-semibold">{t.matches.freestyleOpenLobbyHint}</p>
         </div>
       )}
 
