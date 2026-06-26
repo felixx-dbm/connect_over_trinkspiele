@@ -58,7 +58,7 @@ export type CrewMatchParticipantRow = {
   user_id: string;
   crew_id: string;
   joined_at: string;
-  users: { username: string } | null;
+  users: { username: string; avatar_url: string | null } | null;
   crews: { name: string } | null;
 };
 

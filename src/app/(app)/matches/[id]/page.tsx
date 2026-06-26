@@ -29,15 +29,15 @@ type Match = {
   is_open_lobby: boolean;
   custom_game_name: string | null;
   game_types: { name: string } | null;
-  challenger: { username: string } | null;
-  opponent: { username: string } | null;
+  challenger: { username: string; avatar_url: string | null } | null;
+  opponent: { username: string; avatar_url: string | null } | null;
 };
 
 type MatchMember = {
   id: string;
   user_id: string;
   team: "challenger" | "opponent";
-  users: { username: string } | null;
+  users: { username: string; avatar_url: string | null } | null;
 };
 
 const STATUS_STYLE = {
@@ -78,7 +78,7 @@ export default function MatchPage() {
     const supabase = createClient();
     const { data } = await supabase
       .from("match_members")
-      .select("id, user_id, team, users(username)")
+      .select("id, user_id, team, users(username,avatar_url)")
       .eq("match_id", id);
     if (data) setMembers(data as unknown as MatchMember[]);
   }, [id]);
@@ -87,7 +87,7 @@ export default function MatchPage() {
     const supabase = createClient();
     const { data } = await supabase
       .from("matches")
-      .select("id, status, mode, winner_id, challenger_id, opponent_id, created_at, expires_at, team_size, slots_challenger, slots_opponent, challenger_result, opponent_result, disputed, meeting_hint, fuzzy_lat, fuzzy_lng, is_open_lobby, custom_game_name, game_types(name), challenger:challenger_id(username), opponent:opponent_id(username)")
+      .select("id, status, mode, winner_id, challenger_id, opponent_id, created_at, expires_at, team_size, slots_challenger, slots_opponent, challenger_result, opponent_result, disputed, meeting_hint, fuzzy_lat, fuzzy_lng, is_open_lobby, custom_game_name, game_types(name), challenger:challenger_id(username,avatar_url), opponent:opponent_id(username,avatar_url)")
       .eq("id", id)
       .single();
     if (data) setMatch(data as unknown as Match);
@@ -408,7 +408,7 @@ export default function MatchPage() {
                   {Array.from({ length: match.team_size }).map((_, i) => {
                     const member = challengerMembers[i];
                     return (
-                      <div key={i} className={`w-10 h-10 rounded-xl flex items-center justify-center font-display text-sm ${
+                      <div key={i} className={`w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center font-display text-sm ${
                         member
                           ? member.user_id === currentUserId
                             ? "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-md shadow-amber-200/50"
@@ -416,7 +416,9 @@ export default function MatchPage() {
                           : "border-2 border-dashed border-amber-200 text-amber-300"
                       }`}>
                         {member
-                          ? (member.users?.username?.slice(0, 2).toUpperCase() ?? "??")
+                          ? member.users?.avatar_url
+                            ? <img src={member.users.avatar_url} alt="" className="w-full h-full object-cover" />
+                            : (member.users?.username?.slice(0, 2).toUpperCase() ?? "??")
                           : "+"}
                       </div>
                     );
@@ -436,7 +438,7 @@ export default function MatchPage() {
                   {Array.from({ length: match.team_size }).map((_, i) => {
                     const member = opponentMembers[i];
                     return (
-                      <div key={i} className={`w-10 h-10 rounded-xl flex items-center justify-center font-display text-sm ${
+                      <div key={i} className={`w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center font-display text-sm ${
                         member
                           ? member.user_id === currentUserId
                             ? "bg-gradient-to-br from-violet-400 to-purple-500 text-white shadow-md shadow-violet-200/50"
@@ -444,7 +446,9 @@ export default function MatchPage() {
                           : "border-2 border-dashed border-violet-200 text-violet-300"
                       }`}>
                         {member
-                          ? (member.users?.username?.slice(0, 2).toUpperCase() ?? "??")
+                          ? member.users?.avatar_url
+                            ? <img src={member.users.avatar_url} alt="" className="w-full h-full object-cover" />
+                            : (member.users?.username?.slice(0, 2).toUpperCase() ?? "??")
                           : "+"}
                       </div>
                     );
@@ -456,12 +460,14 @@ export default function MatchPage() {
             /* ── 1v1 display ── */
             <div className="flex items-center justify-between gap-4">
               <div className="flex flex-col items-center gap-2 flex-1">
-                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center font-display text-lg shadow-md ${
+                <div className={`w-16 h-16 rounded-2xl overflow-hidden flex items-center justify-center font-display text-lg shadow-md ${
                   isChallenger
                     ? "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-amber-200/60"
                     : "bg-stone-100 border border-stone-200 text-stone-600"
                 }`}>
-                  {challengerName.slice(0, 2).toUpperCase()}
+                  {match.challenger?.avatar_url
+                    ? <img src={match.challenger.avatar_url} alt="" className="w-full h-full object-cover" />
+                    : challengerName.slice(0, 2).toUpperCase()}
                 </div>
                 <p className="text-stone-800 font-bold text-sm text-center">{challengerName}</p>
                 {isChallenger && <span className="text-xs bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full font-bold">{t.matches.you}</span>}
@@ -471,12 +477,14 @@ export default function MatchPage() {
                 <Swords size={16} className="text-stone-300" />
               </div>
               <div className="flex flex-col items-center gap-2 flex-1">
-                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center font-display text-lg shadow-md ${
+                <div className={`w-16 h-16 rounded-2xl overflow-hidden flex items-center justify-center font-display text-lg shadow-md ${
                   !isChallenger && match.opponent
                     ? "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-amber-200/60"
                     : "bg-stone-100 border border-stone-200 text-stone-600"
                 }`}>
-                  {match.opponent ? opponentName.slice(0, 2).toUpperCase() : "?"}
+                  {match.opponent?.avatar_url
+                    ? <img src={match.opponent.avatar_url} alt="" className="w-full h-full object-cover" />
+                    : match.opponent ? opponentName.slice(0, 2).toUpperCase() : "?"}
                 </div>
                 <p className="text-stone-800 font-bold text-sm text-center">{opponentName}</p>
                 {!isChallenger && match.opponent && <span className="text-xs bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full font-bold">{t.matches.you}</span>}

@@ -44,7 +44,7 @@ export default function CrewMatchPage() {
     const supabase = createClient();
     const { data } = await supabase
       .from("crew_match_participants")
-      .select("id, crew_match_id, user_id, crew_id, joined_at, users(username), crews(name)")
+      .select("id, crew_match_id, user_id, crew_id, joined_at, users(username,avatar_url), crews(name)")
       .eq("crew_match_id", id);
     if (data) setParticipants(data as unknown as CrewMatchParticipantRow[]);
   }, [id]);
@@ -281,6 +281,9 @@ export default function CrewMatchPage() {
                         ? "bg-violet-100 text-violet-700 border border-violet-200"
                         : "bg-stone-100 text-stone-600 border border-stone-200"
                     }`}>
+                      {(p.users as unknown as { username: string; avatar_url: string | null } | null)?.avatar_url && (
+                        <img src={(p.users as unknown as { avatar_url: string }).avatar_url} alt="" className="w-4 h-4 rounded-full object-cover flex-shrink-0" />
+                      )}
                       {(p.users as unknown as { username: string } | null)?.username ?? "?"}
                     </span>
                   ))
@@ -305,12 +308,15 @@ export default function CrewMatchPage() {
                       <span className="text-stone-300 text-xs font-semibold">—</span>
                     ) : (
                       opponentParticipants.map((p) => (
-                        <span key={p.id} className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                        <span key={p.id} className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-bold ${
                           p.user_id === currentUserId
                             ? "bg-amber-100 text-amber-700 border border-amber-200"
                             : "bg-stone-100 text-stone-600 border border-stone-200"
                         }`}>
-                          {(p.users as unknown as { username: string } | null)?.username ?? "?"}
+                          {(p.users as unknown as { username: string; avatar_url: string | null } | null)?.avatar_url && (
+                        <img src={(p.users as unknown as { avatar_url: string }).avatar_url} alt="" className="w-4 h-4 rounded-full object-cover flex-shrink-0" />
+                      )}
+                      {(p.users as unknown as { username: string } | null)?.username ?? "?"}
                         </span>
                       ))
                     )}
