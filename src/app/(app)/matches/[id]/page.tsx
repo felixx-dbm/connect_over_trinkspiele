@@ -22,6 +22,7 @@ type Match = {
   slots_opponent: number;
   challenger_result: "win" | "loss" | null;
   opponent_result: "win" | "loss" | null;
+  first_result_at: string | null;
   disputed: boolean;
   meeting_hint: string | null;
   fuzzy_lat: number | null;
@@ -71,8 +72,10 @@ export default function MatchPage() {
   const [showReport, setShowReport] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState<string | null>(null);
+  const [resolveCountdown, setResolveCountdown] = useState<string | null>(null);
   const prevOpponentId = useRef<string | null | undefined>(undefined);
   const prevStatus = useRef<string | undefined>(undefined);
+  const autoResolveTriggered = useRef(false);
 
   const fetchMembers = useCallback(async () => {
     const supabase = createClient();
@@ -87,7 +90,7 @@ export default function MatchPage() {
     const supabase = createClient();
     const { data } = await supabase
       .from("matches")
-      .select("id, status, mode, winner_id, challenger_id, opponent_id, created_at, expires_at, team_size, slots_challenger, slots_opponent, challenger_result, opponent_result, disputed, meeting_hint, fuzzy_lat, fuzzy_lng, is_open_lobby, custom_game_name, game_types(name), challenger:challenger_id(username,avatar_url), opponent:opponent_id(username,avatar_url)")
+      .select("id, status, mode, winner_id, challenger_id, opponent_id, created_at, expires_at, team_size, slots_challenger, slots_opponent, challenger_result, opponent_result, first_result_at, disputed, meeting_hint, fuzzy_lat, fuzzy_lng, is_open_lobby, custom_game_name, game_types(name), challenger:challenger_id(username,avatar_url), opponent:opponent_id(username,avatar_url)")
       .eq("id", id)
       .single();
     if (data) setMatch(data as unknown as Match);
@@ -104,7 +107,7 @@ export default function MatchPage() {
       const supabase = createClient();
       const { data } = await supabase
         .from("matches")
-        .select("status, winner_id, opponent_id, slots_challenger, slots_opponent, challenger_result, opponent_result, disputed")
+        .select("status, winner_id, opponent_id, slots_challenger, slots_opponent, challenger_result, opponent_result, first_result_at, disputed")
         .eq("id", id)
         .single();
       if (data) {
@@ -141,6 +144,47 @@ export default function MatchPage() {
     const t = setInterval(tick, 60_000);
     return () => clearInterval(t);
   }, [match?.expires_at, match?.status]);
+
+  // Countdown to auto-resolve (10 min after first result submitted)
+  useEffect(() => {
+    if (!match?.first_result_at || match.status !== "active") {
+      setResolveCountdown(null);
+      return;
+    }
+    const autoAt = new Date(match.first_result_at).getTime() + 10 * 60 * 1000;
+    const tick = () => {
+      const ms = autoAt - Date.now();
+      if (ms <= 0) {
+        setResolveCountdown("0:00");
+        return;
+      }
+      const m = Math.floor(ms / 60_000);
+      const s = Math.floor((ms % 60_000) / 1000);
+      setResolveCountdown(`${m}:${s.toString().padStart(2, "0")}`);
+    };
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, [match?.first_result_at, match?.status]);
+
+  // Trigger auto-resolve when countdown expires and I'm a participant
+  useEffect(() => {
+    if (!match?.first_result_at || match.status !== "active" || autoResolveTriggered.current) return;
+    const autoAt = new Date(match.first_result_at).getTime() + 10 * 60 * 1000;
+    const delay = autoAt - Date.now();
+    if (delay > 0) {
+      const timer = setTimeout(async () => {
+        if (autoResolveTriggered.current) return;
+        autoResolveTriggered.current = true;
+        await fetch(`/api/matches/${id}/auto-resolve`, { method: "POST" });
+        await fetchMatch();
+      }, delay);
+      return () => clearTimeout(timer);
+    }
+    // Already expired — trigger immediately
+    autoResolveTriggered.current = true;
+    fetch(`/api/matches/${id}/auto-resolve`, { method: "POST" }).then(() => fetchMatch());
+  }, [match?.first_result_at, match?.status, id, fetchMatch]);
 
   const showNotif = (msg: string) => {
     setNotification(msg);
@@ -377,20 +421,33 @@ export default function MatchPage() {
 
       {/* Opponent reported, waiting for me */}
       {match.status === "active" && isParticipant && theirResult !== null && !iAlreadySubmitted && (
-        <div className="bg-amber-50 border border-amber-300 rounded-2xl px-4 py-3 mb-4 flex items-center gap-2 text-amber-800 text-sm font-bold">
-          <span className="text-lg">👆</span>
-          {t.matches.opponentReported}
+        <div className="bg-amber-50 border border-amber-300 rounded-2xl px-4 py-3 mb-4 text-amber-800 text-sm font-bold">
+          <div className="flex items-center gap-2 mb-0.5">
+            <span className="text-lg leading-none">👆</span>
+            {t.matches.opponentReported}
+          </div>
+          {resolveCountdown && (
+            <p className="text-amber-600 text-xs font-semibold mt-1 pl-1">
+              {t.matches.autoResolvesIn.replace("{time}", resolveCountdown)}
+            </p>
+          )}
         </div>
       )}
 
       {/* Waiting for opponent to confirm after I submitted */}
-      {resultStatus === "waiting" && (
+      {(resultStatus === "waiting" || (mySubmittedResult !== null && theirResult === null)) && match.status === "active" && (
         <div className="bg-sky-50 border border-sky-200 rounded-2xl px-4 py-3 mb-4 text-sky-700 text-sm font-bold">
           <div className="flex items-center gap-2 mb-0.5">
             <Loader2 size={13} className="animate-spin flex-shrink-0" />
             {t.matches.waitingConfirmation}
           </div>
-          <p className="text-sky-500 text-xs font-semibold pl-5">{t.matches.waitingConfirmationHint}</p>
+          {resolveCountdown ? (
+            <p className="text-sky-500 text-xs font-semibold pl-5">
+              {t.matches.autoResolvesIn.replace("{time}", resolveCountdown)}
+            </p>
+          ) : (
+            <p className="text-sky-500 text-xs font-semibold pl-5">{t.matches.waitingConfirmationHint}</p>
+          )}
         </div>
       )}
 
