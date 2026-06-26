@@ -227,8 +227,9 @@ export default function MapView({ filter }: { filter: string }) {
   const ownMatches = filteredMatches.filter((m) => m.is_own);
   const externalQueue = queue.filter((q) => !q.is_own);
   const externalCrewMatches = crewMatches.filter((cm) => !cm.is_own);
+  const ownCrewMatches = crewMatches.filter((cm) => cm.is_own);
   const totalExternal = externalMatches.length + externalCrewMatches.length;
-  const hasNearby = totalExternal > 0 || externalQueue.length > 0;
+  const hasNearby = filteredMatches.length > 0 || crewMatches.length > 0 || externalQueue.length > 0;
 
   if (!location && !locationError) {
     return (
@@ -458,6 +459,32 @@ export default function MapView({ filter }: { filter: string }) {
         {/* Sheet content */}
         {listOpen && (
           <div className="bg-white border-t border-amber-50 max-h-[55vh] overflow-y-auto">
+            {/* Own crew challenges */}
+            {ownCrewMatches.length > 0 && (
+              <div className="px-4 pt-4 pb-2">
+                <p className="text-[10px] text-violet-500 uppercase tracking-widest mb-2 font-bold">{t.map.yourChallenges} · Crew</p>
+                <div className="flex flex-col gap-2">
+                  {ownCrewMatches.map((cm) => (
+                    <button
+                      key={cm.id}
+                      onClick={() => router.push(`/crew-matches/${cm.id}`)}
+                      className="flex items-center gap-3 bg-violet-50 border border-violet-200 rounded-xl p-3 text-left cursor-pointer hover:border-violet-400 transition-colors w-full"
+                    >
+                      <span className="text-xl flex-shrink-0">👥</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-violet-700 text-sm font-bold">{cm.challenger_crew_name}</p>
+                        <p className="text-stone-400 text-xs font-semibold capitalize flex items-center gap-1 mt-0.5">
+                          <Navigation size={9} />
+                          {cm.game_type_name.replace(/_/g, " ")} · {t.map.waitingOpponent}
+                        </p>
+                      </div>
+                      <span className="text-xs text-violet-500 font-bold flex-shrink-0">View →</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Own challenges */}
             {ownMatches.length > 0 && (
               <div className="px-4 pt-4 pb-2">
@@ -550,7 +577,7 @@ export default function MapView({ filter }: { filter: string }) {
               </div>
             )}
 
-            {filteredMatches.length === 0 && externalCrewMatches.length === 0 && (
+            {filteredMatches.length === 0 && crewMatches.length === 0 && (
               <div className="px-4 py-8 text-center">
                 <p className="text-stone-400 text-sm font-semibold">{t.map.noBattlesFilter}</p>
               </div>
