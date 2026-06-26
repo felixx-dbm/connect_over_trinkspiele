@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Trophy, Users, Swords, ChevronLeft, Share2 } from "lucide-react";
+import { Trophy, Users, Swords, ChevronLeft, Share2, Trash2, Loader2 } from "lucide-react";
 import { useT } from "@/components/LanguageProvider";
 import { createClient } from "@/lib/supabase/client";
 
@@ -12,6 +12,7 @@ type Event = {
   name: string;
   join_code: string;
   city: string | null;
+  created_by: string;
 };
 
 type Member = {
@@ -33,6 +34,7 @@ type Battle = {
 export default function EventDetailPage() {
   const { id } = useParams() as { id: string };
   const t = useT();
+  const router = useRouter();
   const supabase = createClient();
 
   const [event, setEvent] = useState<Event | null>(null);
@@ -41,13 +43,16 @@ export default function EventDetailPage() {
   const [userId, setUserId] = useState<string>("");
   const [copied, setCopied] = useState(false);
   const [notFound, setNotFound] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) setUserId(user.id);
 
     const [{ data: ev }, { data: mems }, { data: matchData }] = await Promise.all([
-      supabase.from("events").select("id, name, join_code, city").eq("id", id).single(),
+      supabase.from("events").select("id, name, join_code, city, created_by").eq("id", id).single(),
       supabase.from("event_members").select("user_id, users(username, wins, losses)").eq("event_id", id),
       supabase
         .from("matches")
@@ -71,6 +76,21 @@ export default function EventDetailPage() {
     navigator.clipboard.writeText(event.join_code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  }
+
+  async function handleDelete() {
+    if (!deleteConfirm) { setDeleteConfirm(true); return; }
+    setDeleting(true);
+    setDeleteError(null);
+    const res = await fetch(`/api/events/${id}`, { method: "DELETE" });
+    if (res.ok) {
+      router.push("/events");
+    } else {
+      const data = await res.json() as { error?: string };
+      setDeleteError(data.error ?? "Failed to delete");
+      setDeleteConfirm(false);
+    }
+    setDeleting(false);
   }
 
   if (notFound) {
@@ -221,6 +241,24 @@ export default function EventDetailPage() {
             })}
           </div>
         </>
+      )}
+      {/* Delete event — creator only */}
+      {event.created_by === userId && (
+        <div className="mt-6 text-center">
+          {deleteError && <p className="text-rose-600 text-xs mb-2 font-semibold">{deleteError}</p>}
+          <button
+            onClick={handleDelete}
+            disabled={deleting}
+            className={`inline-flex items-center gap-2 text-xs px-4 py-2 rounded-xl border font-bold transition-all cursor-pointer ${
+              deleteConfirm
+                ? "text-rose-600 border-rose-300 bg-rose-50 hover:bg-rose-100"
+                : "text-stone-400 border-stone-200 hover:text-stone-600 hover:border-stone-300"
+            }`}
+          >
+            {deleting ? <Loader2 size={11} className="animate-spin" /> : <Trash2 size={11} />}
+            {deleting ? "Deleting…" : deleteConfirm ? "Confirm delete" : "Delete event"}
+          </button>
+        </div>
       )}
     </div>
   );
