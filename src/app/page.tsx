@@ -28,7 +28,7 @@ export default function AgeGate() {
           <p className="text-stone-500 leading-relaxed text-base">{t.ageGate.sorryText}</p>
           <button
             onClick={() => setDenied(false)}
-            className="mt-8 text-sm font-bold text-amber-600 hover:text-amber-700 underline underline-offset-4 transition-colors cursor-pointer"
+            className="link-arrow text-sm mt-8 cursor-pointer"
           >
             {t.ageGate.goBack}
           </button>
@@ -70,17 +70,17 @@ export default function AgeGate() {
           {t.ageGate.tagline}
         </p>
 
-        <div className="w-full bg-white/90 backdrop-blur-sm rounded-3xl p-6 mb-4 border border-amber-100 shadow-lg shadow-amber-100/60">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center mx-auto mb-4 shadow-md shadow-amber-300/50">
+        <div className="w-full bg-white/90 backdrop-blur-sm p-6 mb-4 border border-amber-100 shadow-lg shadow-amber-100/60">
+          <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center mx-auto mb-4 shadow-md ">
             <span className="text-white font-display text-sm tracking-widest">18+</span>
           </div>
-          <h2 className="text-stone-800 font-bold text-xl mb-2">{t.ageGate.badge}</h2>
+          
           <p className="text-stone-500 text-sm leading-relaxed">{t.ageGate.description}</p>
         </div>
 
         <Link
           href="/login"
-          className="w-full h-14 flex items-center justify-center text-white font-bold text-base rounded-2xl cursor-pointer mb-3 btn-gold gap-2"
+          className="w-full h-14 flex items-center justify-center text-base cursor-pointer mb-3 btn-gold gap-2"
         >
           {t.ageGate.enter}
         </Link>

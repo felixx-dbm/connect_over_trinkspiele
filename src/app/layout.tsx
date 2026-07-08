@@ -2,8 +2,13 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import { cookies } from "next/headers";
 import { LanguageProvider } from "@/components/LanguageProvider";
+import FloatingBackground from "@/components/FloatingBackground";
 import type { Locale } from "@/lib/i18n";
+
 import "./globals.css";
+//check
+
+
 
 const fraunces = Fraunces({
   weight: ["400", "500", "600"],
@@ -47,6 +52,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang={locale} className={`${fraunces.variable} ${inter.variable}`}>
       <body className="bg-[#FAF8F3] text-[#14110F] antialiased">
+        <FloatingBackground />
         <LanguageProvider locale={locale}>{children}</LanguageProvider>
       </body>
     </html>

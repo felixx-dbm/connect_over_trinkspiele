@@ -86,7 +86,7 @@ body {
 .btn-gold {
   background: #14110F;
   color: #FAF8F3;
-  font-family: var(--font-sans);
+  font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: 0.02em;
   border-radius: 0;
@@ -161,9 +161,10 @@ body {
    for a seamless loop. See Marquee.tsx for usage. */
 .marquee {
   overflow: hidden;
-  border-top: 1px solid #14110F;
-  border-bottom: 1px solid #14110F;
-  background: #14110F;
+  
+  background: rgba(20, 17, 15, 0.25); 
+  
+  backdrop-filter: blur(4px);
 }
 .marquee-track {
   display: flex;
@@ -171,14 +172,15 @@ body {
   animation: marquee-scroll 22s linear infinite;
 }
 .marquee-item {
-  font-family: var(--font-sans);
+  font-family: var(--font-display);
   font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #FAF8F3;
   white-space: nowrap;
-  padding: 0.9rem 1.25rem;
+  padding: 0.9rem 0;
+  text-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
 }
 @keyframes marquee-scroll {
   from { transform: translateX(0); }
@@ -211,6 +213,43 @@ body {
 .animate-pulse-glow  { animation: none; }
 .animate-wiggle      { animation: none; }
 .animate-confetti    { animation: fade-in 0.2s ease-out both; }
+
+/* ── Floating emoji background (site-wide) ──────────────── */
+/* Fixed, negative z-index so it sits behind all in-flow page
+   content without needing position/z-index changes anywhere
+   else. See FloatingBackground.tsx for the emoji list/layout. */
+.floating-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.floating-emoji {
+  position: absolute;
+  font-size: var(--fsize, 2rem);
+  opacity: 0;
+  filter: drop-shadow(0 0 12px rgba(180, 83, 9, 0.35));
+  animation:
+    emoji-drift var(--duration, 16s) ease-in-out infinite,
+    emoji-fade var(--duration, 16s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+  will-change: transform, opacity;
+}
+@keyframes emoji-drift {
+  0%   { transform: translateY(0)      rotate(var(--rot, 0deg)); }
+  50%  { transform: translateY(-22px)  rotate(var(--rot, 0deg)); }
+  100% { transform: translateY(0)      rotate(var(--rot, 0deg)); }
+}
+@keyframes emoji-fade {
+  0%, 100% { opacity: 0; }
+  15%      { opacity: var(--peak, 0.07); }
+  50%      { opacity: var(--peak, 0.07); }
+  85%      { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .floating-emoji { animation: none; opacity: var(--peak, 0.07); }
+}
 
 /* ── Bottom safe area ───────────────────────────────────── */
 .pb-safe {

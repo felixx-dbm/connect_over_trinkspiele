@@ -7,6 +7,7 @@ import { ArrowLeft, Eye, EyeOff, Mail, Lock, AlertCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { safeRedirect } from "@/lib/redirect";
 import { useT } from "@/components/LanguageProvider";
+import Marquee from "@/components/Marquee";
 
 function LoginForm() {
   const searchParams = useSearchParams();
@@ -54,6 +55,13 @@ function LoginForm() {
 
   return (
     <div className="flex-1 flex flex-col px-6 py-8">
+      {/* Full-bleed break-out: cancels the parent's max-w-sm/mx-auto
+          constraint so the ticker spans the true viewport width.
+          Relies on the (auth) layout wrapper having overflow-hidden. */}
+      <div className="relative left-1/2 right-1/2 -mx-[50vw] w-screen -mt-8 mb-8" style={{ minHeight: 40 }}>
+        <Marquee />
+      </div>
+
       <Link
         href="/"
         className="flex items-center gap-2 text-[#8C7A5B] hover:text-[#14110F] transition-colors w-fit mb-10 cursor-pointer"
