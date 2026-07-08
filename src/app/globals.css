@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-nunito);
-  --font-display: var(--font-russo);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-fraunces);
 }
 
 html {
@@ -10,201 +10,234 @@ html {
 }
 
 body {
-  background-color: #FFFBEB;
-  color: #1C1917;
+  background-color: #FAF8F3;
+  color: #14110F;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 /* ── Scrollbar ──────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: #FEF3C7; }
-::-webkit-scrollbar-thumb { background: #FCD34D; border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: #F59E0B; }
+::-webkit-scrollbar-track { background: #F0ECE2; }
+::-webkit-scrollbar-thumb { background: #C9BFA8; border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: #8C7A5B; }
 
-/* ── Gradient text ──────────────────────────────────────── */
-.text-gradient {
-  background: linear-gradient(130deg, #F59E0B 0%, #F97316 55%, #F43F5E 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* ── Display type ───────────────────────────────────────── */
+/* Big italic serif headline treatment — the core signature of
+   this look. Apply .display to h1/h2 wrappers. */
+.display {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 0.95;
 }
+.display-upright {
+  font-family: var(--font-display);
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 0.95;
+}
+
+/* ── Eyebrow labels ─────────────────────────────────────── */
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #8C7A5B;
+}
+
+/* Kept for backward compat with existing gradient-text usages —
+   now flat ink color, no gradient fill. */
+.text-gradient,
 .text-gradient-gold {
-  background: linear-gradient(130deg, #D97706 0%, #F59E0B 60%, #FCD34D 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #14110F;
 }
 
-/* ── Gradient border ring ───────────────────────────────── */
+/* ── Hairline ring (replaces gradient border) ───────────── */
 .ring-gradient {
-  background: linear-gradient(white, white) padding-box,
-              linear-gradient(135deg, #F59E0B, #F43F5E) border-box;
-  border: 3px solid transparent;
+  background: #FAF8F3;
+  border: 1px solid #14110F;
 }
 
-/* ── Card ───────────────────────────────────────────────── */
+/* ── Card → editorial block ─────────────────────────────── */
+/* No shadow, no rounded corners. A hairline top rule and
+   generous padding do the separating instead. */
 .card {
-  background: rgba(255,255,255,0.95);
-  border: 1px solid rgba(245,158,11,0.15);
-  box-shadow: 0 2px 12px rgba(120,53,15,0.07), 0 1px 3px rgba(0,0,0,0.04);
+  background: transparent;
+  border: none;
+  border-top: 1px solid #E3DCCB;
+  border-radius: 0;
+  box-shadow: none;
+  padding-top: 1.5rem;
 }
 .card-hover {
-  transition: transform 0.22s cubic-bezier(0.34,1.3,0.64,1),
-              box-shadow 0.22s ease;
+  transition: opacity 0.15s ease;
 }
 .card-hover:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 36px rgba(120,53,15,0.13), 0 2px 8px rgba(0,0,0,0.06);
+  opacity: 0.7;
 }
 
 /* ── Buttons ────────────────────────────────────────────── */
+/* Solid ink button, sharp corners, no shadow/scale tricks. */
 .btn-gold {
-  background: linear-gradient(135deg, #F59E0B 0%, #F97316 100%);
-  color: #fff;
-  font-weight: 700;
-  box-shadow: 0 4px 20px rgba(245,158,11,0.5), 0 1px 4px rgba(0,0,0,0.1);
-  transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1),
-              box-shadow 0.18s ease,
-              filter 0.18s ease;
+  background: #14110F;
+  color: #FAF8F3;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border-radius: 0;
+  box-shadow: none;
+  transition: background-color 0.15s ease;
 }
 .btn-gold:hover {
-  transform: translateY(-2px) scale(1.015);
-  box-shadow: 0 8px 28px rgba(245,158,11,0.6), 0 2px 6px rgba(0,0,0,0.12);
-  filter: brightness(1.06);
+  background: #322C24;
 }
 .btn-gold:active {
-  transform: scale(0.965);
-  box-shadow: 0 2px 10px rgba(245,158,11,0.35);
+  background: #14110F;
 }
 
 .btn-outline {
-  background: rgba(255,255,255,0.9);
-  border: 1.5px solid rgba(245,158,11,0.3);
-  color: #B45309;
-  box-shadow: 0 2px 8px rgba(120,53,15,0.06);
-  transition: all 0.18s ease;
+  background: transparent;
+  border: 1px solid #14110F;
+  color: #14110F;
+  border-radius: 0;
+  box-shadow: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 .btn-outline:hover {
-  background: #FFFBEB;
-  border-color: #F59E0B;
-  box-shadow: 0 4px 16px rgba(245,158,11,0.18);
+  background: #14110F;
+  color: #FAF8F3;
 }
 
-/* ── Glow effects ───────────────────────────────────────── */
-.glow-gold {
-  box-shadow: 0 0 28px rgba(245,158,11,0.45), 0 4px 14px rgba(245,158,11,0.22);
+/* ── Underline link CTA ─────────────────────────────────── */
+/* Use for secondary actions in place of outline buttons where
+   an inline, editorial-style link reads better than a box. */
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: #14110F;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 0.1em;
+  transition: opacity 0.15s ease;
 }
-.glow-rose {
-  box-shadow: 0 0 28px rgba(244,63,94,0.4), 0 4px 14px rgba(244,63,94,0.2);
+.link-arrow:hover {
+  opacity: 0.6;
 }
-.glow-emerald {
-  box-shadow: 0 0 28px rgba(16,185,129,0.35), 0 4px 14px rgba(16,185,129,0.18);
+.link-arrow::after {
+  content: "➺";
 }
+
+/* ── Status accents (replace colored glow shadows) ──────── */
+/* Flat hairline instead of a colored blur — reads as a status
+   marker, not a decorative effect. */
+.glow-gold,
+.glow-rose,
+.glow-emerald,
 .glow-violet {
-  box-shadow: 0 0 28px rgba(139,92,246,0.35), 0 4px 14px rgba(139,92,246,0.18);
+  box-shadow: none;
+  border: 1px solid #14110F;
 }
 
-/* ── Mesh gradient background ───────────────────────────── */
+/* ── Background ─────────────────────────────────────────── */
 .mesh-bg::before {
   content: "";
   position: fixed;
   inset: 0;
-  background:
-    radial-gradient(ellipse 80% 60% at 5% 8%, rgba(251,191,36,0.18) 0%, transparent 58%),
-    radial-gradient(ellipse 60% 75% at 92% 15%, rgba(167,139,250,0.13) 0%, transparent 55%),
-    radial-gradient(ellipse 80% 50% at 78% 92%, rgba(52,211,153,0.11) 0%, transparent 55%),
-    radial-gradient(ellipse 65% 60% at 12% 82%, rgba(251,113,133,0.11) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 50% at 55% 48%, rgba(56,189,248,0.07) 0%, transparent 55%);
+  background: #FAF8F3;
   pointer-events: none;
   z-index: 0;
 }
 
-/* ── Animations ─────────────────────────────────────────── */
-@keyframes blob-drift {
-  0%, 100% { transform: translate(0,0) scale(1); }
-  20% { transform: translate(14px,-20px) scale(1.04); }
-  40% { transform: translate(-10px,-12px) scale(0.96); }
-  60% { transform: translate(18px,8px) scale(1.02); }
-  80% { transform: translate(-6px,16px) scale(0.98); }
+/* ── Marquee ticker (signature element) ─────────────────── */
+/* Endless scrolling line of small-caps text, separated by a
+   diamond glyph. Duplicate the child content twice in markup
+   for a seamless loop. See Marquee.tsx for usage. */
+.marquee {
+  overflow: hidden;
+  border-top: 1px solid #14110F;
+  border-bottom: 1px solid #14110F;
+  background: #14110F;
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 22s linear infinite;
+}
+.marquee-item {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #FAF8F3;
+  white-space: nowrap;
+  padding: 0.9rem 1.25rem;
+}
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
 }
 
-@keyframes bounce-in {
-  0% { transform: scale(0.25); opacity: 0; }
-  50% { transform: scale(1.12); opacity: 1; }
-  75% { transform: scale(0.93); }
-  100% { transform: scale(1); }
+/* ── Motion ─────────────────────────────────────────────── */
+/* Kept class names used elsewhere in the app, reduced to quiet
+   fades. No bounce/spring/wiggle/confetti — those are the
+   biggest "AI app" tell and don't fit an editorial register. */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
-
-@keyframes float-gentle {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  33% { transform: translateY(-7px) rotate(2.5deg); }
-  66% { transform: translateY(4px) rotate(-1.5deg); }
-}
-
 @keyframes slide-up {
-  from { transform: translateY(14px); opacity: 0; }
+  from { transform: translateY(10px); opacity: 0; }
   to   { transform: translateY(0);    opacity: 1; }
 }
 
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 12px rgba(245,158,11,0.3); }
-  50%       { box-shadow: 0 0 28px rgba(245,158,11,0.65); }
-}
-
-@keyframes wiggle {
-  0%, 100% { transform: rotate(-3deg); }
-  50%       { transform: rotate(3deg); }
-}
-
-@keyframes confetti-pop {
-  0%   { transform: scale(0) rotate(0deg);   opacity: 0; }
-  60%  { transform: scale(1.2) rotate(15deg); opacity: 1; }
-  100% { transform: scale(1)   rotate(10deg); opacity: 1; }
-}
-
-.animate-blob   { animation: blob-drift 10s ease-in-out infinite; }
-.animate-blob-2 { animation: blob-drift 14s ease-in-out 3.5s infinite; }
-.animate-blob-3 { animation: blob-drift 18s ease-in-out 7s   infinite; }
-.animate-bounce-in   { animation: bounce-in 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
-.animate-float       { animation: float-gentle 4s ease-in-out infinite; }
-.animate-slide-up    { animation: slide-up 0.3s ease-out both; }
-.animate-spin-slow   { animation: spin-slow 8s linear infinite; }
-.animate-pulse-glow  { animation: pulse-glow 2s ease-in-out infinite; }
-.animate-wiggle      { animation: wiggle 2.5s ease-in-out infinite; }
-.animate-confetti    { animation: confetti-pop 0.45s cubic-bezier(0.34,1.56,0.64,1) both; }
+.animate-blob   { animation: none; }
+.animate-blob-2 { animation: none; }
+.animate-blob-3 { animation: none; }
+.animate-bounce-in   { animation: fade-in 0.2s ease-out both; }
+.animate-float       { animation: none; }
+.animate-slide-up    { animation: slide-up 0.25s ease-out both; }
+.animate-spin-slow   { animation: spin 1s linear infinite; }
+.animate-pulse-glow  { animation: none; }
+.animate-wiggle      { animation: none; }
+.animate-confetti    { animation: fade-in 0.2s ease-out both; }
 
 /* ── Bottom safe area ───────────────────────────────────── */
 .pb-safe {
   padding-bottom: max(96px, calc(96px + env(safe-area-inset-bottom)));
 }
 
-/* ── Leaflet — natural colours on light bg ──────────────── */
+/* ── Leaflet — muted editorial map ──────────────────────── */
 .leaflet-tile {
-  filter: saturate(0.85) brightness(1.03);
+  filter: grayscale(0.4) saturate(0.7) brightness(1.02);
 }
-.leaflet-container { background: #E8F5E9; }
+.leaflet-container { background: #F0ECE2; }
 .leaflet-popup-content-wrapper {
-  background: rgba(255,255,255,0.97);
-  border: 1px solid rgba(245,158,11,0.2);
-  border-radius: 16px;
+  background: #FAF8F3;
+  border: 1px solid #14110F;
+  border-radius: 0;
   padding: 0;
-  box-shadow: 0 4px 24px rgba(120,53,15,0.12);
+  box-shadow: none;
 }
 .leaflet-popup-content { margin: 0; }
-.leaflet-popup-tip { background: rgba(245,158,11,0.15); }
+.leaflet-popup-tip { background: #14110F; }
 
 /* ── Own match map icon pulse ───────────────────────────── */
 @keyframes own-match-ring {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.55), 0 4px 14px rgba(99,102,241,0.45); }
-  60%      { box-shadow: 0 0 0 9px rgba(99,102,241,0), 0 4px 14px rgba(99,102,241,0.45); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(20,17,15,0.4), 0 2px 6px rgba(20,17,15,0.15); }
+  60%      { box-shadow: 0 0 0 6px rgba(20,17,15,0), 0 2px 6px rgba(20,17,15,0.15); }
 }
-.own-match-pulse { animation: own-match-ring 1.8s ease-out infinite; }
+.own-match-pulse { animation: own-match-ring 2s ease-out infinite; }
 
 /* ── No scrollbar ───────────────────────────────────────── */
 .no-scrollbar::-webkit-scrollbar { display: none; }
