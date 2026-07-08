@@ -56,23 +56,24 @@ function LoginForm() {
     <div className="flex-1 flex flex-col px-6 py-8">
       <Link
         href="/"
-        className="flex items-center gap-2 text-stone-500 hover:text-stone-800 transition-colors w-fit mb-10 cursor-pointer"
+        className="flex items-center gap-2 text-[#8C7A5B] hover:text-[#14110F] transition-colors w-fit mb-10 cursor-pointer"
       >
         <ArrowLeft size={18} />
-        <span className="text-sm font-bold">{t.common.back}</span>
+        <span className="text-sm font-semibold">{t.common.back}</span>
       </Link>
 
       <div className="mb-10">
-        <div className="text-5xl mb-4 animate-bounce-in">👋</div>
-        <h1 className="font-display text-4xl text-stone-900 leading-tight mb-1">
-          {t.auth.loginTitle} <span className="text-gradient">{t.auth.loginTitleAccent}</span>
+        <p className="eyebrow mb-2">{t.auth.loginSubtitle}</p>
+        <h1 className="display text-5xl leading-[0.95]">
+          {t.auth.loginTitle}
+          <br />
+          {t.auth.loginTitleAccent}
         </h1>
-        <p className="text-stone-500 text-sm font-semibold">{t.auth.loginSubtitle}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 flex-1">
         <div className="relative">
-          <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-amber-400" />
+          <Mail size={16} className="absolute left-0 top-1/2 -translate-y-1/2 text-[#8C7A5B]" />
           <input
             name="email"
             type="email"
@@ -81,12 +82,12 @@ function LoginForm() {
             onChange={handleChange}
             autoComplete="email"
             required
-            className="w-full h-14 bg-white border border-amber-100 rounded-2xl pl-11 pr-4 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 transition-all text-sm font-semibold shadow-sm"
+            className="w-full h-14 bg-transparent border-b border-[#14110F] pl-7 pr-4 text-[#14110F] placeholder:text-[#8C7A5B] focus:outline-none focus:border-b-2 transition-all text-sm font-medium"
           />
         </div>
 
         <div className="relative">
-          <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-amber-400" />
+          <Lock size={16} className="absolute left-0 top-1/2 -translate-y-1/2 text-[#8C7A5B]" />
           <input
             name="password"
             type={showPassword ? "text" : "password"}
@@ -95,25 +96,25 @@ function LoginForm() {
             onChange={handleChange}
             autoComplete="current-password"
             required
-            className="w-full h-14 bg-white border border-amber-100 rounded-2xl pl-11 pr-12 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 transition-all text-sm font-semibold shadow-sm"
+            className="w-full h-14 bg-transparent border-b border-[#14110F] pl-7 pr-12 text-[#14110F] placeholder:text-[#8C7A5B] focus:outline-none focus:border-b-2 transition-all text-sm font-medium"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors cursor-pointer"
+            className="absolute right-0 top-1/2 -translate-y-1/2 text-[#8C7A5B] hover:text-[#14110F] transition-colors cursor-pointer"
           >
             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         </div>
 
         <div className="flex justify-end">
-          <Link href="/forgot-password" className="text-sm font-bold text-amber-600 hover:text-amber-700 transition-colors cursor-pointer">
+          <Link href="/forgot-password" className="text-sm font-semibold text-[#8C7A5B] hover:text-[#14110F] transition-colors cursor-pointer">
             {t.auth.forgotPassword}
           </Link>
         </div>
 
         {error && (
-          <div className="flex items-center gap-2 text-rose-600 text-sm bg-rose-50 border border-rose-200 rounded-2xl px-4 py-3 font-semibold">
+          <div className="flex items-center gap-2 text-[#14110F] text-sm border border-[#14110F] px-4 py-3 font-medium">
             <AlertCircle size={14} className="flex-shrink-0" />
             {error}
           </div>
@@ -122,24 +123,24 @@ function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className={`w-full h-14 flex items-center justify-center text-base rounded-2xl cursor-pointer gap-2 ${
-            !loading ? "btn-gold" : "bg-amber-100 text-amber-400 cursor-not-allowed font-bold"
+          className={`w-full h-14 flex items-center justify-center text-base cursor-pointer gap-2 mt-2 ${
+            !loading ? "btn-gold" : "border border-[#E3DCCB] text-[#8C7A5B] cursor-not-allowed font-semibold"
           }`}
         >
           {loading ? t.auth.signingIn : t.auth.signIn}
         </button>
 
         <div className="flex items-center gap-3 my-1">
-          <div className="flex-1 h-px bg-amber-100" />
-          <span className="text-xs text-stone-400 font-bold tracking-wider">{t.common.or}</span>
-          <div className="flex-1 h-px bg-amber-100" />
+          <div className="flex-1 h-px bg-[#E3DCCB]" />
+          <span className="eyebrow">{t.common.or}</span>
+          <div className="flex-1 h-px bg-[#E3DCCB]" />
         </div>
 
         <button
           type="button"
           onClick={handleGoogle}
           disabled={oauthLoading}
-          className="w-full h-14 flex items-center justify-center gap-3 bg-white border border-amber-100 hover:border-amber-300 hover:bg-amber-50/60 text-stone-700 font-bold text-sm rounded-2xl transition-all cursor-pointer disabled:opacity-50 shadow-sm"
+          className="btn-outline w-full h-14 flex items-center justify-center gap-3 text-sm cursor-pointer disabled:opacity-50"
         >
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
             <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
@@ -151,9 +152,9 @@ function LoginForm() {
         </button>
       </form>
 
-      <p className="text-center text-sm text-stone-500 mt-6 font-semibold">
+      <p className="text-center text-sm text-[#8C7A5B] mt-6 font-medium">
         {t.auth.noAccount}{" "}
-        <Link href="/register" className="text-amber-600 hover:text-amber-700 font-extrabold transition-colors cursor-pointer">
+        <Link href="/register" className="text-[#14110F] font-semibold underline underline-offset-2 cursor-pointer">
           {t.auth.registerHere}
         </Link>
       </p>
