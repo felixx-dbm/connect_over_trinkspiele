@@ -83,7 +83,7 @@ const translations = {
       tagline: "Battle · Drink · Conquer",
       badge: "Age Verification",
       description: "This app involves drinking games and alcohol. You must be 18 or older in your country to enter.",
-      enter: "🍻 I'M 18 OR OLDER — ENTER",
+      enter: "🍻 I'M 18 OR OLDER - ENTER 🍻",
       underAge: "I am under 18",
       sorryTitle: "Sorry!",
       sorryText: "You must be 18 or older to use Prost. Come back when you're of legal age.",

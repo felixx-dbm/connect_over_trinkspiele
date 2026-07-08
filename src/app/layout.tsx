@@ -1,21 +1,27 @@
 import type { Metadata, Viewport } from "next";
-import { Russo_One, Nunito } from "next/font/google";
+import { Fraunces, Inter } from "next/font/google";
 import { cookies } from "next/headers";
 import { LanguageProvider } from "@/components/LanguageProvider";
+import FloatingBackground from "@/components/FloatingBackground";
 import type { Locale } from "@/lib/i18n";
-import "./globals.css";
 
-const russo = Russo_One({
-  weight: "400",
+import "./globals.css";
+//check
+
+
+
+const fraunces = Fraunces({
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
   subsets: ["latin"],
-  variable: "--font-russo",
+  variable: "--font-fraunces",
   display: "swap",
 });
 
-const nunito = Nunito({
-  weight: ["400", "500", "600", "700", "800", "900"],
+const inter = Inter({
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
-  variable: "--font-nunito",
+  variable: "--font-inter",
   display: "swap",
 });
 
@@ -36,7 +42,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#F59E0B",
+  themeColor: "#14110F",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -44,8 +50,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const locale = (cookieStore.get("lang")?.value ?? "en") as Locale;
 
   return (
-    <html lang={locale} className={`${russo.variable} ${nunito.variable}`}>
-      <body className="bg-amber-50 text-stone-900 antialiased">
+    <html lang={locale} className={`${fraunces.variable} ${inter.variable}`}>
+      <body className="bg-[#FAF8F3] text-[#14110F] antialiased">
+        <FloatingBackground />
         <LanguageProvider locale={locale}>{children}</LanguageProvider>
       </body>
     </html>
