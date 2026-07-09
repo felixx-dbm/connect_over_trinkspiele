@@ -1,6 +1,18 @@
-# Trinkspiel
+# Prost — Trinkspiel Battle App
 
 Mobile-first beer drinking game battle app. Challenge nearby players, join crews, climb the leaderboard.
+
+## Features
+
+- **Matches** — post a challenge (Beer Pong, Flunkyball, Freestyle …), let nearby players accept, track the score live and confirm the winner
+- **Map** — see open challenges around you on an interactive OpenStreetMap (locations are fuzzed for privacy)
+- **Crews** — create or join a crew via invite code, fight crew-vs-crew battles
+- **Events** — create public events, join others, see who's coming
+- **Leaderboard** — global and crew rankings based on match wins
+- **Profile & QR challenge** — share a QR code that lets anyone challenge you directly
+- **Notifications** — in-app notifications for challenges, match results and crew activity
+- **i18n** — English and German, switchable in settings
+- **PWA** — installable on the home screen (manifest + install banner)
 
 ## Stack
 

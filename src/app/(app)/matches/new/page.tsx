@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Match creation — pick a game type, optionally share your location,
+ * and post an open challenge for nearby players to accept.
+ */
 import { useState, useEffect } from "react";
 import { ArrowLeft, Navigation, ChevronRight, Loader2, Users } from "lucide-react";
 import Link from "next/link";

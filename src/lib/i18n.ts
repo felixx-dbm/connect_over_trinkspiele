@@ -1,3 +1,7 @@
+/**
+ * All UI strings for the app in English and German.
+ * Components access them via the useT() hook from LanguageProvider.
+ */
 export type Locale = "en" | "de";
 export const DEFAULT_LOCALE: Locale = "en";
 

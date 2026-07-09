@@ -1,3 +1,7 @@
+/**
+ * Home dashboard — greets the user and surfaces live matches,
+ * recent activity, stats and quick links to the main features.
+ */
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Swords, Trophy, TrendingUp, Clock, ChevronRight, Flame, Users, MapPin, Zap } from "lucide-react";

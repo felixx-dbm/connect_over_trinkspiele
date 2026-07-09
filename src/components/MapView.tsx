@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Interactive Leaflet map showing open challenges near the user.
+ * Fetches challenge pins from /api/map/challenges and re-queries on pan/zoom.
+ */
 import { useEffect, useRef, useState, useCallback } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from "react-leaflet";
 import L from "leaflet";
