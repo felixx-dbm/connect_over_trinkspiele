@@ -1,11 +1,16 @@
 "use client";
 
+/**
+ * Match detail — the full lifecycle of a battle: waiting for an opponent,
+ * joining teams, live scoring, confirming the result and reporting players.
+ */
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, MapPin, Clock, CheckCircle, XCircle, Trophy, Swords, Loader2, Share2, Copy, Check, RefreshCw, Trash2, Users, UserPlus, Navigation, Timer, Play, Flag } from "lucide-react";
 import ReportModal from "@/components/ReportModal";
 import { createClient } from "@/lib/supabase/client";
+import { copyToClipboard } from "@/lib/browser";
 import { useT } from "@/components/LanguageProvider";
 
 type Match = {
@@ -197,7 +202,7 @@ export default function MatchPage() {
     if (navigator.share) {
       try { await navigator.share({ title: "Join my battle!", url }); return; } catch {}
     }
-    await navigator.clipboard.writeText(url);
+    await copyToClipboard(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -779,7 +784,7 @@ export default function MatchPage() {
                   {copied ? <><Check size={14} className="text-emerald-500" /> {t.common.copied}</> : <><Share2 size={14} /> {t.matches.shareLink}</>}
                 </button>
                 <button
-                  onClick={() => navigator.clipboard.writeText(`${window.location.origin}/matches/${id}`).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); })}
+                  onClick={() => copyToClipboard(`${window.location.origin}/matches/${id}`).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); })}
                   className="flex items-center gap-2 text-xs text-stone-400 hover:text-stone-600 px-4 py-1.5 rounded-xl transition-all cursor-pointer"
                 >
                   <Copy size={11} /> {t.matches.copyLink}

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { ChevronRight, X } from "lucide-react";
 import { useT } from "@/components/LanguageProvider";
+import { safeStorage } from "@/lib/browser";
 
 const STORAGE_KEY = "onboarding_v1_done";
 
@@ -74,13 +75,13 @@ export default function Onboarding() {
   const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && !localStorage.getItem(STORAGE_KEY)) {
+    if (typeof window !== "undefined" && !safeStorage.get(STORAGE_KEY)) {
       setVisible(true);
     }
   }, []);
 
   const finish = () => {
-    localStorage.setItem(STORAGE_KEY, "1");
+    safeStorage.set(STORAGE_KEY, "1");
     setVisible(false);
   };
 
@@ -138,6 +139,7 @@ export default function Onboarding() {
         </div>
         <button
           onClick={finish}
+          aria-label="Skip onboarding"
           className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-400 hover:text-stone-600 transition-colors cursor-pointer shadow-sm"
         >
           <X size={14} />

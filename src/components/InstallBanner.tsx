@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { X, Share } from "lucide-react";
+import { safeStorage } from "@/lib/browser";
 
 const STORAGE_KEY = "install_banner_dismissed";
 
@@ -11,7 +12,7 @@ export default function InstallBanner() {
   useEffect(() => {
     const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent);
     const isInstalled = window.matchMedia("(display-mode: standalone)").matches;
-    const dismissed = localStorage.getItem(STORAGE_KEY);
+    const dismissed = safeStorage.get(STORAGE_KEY);
     if (isIos && !isInstalled && !dismissed) {
       // Small delay so it doesn't flash on first paint
       const t = setTimeout(() => setShow(true), 1500);
@@ -20,7 +21,7 @@ export default function InstallBanner() {
   }, []);
 
   const dismiss = () => {
-    localStorage.setItem(STORAGE_KEY, "1");
+    safeStorage.set(STORAGE_KEY, "1");
     setShow(false);
   };
 
@@ -39,6 +40,7 @@ export default function InstallBanner() {
         </div>
         <button
           onClick={dismiss}
+          aria-label="Dismiss install banner"
           className="w-7 h-7 rounded-full bg-stone-700 flex items-center justify-center flex-shrink-0 cursor-pointer hover:bg-stone-600 transition-colors"
         >
           <X size={13} />

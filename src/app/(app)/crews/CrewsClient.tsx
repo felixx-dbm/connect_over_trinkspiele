@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Crews — create or join a crew via invite code, manage members
+ * and start crew-vs-crew battles against nearby crews.
+ */
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -7,6 +11,7 @@ import { Users, Crown, Copy, Plus, LogIn, Swords, Check, AlertCircle, Shield, Lo
 import { createCrew, joinCrew } from "@/app/actions/crews";
 import { createClient } from "@/lib/supabase/client";
 import { fuzzCoords } from "@/lib/geo";
+import { copyToClipboard } from "@/lib/browser";
 import { useT } from "@/components/LanguageProvider";
 
 type Member = {
@@ -123,7 +128,7 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
 
   const copyCode = async () => {
     if (!crew) return;
-    await navigator.clipboard.writeText(crew.invite_code);
+    await copyToClipboard(crew.invite_code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

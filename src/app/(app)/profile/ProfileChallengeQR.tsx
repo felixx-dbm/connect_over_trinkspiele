@@ -3,6 +3,7 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import { QrCode, Copy, Check } from "lucide-react";
+import { copyToClipboard } from "@/lib/browser";
 
 const QRCodeSVG = dynamic(() => import("qrcode.react").then((m) => m.QRCodeSVG), { ssr: false });
 
@@ -23,7 +24,7 @@ export default function ProfileChallengeQR({ userId, t }: { userId: string; t: T
   const challengeUrl = `${origin}/challenge/${userId}`;
 
   function copyLink() {
-    navigator.clipboard.writeText(challengeUrl);
+    copyToClipboard(challengeUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
