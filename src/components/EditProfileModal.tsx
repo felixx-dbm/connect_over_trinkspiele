@@ -53,7 +53,7 @@ export default function EditProfileModal({ initialUsername, initialCity, onClose
             <h3 className="font-display text-xl text-stone-900">{t.editProfile.title}</h3>
             <p className="text-stone-400 text-xs font-semibold mt-0.5">{t.editProfile.subtitle}</p>
           </div>
-          <button type="button" onClick={onClose} className="w-8 h-8 rounded-xl bg-stone-100 hover:bg-stone-200 flex items-center justify-center cursor-pointer transition-colors">
+          <button type="button" onClick={onClose} aria-label="Close edit profile dialog" className="w-8 h-8 rounded-xl bg-stone-100 hover:bg-stone-200 flex items-center justify-center cursor-pointer transition-colors">
             <X size={16} className="text-stone-500" />
           </button>
         </div>

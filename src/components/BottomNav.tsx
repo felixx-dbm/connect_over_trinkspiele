@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Fixed bottom tab bar — main navigation between Home, Map, Events and Profile.
+ * The center CTA switches to the user's live match while one is running.
+ */
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -47,7 +51,7 @@ export default function BottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-[max(10px,env(safe-area-inset-bottom))]">
+    <nav aria-label="Main navigation" className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-[max(10px,env(safe-area-inset-bottom))]">
       <div className="max-w-lg mx-auto bg-white/92 backdrop-blur-2xl rounded-[22px] border border-amber-100/80 shadow-2xl shadow-amber-200/40">
         <div className="flex items-center justify-around h-[62px] px-2">
           {tabs.map(({ href, label, Icon, activeColor, dotColor, isCTA }) => {

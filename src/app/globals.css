@@ -16,6 +16,22 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ── Keyboard focus ─────────────────────────────────────── */
+/* Visible focus ring for keyboard users only (mouse clicks don't trigger :focus-visible) */
+:focus-visible {
+  outline: 2px solid #F59E0B;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Responsive base ────────────────────────────────────── */
+/* Mobile first: scale the whole rem-based UI up slightly on tablet+ */
+@media (min-width: 768px) {
+  html {
+    font-size: 17px;
+  }
+}
+
 /* ── Scrollbar ──────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: #F0ECE2; }

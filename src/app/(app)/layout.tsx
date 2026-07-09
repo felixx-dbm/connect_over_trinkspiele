@@ -5,9 +5,9 @@ import InstallBanner from "@/components/InstallBanner";
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-transparent">
-      <div className="max-w-lg mx-auto pb-safe">
+      <main className="max-w-lg md:max-w-xl lg:max-w-2xl mx-auto pb-safe">
         {children}
-      </div>
+      </main>
       <BottomNav />
       <Onboarding />
       <InstallBanner />

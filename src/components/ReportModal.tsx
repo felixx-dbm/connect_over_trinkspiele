@@ -52,7 +52,7 @@ export default function ReportModal({ reportedUserId, matchId, onClose }: Props)
             <Flag size={16} className="text-rose-500" />
             <p className="font-bold text-stone-900">Report user</p>
           </div>
-          <button onClick={onClose} className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 hover:text-stone-600 cursor-pointer">
+          <button onClick={onClose} aria-label="Close report dialog" className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 hover:text-stone-600 cursor-pointer">
             <X size={14} />
           </button>
         </div>

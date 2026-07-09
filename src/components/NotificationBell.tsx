@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Notification bell with unread badge and a dropdown panel
+ * listing challenge, match and crew notifications.
+ */
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Bell, X, CheckCheck } from "lucide-react";
@@ -108,6 +112,7 @@ export default function NotificationBell() {
     <div className="relative" ref={panelRef}>
       <button
         onClick={() => { setOpen((v) => !v); if (!open && userId) fetchNotifs(userId); }}
+        aria-label={unread > 0 ? `Notifications, ${unread} unread` : "Notifications"}
         className="relative w-9 h-9 rounded-xl bg-white border border-amber-100 flex items-center justify-center text-stone-500 hover:border-amber-300 transition-colors cursor-pointer shadow-sm"
       >
         <Bell size={16} />
@@ -129,7 +134,7 @@ export default function NotificationBell() {
                   <CheckCheck size={12} /> Mark all read
                 </button>
               )}
-              <button onClick={() => setOpen(false)} className="text-stone-400 hover:text-stone-600 cursor-pointer">
+              <button onClick={() => setOpen(false)} aria-label="Close notifications" className="text-stone-400 hover:text-stone-600 cursor-pointer">
                 <X size={14} />
               </button>
             </div>
