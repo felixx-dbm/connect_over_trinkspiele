@@ -36,13 +36,13 @@ export default function ProfileChallengeQR({ userId, t }: { userId: string; t: T
         className="w-full flex items-center gap-3 bg-white border border-amber-200 rounded-2xl p-4 hover:bg-amber-50 transition-colors cursor-pointer shadow-sm"
       >
         <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
-          <QrCode size={16} className="text-amber-500" />
+          <QrCode size={16} className="text-amber-700" />
         </div>
         <div className="flex-1 text-left">
           <p className="text-stone-800 text-sm font-bold">
-            {t.challenge.title} <span className="text-amber-500">{t.challenge.titleAccent}</span>
+            {t.challenge.title} <span className="text-amber-700">{t.challenge.titleAccent}</span>
           </p>
-          <p className="text-stone-400 text-xs font-semibold">{t.challenge.qrHint}</p>
+          <p className="text-stone-600 text-xs font-semibold">{t.challenge.qrHint}</p>
         </div>
         <span className="text-stone-300 text-lg">{open ? "▲" : "▼"}</span>
       </button>

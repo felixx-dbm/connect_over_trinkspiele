@@ -141,7 +141,7 @@ export default function EventDetailPage() {
         </Link>
         <div className="flex-1 min-w-0">
           <h1 className="font-display text-xl text-stone-900 truncate">{event.name}</h1>
-          {event.city && <p className="text-stone-400 text-xs font-semibold">{event.city}</p>}
+          {event.city && <p className="text-stone-600 text-xs font-semibold">{event.city}</p>}
         </div>
         <button
           onClick={copyCode}
@@ -159,17 +159,17 @@ export default function EventDetailPage() {
           <p className="font-display text-3xl text-amber-700 tracking-[0.3em]">{event.join_code}</p>
         </div>
         <div className="text-right">
-          <p className="text-xs text-stone-400 font-semibold">{t.events.participants}</p>
+          <p className="text-xs text-stone-600 font-semibold">{t.events.participants}</p>
           <p className="font-display text-2xl text-stone-700">{members.length}</p>
         </div>
       </div>
 
       {/* Leaderboard */}
-      <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">{t.events.topPlayers}</p>
+      <p className="text-xs text-stone-600 font-bold uppercase tracking-widest mb-3">{t.events.topPlayers}</p>
       {leaderboard.length === 0 ? (
         <div className="bg-white border border-amber-100 rounded-2xl p-6 text-center mb-5 shadow-sm">
           <Swords size={32} className="text-stone-200 mx-auto mb-2" />
-          <p className="text-stone-400 text-sm font-semibold">{t.events.noBattles}</p>
+          <p className="text-stone-600 text-sm font-semibold">{t.events.noBattles}</p>
         </div>
       ) : (
         <div className="flex flex-col gap-2 mb-5">
@@ -185,13 +185,13 @@ export default function EventDetailPage() {
               <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-display text-sm flex-shrink-0 ${
                 i === 0 ? "bg-amber-100 text-amber-600" :
                 i === 1 ? "bg-stone-100 text-stone-600" :
-                i === 2 ? "bg-orange-100 text-orange-600" : "bg-stone-50 text-stone-400"
+                i === 2 ? "bg-orange-100 text-orange-600" : "bg-stone-50 text-stone-600"
               }`}>
                 {i + 1}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-stone-800 text-sm font-bold truncate">{p.username}</p>
-                <p className="text-stone-400 text-xs font-semibold">{p.eventMatches} {t.events.battles}</p>
+                <p className="text-stone-600 text-xs font-semibold">{p.eventMatches} {t.events.battles}</p>
               </div>
               <div className="flex items-center gap-1 flex-shrink-0">
                 <Trophy size={13} className="text-amber-500" />
@@ -203,11 +203,11 @@ export default function EventDetailPage() {
       )}
 
       {/* Members */}
-      <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">{t.events.participants} ({members.length})</p>
+      <p className="text-xs text-stone-600 font-bold uppercase tracking-widest mb-3">{t.events.participants} ({members.length})</p>
       <div className="flex flex-wrap gap-2 mb-5">
         {members.map((m) => (
           <div key={m.user_id} className="flex items-center gap-1.5 bg-white border border-stone-100 rounded-xl px-3 py-1.5 shadow-sm">
-            <Users size={11} className="text-stone-400" />
+            <Users size={11} className="text-stone-600" />
             <span className="text-stone-700 text-xs font-bold">{m.users?.username ?? "?"}</span>
           </div>
         ))}
@@ -216,7 +216,7 @@ export default function EventDetailPage() {
       {/* Recent battles */}
       {battles.length > 0 && (
         <>
-          <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">{t.events.recentBattles}</p>
+          <p className="text-xs text-stone-600 font-bold uppercase tracking-widest mb-3">{t.events.recentBattles}</p>
           <div className="flex flex-col gap-2">
             {battles.map((b) => {
               const isWin = b.winner_id === userId;
@@ -237,7 +237,7 @@ export default function EventDetailPage() {
                     <p className="text-stone-800 text-sm font-bold truncate">
                       {b.challenger?.username} vs {b.opponent?.username ?? "?"}
                     </p>
-                    <p className="text-stone-400 text-xs font-semibold capitalize">{b.game_types?.name?.replace("_", " ")}</p>
+                    <p className="text-stone-600 text-xs font-semibold capitalize">{b.game_types?.name?.replace("_", " ")}</p>
                   </div>
                 </Link>
               );
@@ -255,7 +255,7 @@ export default function EventDetailPage() {
             className={`inline-flex items-center gap-2 text-xs px-4 py-2 rounded-xl border font-bold transition-all cursor-pointer ${
               deleteConfirm
                 ? "text-rose-600 border-rose-300 bg-rose-50 hover:bg-rose-100"
-                : "text-stone-400 border-stone-200 hover:text-stone-600 hover:border-stone-300"
+                : "text-stone-600 border-stone-200 hover:text-stone-600 hover:border-stone-300"
             }`}
           >
             {deleting ? <Loader2 size={11} className="animate-spin" /> : <Trash2 size={11} />}

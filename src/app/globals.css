@@ -63,7 +63,7 @@ body {
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #8C7A5B;
+  color: #6B5D42;
 }
 
 /* Kept for backward compat with existing gradient-text usages —
@@ -177,9 +177,9 @@ body {
    for a seamless loop. See Marquee.tsx for usage. */
 .marquee {
   overflow: hidden;
-  
-  background: rgba(20, 17, 15, 0.25); 
-  
+
+  background: rgba(20, 17, 15, 0.75);
+
   backdrop-filter: blur(4px);
 }
 .marquee-track {

@@ -153,7 +153,8 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors cursor-pointer"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-500 hover:text-stone-600 transition-colors cursor-pointer"
             >
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
@@ -186,6 +187,7 @@ export default function RegisterPage() {
             <input
               name="dob"
               type="date"
+              aria-label="Date of birth"
               value={form.dob}
               onChange={handleChange}
               required
@@ -219,14 +221,14 @@ export default function RegisterPage() {
           </button>
         </div>
 
-        <p className="text-xs text-stone-400 text-center leading-relaxed font-semibold">
+        <p className="text-xs text-stone-600 text-center leading-relaxed font-semibold">
           {t.auth.terms}
         </p>
       </form>
 
-      <p className="text-center text-sm text-stone-500 mt-4 font-semibold">
+      <p className="text-center text-sm text-stone-600 mt-4 font-semibold">
         {t.auth.hasAccount}{" "}
-        <Link href="/login" className="text-amber-600 hover:text-amber-700 font-extrabold transition-colors cursor-pointer">
+        <Link href="/login" className="text-amber-700 hover:text-amber-800 font-extrabold transition-colors cursor-pointer">
           {t.auth.signInLink}
         </Link>
       </p>

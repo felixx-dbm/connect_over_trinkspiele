@@ -155,7 +155,7 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
     router.refresh();
   };
 
-  const inputClass = "w-full h-14 bg-amber-50 border border-amber-200 rounded-2xl px-4 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 text-sm font-semibold";
+  const inputClass = "w-full h-14 bg-amber-50 border border-amber-200 rounded-2xl px-4 text-stone-900 placeholder:text-stone-500 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 text-sm font-semibold";
 
   if (!crew) {
     return (
@@ -292,7 +292,7 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
 
       {/* Invite code */}
       <div className="bg-white border border-amber-100 rounded-2xl p-4 mb-5 shadow-sm">
-        <p className="text-stone-400 text-xs font-bold uppercase tracking-widest mb-2">{t.crews.inviteCode}</p>
+        <p className="text-stone-600 text-xs font-bold uppercase tracking-widest mb-2">{t.crews.inviteCode}</p>
         <div className="flex items-center gap-3">
           <span className="flex-1 font-display text-2xl text-gradient-gold tracking-widest">{crew.invite_code}</span>
           <button
@@ -322,7 +322,7 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
       {/* Recent crew battles */}
       {recentBattles.length > 0 && (
         <div className="mb-5">
-          <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">{t.crewMatches.recentBattles}</p>
+          <p className="text-xs text-stone-600 font-bold uppercase tracking-widest mb-3">{t.crewMatches.recentBattles}</p>
           <div className="flex flex-col gap-2">
             {recentBattles.map((battle) => {
               const challengerName = (battle.challenger_crew as unknown as { name: string } | null)?.name ?? "?";
@@ -338,18 +338,18 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
                       : "bg-violet-50 border border-violet-200"
                   }`}>
                     {isDone
-                      ? weWon ? <Trophy size={14} className="text-white" /> : <span className="text-xs font-bold text-rose-500">L</span>
+                      ? weWon ? <Trophy size={14} className="text-white" /> : <span className="text-xs font-bold text-rose-700">L</span>
                       : <Swords size={14} className="text-violet-500" />}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-stone-800 text-sm font-bold truncate">{challengerName} vs {opponentName}</p>
-                    <p className="text-stone-400 text-xs font-semibold capitalize">{gameName}</p>
+                    <p className="text-stone-600 text-xs font-semibold capitalize">{gameName}</p>
                   </div>
                   <span className={`text-xs font-bold px-2 py-0.5 rounded-full capitalize flex-shrink-0 ${
                     battle.status === "active" ? "bg-emerald-100 text-emerald-700" :
                     battle.status === "open" ? "bg-sky-100 text-sky-700" :
-                    battle.status === "completed" ? "bg-stone-100 text-stone-500" :
-                    "bg-rose-100 text-rose-600"
+                    battle.status === "completed" ? "bg-stone-100 text-stone-600" :
+                    "bg-rose-100 text-rose-700"
                   }`}>
                     {t.crewMatches.status[battle.status as keyof typeof t.crewMatches.status] ?? battle.status}
                   </span>
@@ -361,7 +361,7 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
       )}
 
       {/* Members */}
-      <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">{t.crews.members}</p>
+      <p className="text-xs text-stone-600 font-bold uppercase tracking-widest mb-3">{t.crews.members}</p>
       <div className="flex flex-col gap-2">
         {members.map((member) => (
           <div key={member.id} className="flex items-center gap-3 bg-white border border-amber-100 rounded-2xl p-3 shadow-sm">
@@ -377,7 +377,7 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
                 <p className="text-stone-800 text-sm font-bold truncate">{member.users?.username ?? "Unknown"}</p>
                 {member.role === "captain" && <Crown size={12} className="text-amber-500 flex-shrink-0" />}
               </div>
-              <p className="text-stone-400 text-xs font-semibold capitalize">{member.role === "captain" ? t.crews.captain : t.crews.member}</p>
+              <p className="text-stone-600 text-xs font-semibold capitalize">{member.role === "captain" ? t.crews.captain : t.crews.member}</p>
             </div>
             <p className="text-stone-600 text-sm font-bold flex-shrink-0">{member.users?.wins ?? 0}W</p>
           </div>
@@ -392,7 +392,7 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
             <div className="text-3xl mb-3">⚔️</div>
             <h3 className="font-display text-xl text-stone-900 mb-1">{t.crewMatches.title} <span className="text-gradient">{t.crewMatches.titleAccent}</span></h3>
             <p className="text-stone-500 text-sm font-semibold mb-5">{t.crewMatches.challengeHint}</p>
-            <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-2">{t.crewMatches.chooseGame}</p>
+            <p className="text-xs text-stone-600 font-bold uppercase tracking-widest mb-2">{t.crewMatches.chooseGame}</p>
             <div className="flex flex-col gap-2 mb-5">
               {gameTypes.map((gt) => (
                 <button

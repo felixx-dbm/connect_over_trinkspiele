@@ -43,11 +43,11 @@ export default function BottomNav() {
   }, [pathname]);
 
   const tabs = [
-    { href: "/home",        label: t.nav.home,   Icon: Home,         activeColor: "text-amber-500",   dotColor: "bg-amber-500"   },
-    { href: "/map",         label: t.nav.map,    Icon: MapPin,       activeColor: "text-rose-500",    dotColor: "bg-rose-500"    },
+    { href: "/home",        label: t.nav.home,   Icon: Home,         activeColor: "text-amber-700",   dotColor: "bg-amber-500"   },
+    { href: "/map",         label: t.nav.map,    Icon: MapPin,       activeColor: "text-rose-700",    dotColor: "bg-rose-500"    },
     { href: "/matches/new", label: null,          Icon: Plus,         activeColor: "",                 dotColor: "",              isCTA: true },
-    { href: "/events",      label: t.nav.events, Icon: CalendarDays, activeColor: "text-violet-500",  dotColor: "bg-violet-500"  },
-    { href: "/profile",     label: t.nav.me,     Icon: User,         activeColor: "text-emerald-500", dotColor: "bg-emerald-500" },
+    { href: "/events",      label: t.nav.events, Icon: CalendarDays, activeColor: "text-violet-700",  dotColor: "bg-violet-500"  },
+    { href: "/profile",     label: t.nav.me,     Icon: User,         activeColor: "text-emerald-700", dotColor: "bg-emerald-500" },
   ];
 
   return (
@@ -91,7 +91,7 @@ export default function BottomNav() {
                 key={href}
                 href={href}
                 className={`relative flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all duration-200 cursor-pointer ${
-                  active ? activeColor : "text-stone-400 hover:text-stone-600"
+                  active ? activeColor : "text-stone-600 hover:text-stone-700"
                 }`}
               >
                 <Icon

@@ -53,7 +53,7 @@ export default function PrivacySettings({ showOnLeaderboard, allowDirectChalleng
             </div>
             <div className="flex-1">
               <p className="text-stone-800 text-sm font-bold">{label}</p>
-              <p className="text-stone-400 text-xs font-semibold leading-snug">{hint}</p>
+              <p className="text-stone-600 text-xs font-semibold leading-snug">{hint}</p>
             </div>
             <button
               type="button"
@@ -61,6 +61,7 @@ export default function PrivacySettings({ showOnLeaderboard, allowDirectChalleng
               disabled={saving === key}
               role="switch"
               aria-checked={values[key]}
+              aria-label={label}
               className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
                 values[key] ? "bg-amber-500" : "bg-stone-200"
               } ${saving === key ? "opacity-70" : ""}`}

@@ -66,7 +66,7 @@ export default function AgeGate() {
           <span className="text-stone-900">PR</span>
           <span className="text-gradient">OST</span>
         </h1>
-        <p className="text-stone-400 text-xs tracking-[0.22em] uppercase mb-10 font-bold">
+        <p className="text-stone-600 text-xs tracking-[0.22em] uppercase mb-10 font-bold">
           {t.ageGate.tagline}
         </p>
 
@@ -87,7 +87,7 @@ export default function AgeGate() {
 
         <button
           onClick={() => setDenied(true)}
-          className="text-sm text-stone-400 hover:text-stone-600 transition-colors cursor-pointer py-2 font-semibold"
+          className="text-sm text-stone-600 hover:text-stone-600 transition-colors cursor-pointer py-2 font-semibold"
         >
           {t.ageGate.underAge}
         </button>

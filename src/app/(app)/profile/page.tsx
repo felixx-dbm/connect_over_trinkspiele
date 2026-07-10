@@ -53,6 +53,7 @@ export default async function ProfilePage() {
         </h1>
         <Link
           href="/settings"
+          aria-label="Settings"
           className="w-10 h-10 rounded-xl bg-white border border-amber-100 flex items-center justify-center hover:border-amber-300 transition-colors cursor-pointer shadow-sm"
         >
           <Settings size={16} className="text-stone-500" />
@@ -76,7 +77,7 @@ export default async function ProfilePage() {
             <div className="flex flex-wrap items-center gap-2 mt-1">
               {profile?.city && (
                 <div className="flex items-center gap-1 text-stone-500 text-xs font-semibold">
-                  <MapPin size={11} className="text-amber-500" />
+                  <MapPin size={11} className="text-amber-700" />
                   {profile.city}
                 </div>
               )}
@@ -95,14 +96,14 @@ export default async function ProfilePage() {
 
         <div className="grid grid-cols-3 gap-2">
           {[
-            { label: t.profile.wins,    value: profile?.wins ?? 0,   Icon: Trophy,    bg: "bg-amber-50",   border: "border-amber-200",   text: "text-amber-600",   icon: "text-amber-500"   },
-            { label: t.profile.losses,  value: profile?.losses ?? 0, Icon: Swords,    bg: "bg-rose-50",    border: "border-rose-200",    text: "text-rose-600",    icon: "text-rose-400"    },
+            { label: t.profile.wins,    value: profile?.wins ?? 0,   Icon: Trophy,    bg: "bg-amber-50",   border: "border-amber-200",   text: "text-amber-700",   icon: "text-amber-700"   },
+            { label: t.profile.losses,  value: profile?.losses ?? 0, Icon: Swords,    bg: "bg-rose-50",    border: "border-rose-200",    text: "text-rose-700",    icon: "text-rose-700"    },
             { label: t.profile.winRate, value: `${winRate}%`,        Icon: TrendingUp, bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-700", icon: "text-emerald-500" },
           ].map(({ label, value, Icon, bg, border, text, icon }) => (
             <div key={label} className={`${bg} border ${border} rounded-2xl p-3 text-center shadow-sm`}>
               <Icon size={14} className={`${icon} mx-auto mb-1`} />
               <p className={`font-display text-xl ${text}`}>{value}</p>
-              <p className="text-stone-500 text-xs font-semibold">{label}</p>
+              <p className="text-stone-600 text-xs font-semibold">{label}</p>
             </div>
           ))}
         </div>
@@ -112,10 +113,10 @@ export default async function ProfilePage() {
       <div className="bg-white border border-amber-100 rounded-2xl overflow-hidden mb-5 shadow-sm">
         {[
           crew
-            ? { label: t.profile.myCrew,     sublabel: crew.name,                                                  Icon: Users,    href: "/crews",       color: "text-violet-500", bg: "bg-violet-50"  }
-            : { label: t.profile.createCrew, sublabel: t.profile.createCrewHint,                                   Icon: Users,    href: "/crews",       color: "text-violet-500", bg: "bg-violet-50"  },
-          {   label: t.profile.leaderboard,  sublabel: profile?.city ? t.profile.rankingsIn.replace("{city}", profile.city) : t.profile.cityRankings, Icon: Trophy, href: "/leaderboard", color: "text-amber-500",  bg: "bg-amber-50"   },
-          {   label: t.profile.settings,     sublabel: t.profile.settingsHint,                                     Icon: Settings, href: "/settings",    color: "text-stone-500",  bg: "bg-stone-100"  },
+            ? { label: t.profile.myCrew,     sublabel: crew.name,                                                  Icon: Users,    href: "/crews",       color: "text-violet-700", bg: "bg-violet-50"  }
+            : { label: t.profile.createCrew, sublabel: t.profile.createCrewHint,                                   Icon: Users,    href: "/crews",       color: "text-violet-700", bg: "bg-violet-50"  },
+          {   label: t.profile.leaderboard,  sublabel: profile?.city ? t.profile.rankingsIn.replace("{city}", profile.city) : t.profile.cityRankings, Icon: Trophy, href: "/leaderboard", color: "text-amber-700",  bg: "bg-amber-50"   },
+          {   label: t.profile.settings,     sublabel: t.profile.settingsHint,                                     Icon: Settings, href: "/settings",    color: "text-stone-600",  bg: "bg-stone-100"  },
         ].map(({ label, sublabel, Icon, href, color, bg }, i) => (
           <Link
             key={label}
@@ -127,7 +128,7 @@ export default async function ProfilePage() {
             </div>
             <div className="flex-1">
               <p className="text-stone-800 text-sm font-bold">{label}</p>
-              <p className="text-stone-400 text-xs font-semibold">{sublabel}</p>
+              <p className="text-stone-600 text-xs font-semibold">{sublabel}</p>
             </div>
             <ChevronRight size={14} className="text-stone-300" />
           </Link>
@@ -147,7 +148,7 @@ export default async function ProfilePage() {
 
       {recentMatches && recentMatches.length > 0 && (
         <div className="mb-6">
-          <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">{t.profile.recentBattles}</p>
+          <p className="text-xs text-stone-600 font-bold uppercase tracking-widest mb-3">{t.profile.recentBattles}</p>
           <div className="flex flex-col gap-2">
             {(recentMatches as unknown as MatchRow[]).map((match) => {
               const isWin = match.winner_id === user.id;
@@ -163,17 +164,17 @@ export default async function ProfilePage() {
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-display text-xs flex-shrink-0 ${
                     isWin
                       ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
-                      : "bg-rose-50 text-rose-500 border border-rose-200"
+                      : "bg-rose-50 text-rose-700 border border-rose-200"
                   }`}>
                     {isWin ? "W" : "L"}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-stone-800 text-sm font-bold truncate">{t.profile.vs} {opponentName ?? "Unknown"}</p>
-                    <p className="text-stone-400 text-xs font-semibold capitalize">{match.game_types?.name?.replace("_", " ")}</p>
+                    <p className="text-stone-600 text-xs font-semibold capitalize">{match.game_types?.name?.replace("_", " ")}</p>
                   </div>
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     <Clock size={11} className="text-stone-300" />
-                    <span className="text-stone-400 text-xs font-semibold">
+                    <span className="text-stone-600 text-xs font-semibold">
                       {new Date(match.created_at).toLocaleDateString()}
                     </span>
                   </div>
@@ -187,7 +188,7 @@ export default async function ProfilePage() {
       {/* Achievements */}
       {achievements.length > 0 && (
         <div className="mb-5">
-          <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">{t.achievements.title}</p>
+          <p className="text-xs text-stone-600 font-bold uppercase tracking-widest mb-3">{t.achievements.title}</p>
           <div className="flex flex-wrap gap-2">
             {achievements.map(({ achievement }) => {
               const def = (t.achievements as Record<string, unknown>)[achievement] as { label: string; desc: string } | undefined;
@@ -218,7 +219,7 @@ export default async function ProfilePage() {
       <form action={signOut}>
         <button
           type="submit"
-          className="w-full h-12 flex items-center justify-center text-rose-500 border border-rose-200 hover:bg-rose-50 rounded-2xl text-sm font-bold transition-all cursor-pointer"
+          className="w-full h-12 flex items-center justify-center text-rose-700 border border-rose-200 hover:bg-rose-50 rounded-2xl text-sm font-bold transition-all cursor-pointer"
         >
           {t.common.signOut}
         </button>

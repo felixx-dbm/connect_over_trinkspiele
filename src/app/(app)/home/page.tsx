@@ -115,7 +115,7 @@ export default async function HomePage() {
               { label: t.home.winRate, value: `${winRate}%`, Icon: TrendingUp },
             ].map(({ label, value, Icon }) => (
               <div key={label} className="flex flex-col items-center gap-1 py-4">
-                <Icon size={14} className="text-[#8C7A5B]" />
+                <Icon size={14} className="text-[#4A3F2C]" />
                 <span className="display text-2xl">{value}</span>
                 <span className="eyebrow">{label}</span>
               </div>
@@ -161,7 +161,7 @@ export default async function HomePage() {
                 </div>
                 <p className="text-xs font-semibold">{t.home.you}</p>
               </div>
-              <span className="display italic text-xl text-[#8C7A5B]">vs</span>
+              <span className="display italic text-xl text-[#4A3F2C]">vs</span>
               <div className="text-center">
                 <div className="w-10 h-10 border border-[#E3DCCB] flex items-center justify-center display-upright text-sm mb-1 mx-auto">
                   {((activeMatch.opponent as unknown as { username: string } | null)?.username ??
@@ -212,14 +212,14 @@ export default async function HomePage() {
                 <Link
                   key={m.id}
                   href={`/matches/${m.id}`}
-                  className="flex items-center gap-3 py-3 hover:opacity-60 transition-opacity cursor-pointer"
+                  className="flex items-center gap-3 py-3 hover:opacity-90 transition-opacity cursor-pointer"
                 >
                   <Swords size={14} className="flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold truncate">
                       {m.challenger?.username ?? "?"} challenged you
                     </p>
-                    <p className="text-xs text-[#8C7A5B] font-medium capitalize">
+                    <p className="text-xs text-[#4A3F2C] font-medium capitalize">
                       {m.game_types?.name?.replace("_", " ")}
                     </p>
                   </div>
@@ -239,7 +239,7 @@ export default async function HomePage() {
             <MapPin size={16} className="flex-shrink-0" />
             <div className="flex-1">
               <p className="text-sm font-semibold">{t.home.setCity}</p>
-              <p className="text-xs text-[#8C7A5B] font-medium group-hover:text-[#FAF8F3]/60">{t.home.setCityHint}</p>
+              <p className="text-xs text-[#4A3F2C] font-medium group-hover:text-[#FAF8F3]/60">{t.home.setCityHint}</p>
             </div>
             <ChevronRight size={14} className="flex-shrink-0" />
           </Link>
@@ -277,22 +277,22 @@ export default async function HomePage() {
                   <Link
                     key={match.id}
                     href={`/matches/${match.id}`}
-                    className="flex items-center gap-3 py-3 hover:opacity-60 transition-opacity cursor-pointer"
+                    className="flex items-center gap-3 py-3 hover:opacity-90 transition-opacity cursor-pointer"
                   >
                     <div className={`w-8 h-8 border flex items-center justify-center display-upright text-xs flex-shrink-0 ${
                       isWin
                         ? "border-[#14110F] bg-[#14110F] text-[#FAF8F3]"
-                        : "border-[#E3DCCB] text-[#8C7A5B]"
+                        : "border-[#E3DCCB] text-[#4A3F2C]"
                     }`}>
                       {isWin ? "W" : "L"}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold truncate">{t.profile.vs} {opponentName ?? "Unknown"}</p>
-                      <p className="text-xs text-[#8C7A5B] font-medium capitalize">{match.game_types?.name?.replace("_", " ")}</p>
+                      <p className="text-xs text-[#4A3F2C] font-medium capitalize">{match.game_types?.name?.replace("_", " ")}</p>
                     </div>
                     <div className="flex items-center gap-1.5 flex-shrink-0">
-                      <Clock size={11} className="text-[#8C7A5B]" />
-                      <span className="text-xs text-[#8C7A5B] font-medium">
+                      <Clock size={11} className="text-[#4A3F2C]" />
+                      <span className="text-xs text-[#4A3F2C] font-medium">
                         {new Date(match.created_at).toLocaleDateString()}
                       </span>
                     </div>

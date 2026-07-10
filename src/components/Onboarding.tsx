@@ -126,6 +126,8 @@ export default function Onboarding() {
             <button
               key={i}
               onClick={() => goTo(i)}
+              aria-label={`Go to slide ${i + 1} of ${SLIDES.length}`}
+              aria-current={i === step}
               className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
                 i === step
                   ? "w-6 bg-amber-500"

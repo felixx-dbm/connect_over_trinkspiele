@@ -253,7 +253,7 @@ export default function MapView({ filter }: { filter: string }) {
         </div>
         <div>
           <p className="text-stone-700 font-bold text-sm mb-1">{t.map.locationRequired}</p>
-          <p className="text-stone-400 text-sm font-semibold">{t.map.locationHint}</p>
+          <p className="text-stone-600 text-sm font-semibold">{t.map.locationHint}</p>
         </div>
       </div>
     );
@@ -383,7 +383,7 @@ export default function MapView({ filter }: { filter: string }) {
             <p className="text-indigo-700 font-bold text-xs leading-none mb-0.5">
               {liveMatch.status === "active" ? "Match läuft" : "Warten auf Gegner"}
             </p>
-            <p className="text-stone-400 text-[10px] font-semibold capitalize leading-none">
+            <p className="text-stone-600 text-[10px] font-semibold capitalize leading-none">
               {(liveMatch.game_types as unknown as { name: string } | null)?.name?.replace(/_/g, " ")}
               {liveMatch.status === "active" && liveMatch.opponent_id && liveMatch.challenger_id !== liveUserId
                 ? ` · vs ${(liveMatch.challenger as unknown as { username: string } | null)?.username ?? "?"}`
@@ -409,7 +409,7 @@ export default function MapView({ filter }: { filter: string }) {
         <div className="absolute inset-0 z-[999] pointer-events-none flex items-end justify-center pb-32">
           <div className="pointer-events-auto bg-white/95 backdrop-blur border border-amber-100 rounded-2xl px-5 py-4 mx-4 text-center max-w-xs shadow-lg shadow-amber-100/40">
             <p className="text-stone-700 font-bold text-sm mb-1">{t.map.noBattles}</p>
-            <p className="text-stone-400 text-xs font-semibold mb-3">{t.map.noBattlesHint}</p>
+            <p className="text-stone-600 text-xs font-semibold mb-3">{t.map.noBattlesHint}</p>
             <button
               onClick={() => location && fetchChallenges(location)}
               className="flex items-center gap-1.5 text-xs text-amber-600 hover:text-amber-700 mx-auto cursor-pointer transition-colors font-bold"
@@ -424,8 +424,8 @@ export default function MapView({ filter }: { filter: string }) {
       {/* Last refreshed indicator */}
       {lastRefresh && (
         <div className="absolute bottom-16 left-3 z-[1000] bg-white/80 backdrop-blur rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 border border-amber-100 shadow-sm">
-          <RefreshCw size={10} className="text-stone-400" />
-          <span className="text-stone-400 text-[10px] font-semibold">
+          <RefreshCw size={10} className="text-stone-600" />
+          <span className="text-stone-600 text-[10px] font-semibold">
             {lastRefresh.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
           </span>
         </div>
@@ -458,7 +458,7 @@ export default function MapView({ filter }: { filter: string }) {
               </span>
             )}
           </div>
-          {listOpen ? <ChevronDown size={16} className="text-stone-400" /> : <ChevronUp size={16} className="text-stone-400" />}
+          {listOpen ? <ChevronDown size={16} className="text-stone-600" /> : <ChevronUp size={16} className="text-stone-600" />}
         </button>
 
         {/* Sheet content */}
@@ -478,7 +478,7 @@ export default function MapView({ filter }: { filter: string }) {
                       <span className="text-xl flex-shrink-0">👥</span>
                       <div className="flex-1 min-w-0">
                         <p className="text-violet-700 text-sm font-bold">{cm.challenger_crew_name}</p>
-                        <p className="text-stone-400 text-xs font-semibold capitalize flex items-center gap-1 mt-0.5">
+                        <p className="text-stone-600 text-xs font-semibold capitalize flex items-center gap-1 mt-0.5">
                           <Navigation size={9} />
                           {cm.game_type_name.replace(/_/g, " ")} · {t.map.waitingOpponent}
                         </p>
@@ -506,7 +506,7 @@ export default function MapView({ filter }: { filter: string }) {
                         <p className="text-violet-700 text-sm font-bold capitalize">
                           {m.game_type_name.replace(/_/g, " ")}
                         </p>
-                        <p className="text-stone-400 text-xs font-semibold flex items-center gap-1 mt-0.5">
+                        <p className="text-stone-600 text-xs font-semibold flex items-center gap-1 mt-0.5">
                           <Navigation size={9} />
                           {t.map.waitingOpponent}
                         </p>
@@ -536,7 +536,7 @@ export default function MapView({ filter }: { filter: string }) {
                             <span className="text-[9px] bg-violet-100 text-violet-600 border border-violet-200 px-1 py-0.5 rounded-full font-bold leading-none">{m.team_size}v{m.team_size}</span>
                           )}
                         </div>
-                        <p className="text-stone-400 text-xs font-semibold capitalize flex items-center gap-1 mt-0.5">
+                        <p className="text-stone-600 text-xs font-semibold capitalize flex items-center gap-1 mt-0.5">
                           <MapPin size={9} />
                           {m.game_type_name.replace(/_/g, " ")} · {Math.round(m.distance_m)}m
                           {m.team_size > 1 && ` · ${m.slots_challenger}/${m.team_size} vs ${m.slots_opponent}/${m.team_size}`}
@@ -570,7 +570,7 @@ export default function MapView({ filter }: { filter: string }) {
                       <span className="text-xl flex-shrink-0">👥</span>
                       <div className="flex-1 min-w-0">
                         <p className="text-violet-700 text-sm font-bold">{cm.challenger_crew_name}</p>
-                        <p className="text-stone-400 text-xs font-semibold capitalize flex items-center gap-1 mt-0.5">
+                        <p className="text-stone-600 text-xs font-semibold capitalize flex items-center gap-1 mt-0.5">
                           <MapPin size={9} />
                           {cm.game_type_name.replace(/_/g, " ")} · {Math.round(cm.distance_m)}m
                         </p>
@@ -584,7 +584,7 @@ export default function MapView({ filter }: { filter: string }) {
 
             {filteredMatches.length === 0 && crewMatches.length === 0 && (
               <div className="px-4 py-8 text-center">
-                <p className="text-stone-400 text-sm font-semibold">{t.map.noBattlesFilter}</p>
+                <p className="text-stone-600 text-sm font-semibold">{t.map.noBattlesFilter}</p>
               </div>
             )}
 

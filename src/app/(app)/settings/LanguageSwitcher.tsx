@@ -23,7 +23,7 @@ export default function LanguageSwitcher({ currentLocale }: { currentLocale: Loc
       <div className="flex items-center justify-between mb-3">
         <div>
           <p className="text-stone-800 text-sm font-bold">{t.settings.language}</p>
-          <p className="text-stone-400 text-xs font-semibold">{t.settings.languageHint}</p>
+          <p className="text-stone-600 text-xs font-semibold">{t.settings.languageHint}</p>
         </div>
       </div>
       <div className="flex gap-2">

@@ -141,7 +141,7 @@ export default function EventsPage() {
         >
           <Plus size={20} className={tab === "create" ? "text-white" : "text-amber-500"} />
           <span className="font-bold text-sm">{t.events.create}</span>
-          <span className={`text-xs font-semibold ${tab === "create" ? "text-amber-100" : "text-stone-400"}`}>{t.events.createHint}</span>
+          <span className={`text-xs font-semibold ${tab === "create" ? "text-amber-100" : "text-stone-600"}`}>{t.events.createHint}</span>
         </button>
         <button
           onClick={() => { setTab(tab === "join" ? null : "join"); setError(""); }}
@@ -151,7 +151,7 @@ export default function EventsPage() {
         >
           <Hash size={20} className={tab === "join" ? "text-white" : "text-violet-500"} />
           <span className="font-bold text-sm">{t.events.join}</span>
-          <span className={`text-xs font-semibold ${tab === "join" ? "text-violet-200" : "text-stone-400"}`}>{t.events.joinHint}</span>
+          <span className={`text-xs font-semibold ${tab === "join" ? "text-violet-200" : "text-stone-600"}`}>{t.events.joinHint}</span>
         </button>
       </div>
 
@@ -207,23 +207,23 @@ export default function EventsPage() {
         <div className="text-center py-14">
           <CalendarDays size={48} className="text-stone-200 mx-auto mb-3" />
           <p className="text-stone-500 text-sm font-semibold mb-1">{t.events.noEvents}</p>
-          <p className="text-stone-400 text-xs font-semibold">{t.events.noEventsHint}</p>
+          <p className="text-stone-600 text-xs font-semibold">{t.events.noEventsHint}</p>
         </div>
       )}
 
       {memberships.length > 0 && (
         <div>
-          <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">Your Events</p>
+          <p className="text-xs text-stone-600 font-bold uppercase tracking-widest mb-3">Your Events</p>
           <div className="flex flex-col gap-2">
             {memberships.map(({ is_active, events: ev }) => (
               <div key={ev.id} className={`flex items-center gap-3 bg-white border rounded-2xl p-3 shadow-sm ${is_active ? "border-violet-300 bg-violet-50" : "border-amber-100"}`}>
                 <Link href={`/events/${ev.id}`} className="flex-1 flex items-center gap-3 min-w-0">
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${is_active ? "bg-violet-200" : "bg-stone-100"}`}>
-                    <CalendarDays size={14} className={is_active ? "text-violet-600" : "text-stone-400"} />
+                    <CalendarDays size={14} className={is_active ? "text-violet-600" : "text-stone-600"} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-stone-800 text-sm font-bold truncate">{ev.name}</p>
-                    <p className="text-stone-400 text-xs font-semibold">{ev.join_code}{ev.city ? ` · ${ev.city}` : ""}</p>
+                    <p className="text-stone-600 text-xs font-semibold">{ev.join_code}{ev.city ? ` · ${ev.city}` : ""}</p>
                   </div>
                 </Link>
                 {is_active

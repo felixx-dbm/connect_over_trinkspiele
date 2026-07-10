@@ -11,7 +11,7 @@ export default function DeleteAccountButton() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="text-xs text-rose-500 font-bold border border-rose-200 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5"
+        className="text-xs text-rose-700 font-bold border border-rose-200 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5"
       >
         <Trash2 size={11} />
         Delete

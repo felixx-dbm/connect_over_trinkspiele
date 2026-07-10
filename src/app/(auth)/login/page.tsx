@@ -64,7 +64,7 @@ function LoginForm() {
 
       <Link
         href="/"
-        className="flex items-center gap-2 text-[#8C7A5B] hover:text-[#14110F] transition-colors w-fit mb-10 cursor-pointer"
+        className="flex items-center gap-2 text-[#6B5D42] hover:text-[#14110F] transition-colors w-fit mb-10 cursor-pointer"
       >
         <ArrowLeft size={18} />
         <span className="text-sm font-semibold">{t.common.back}</span>
@@ -81,7 +81,7 @@ function LoginForm() {
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 flex-1">
         <div className="relative">
-          <Mail size={16} className="absolute left-0 top-1/2 -translate-y-1/2 text-[#8C7A5B]" />
+          <Mail size={16} className="absolute left-0 top-1/2 -translate-y-1/2 text-[#6B5D42]" />
           <input
             name="email"
             type="email"
@@ -90,12 +90,12 @@ function LoginForm() {
             onChange={handleChange}
             autoComplete="email"
             required
-            className="w-full h-14 bg-transparent border-b border-[#14110F] pl-7 pr-4 text-[#14110F] placeholder:text-[#8C7A5B] focus:outline-none focus:border-b-2 transition-all text-sm font-medium"
+            className="w-full h-14 bg-transparent border-b border-[#14110F] pl-7 pr-4 text-[#14110F] placeholder:text-[#6B5D42] focus:outline-none focus:border-b-2 transition-all text-sm font-medium"
           />
         </div>
 
         <div className="relative">
-          <Lock size={16} className="absolute left-0 top-1/2 -translate-y-1/2 text-[#8C7A5B]" />
+          <Lock size={16} className="absolute left-0 top-1/2 -translate-y-1/2 text-[#6B5D42]" />
           <input
             name="password"
             type={showPassword ? "text" : "password"}
@@ -104,19 +104,20 @@ function LoginForm() {
             onChange={handleChange}
             autoComplete="current-password"
             required
-            className="w-full h-14 bg-transparent border-b border-[#14110F] pl-7 pr-12 text-[#14110F] placeholder:text-[#8C7A5B] focus:outline-none focus:border-b-2 transition-all text-sm font-medium"
+            className="w-full h-14 bg-transparent border-b border-[#14110F] pl-7 pr-12 text-[#14110F] placeholder:text-[#6B5D42] focus:outline-none focus:border-b-2 transition-all text-sm font-medium"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-0 top-1/2 -translate-y-1/2 text-[#8C7A5B] hover:text-[#14110F] transition-colors cursor-pointer"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            className="absolute right-0 top-1/2 -translate-y-1/2 text-[#6B5D42] hover:text-[#14110F] transition-colors cursor-pointer"
           >
             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         </div>
 
         <div className="flex justify-end">
-          <Link href="/forgot-password" className="text-sm font-semibold text-[#8C7A5B] hover:text-[#14110F] transition-colors cursor-pointer">
+          <Link href="/forgot-password" className="text-sm font-semibold text-[#6B5D42] hover:text-[#14110F] transition-colors cursor-pointer">
             {t.auth.forgotPassword}
           </Link>
         </div>
@@ -132,7 +133,7 @@ function LoginForm() {
           type="submit"
           disabled={loading}
           className={`w-full h-14 flex items-center justify-center text-base cursor-pointer gap-2 mt-2 ${
-            !loading ? "btn-gold" : "border border-[#E3DCCB] text-[#8C7A5B] cursor-not-allowed font-semibold"
+            !loading ? "btn-gold" : "border border-[#E3DCCB] text-[#6B5D42] cursor-not-allowed font-semibold"
           }`}
         >
           {loading ? t.auth.signingIn : t.auth.signIn}
@@ -160,7 +161,7 @@ function LoginForm() {
         </button>
       </form>
 
-      <p className="text-center text-sm text-[#8C7A5B] mt-6 font-medium">
+      <p className="text-center text-sm text-[#6B5D42] mt-6 font-medium">
         {t.auth.noAccount}{" "}
         <Link href="/register" className="text-[#14110F] font-semibold underline underline-offset-2 cursor-pointer">
           {t.auth.registerHere}
