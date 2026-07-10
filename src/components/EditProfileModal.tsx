@@ -40,27 +40,27 @@ export default function EditProfileModal({ initialUsername, initialCity, onClose
 
   return (
     <div
-      className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center px-4"
+      className="fixed inset-0 bg-[#14110F]/40 backdrop-blur-sm z-50 flex items-center justify-center px-4"
       onClick={onClose}
     >
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm bg-white border border-amber-100 rounded-3xl p-6 shadow-2xl shadow-amber-200/30 animate-bounce-in"
+        className="w-full max-w-sm bg-[#FAF8F3] border border-[#14110F] p-6 animate-bounce-in"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h3 className="font-display text-xl text-stone-900">{t.editProfile.title}</h3>
-            <p className="text-stone-400 text-xs font-semibold mt-0.5">{t.editProfile.subtitle}</p>
+            <h3 className="display text-xl">{t.editProfile.title}</h3>
+            <p className="text-[#6B5D42] text-xs font-medium mt-0.5">{t.editProfile.subtitle}</p>
           </div>
-          <button type="button" onClick={onClose} aria-label="Close edit profile dialog" className="w-8 h-8 rounded-xl bg-stone-100 hover:bg-stone-200 flex items-center justify-center cursor-pointer transition-colors">
-            <X size={16} className="text-stone-500" />
+          <button type="button" onClick={onClose} aria-label="Close edit profile dialog" className="w-8 h-8 border border-[#14110F] hover:bg-[#14110F] hover:text-[#FAF8F3] flex items-center justify-center cursor-pointer transition-colors">
+            <X size={16} />
           </button>
         </div>
 
         <div className="flex flex-col gap-3 mb-4">
           <div>
-            <label className="text-xs text-stone-400 font-bold uppercase tracking-widest block mb-1.5">{t.editProfile.username}</label>
+            <label className="eyebrow block mb-1.5">{t.editProfile.username}</label>
             <input
               type="text"
               value={username}
@@ -68,24 +68,24 @@ export default function EditProfileModal({ initialUsername, initialCity, onClose
               minLength={2}
               maxLength={30}
               required
-              className="w-full h-14 bg-amber-50 border border-amber-200 rounded-2xl px-4 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 text-sm font-semibold"
+              className="w-full h-14 bg-transparent border border-[#14110F] px-4 placeholder:text-[#6B5D42] focus:outline-none text-sm font-medium"
             />
           </div>
           <div>
-            <label className="text-xs text-stone-400 font-bold uppercase tracking-widest block mb-1.5">{t.editProfile.city}</label>
+            <label className="eyebrow block mb-1.5">{t.editProfile.city}</label>
             <input
               type="text"
               value={city}
               onChange={(e) => setCity(e.target.value)}
               placeholder={t.editProfile.cityPlaceholder}
               maxLength={60}
-              className="w-full h-14 bg-amber-50 border border-amber-200 rounded-2xl px-4 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 text-sm font-semibold"
+              className="w-full h-14 bg-transparent border border-[#14110F] px-4 placeholder:text-[#6B5D42] focus:outline-none text-sm font-medium"
             />
           </div>
         </div>
 
         {error && (
-          <div className="flex items-center gap-2 text-rose-600 text-sm mb-4 bg-rose-50 border border-rose-200 rounded-2xl px-3 py-2 font-semibold">
+          <div className="flex items-center gap-2 text-rose-700 text-sm mb-4 bg-rose-50 border border-rose-700 px-3 py-2 font-semibold">
             <AlertCircle size={14} className="flex-shrink-0" />{error}
           </div>
         )}
@@ -93,15 +93,15 @@ export default function EditProfileModal({ initialUsername, initialCity, onClose
         <button
           type="submit"
           disabled={loading || saved}
-          className={`w-full h-12 rounded-2xl font-bold transition-all cursor-pointer flex items-center justify-center gap-2 ${
+          className={`w-full h-12 font-bold transition-colors cursor-pointer flex items-center justify-center gap-2 ${
             saved
-              ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+              ? "bg-emerald-600 text-white"
               : loading
-              ? "bg-amber-100 text-amber-400 cursor-not-allowed"
+              ? "border border-[#E3DCCB] text-[#6B5D42] cursor-not-allowed"
               : "btn-gold"
           }`}
         >
-          {saved ? <><Check size={16} className="text-emerald-600" /> {t.common.saved}</> : loading ? t.common.saving : t.common.save}
+          {saved ? <><Check size={16} /> {t.common.saved}</> : loading ? t.common.saving : t.common.save}
         </button>
       </form>
     </div>

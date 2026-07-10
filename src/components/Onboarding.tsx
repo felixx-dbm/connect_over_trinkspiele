@@ -9,10 +9,8 @@ const STORAGE_KEY = "onboarding_v1_done";
 
 type Slide = {
   emoji: string;
-  gradientFrom: string;
-  gradientTo: string;
-  shadowColor: string;
-  accentBg: string;
+  bg: string;
+  border: string;
   accentText: string;
   titleKey: keyof ReturnType<typeof useT>["onboarding"];
   descKey:  keyof ReturnType<typeof useT>["onboarding"];
@@ -26,41 +24,31 @@ type Slide = {
 const SLIDES: Slide[] = [
   {
     emoji: "🍺",
-    gradientFrom: "from-amber-400", gradientTo: "to-orange-500",
-    shadowColor: "shadow-amber-300/60",
-    accentBg: "bg-amber-100", accentText: "text-amber-700",
+    bg: "bg-amber-600", border: "border-amber-700", accentText: "text-amber-700",
     titleKey: "s1Title", descKey: "s1Desc",
     chipKeys: ["s1c1", "s1c2", "s1c3"],
   },
   {
     emoji: "🗺️",
-    gradientFrom: "from-sky-400", gradientTo: "to-blue-500",
-    shadowColor: "shadow-sky-300/60",
-    accentBg: "bg-sky-100", accentText: "text-sky-700",
+    bg: "bg-sky-700", border: "border-sky-800", accentText: "text-sky-700",
     titleKey: "s2Title", descKey: "s2Desc",
     chipKeys: ["s2c1", "s2c2", "s2c3"],
   },
   {
     emoji: "⚔️",
-    gradientFrom: "from-rose-400", gradientTo: "to-orange-500",
-    shadowColor: "shadow-rose-300/60",
-    accentBg: "bg-rose-100", accentText: "text-rose-700",
+    bg: "bg-rose-700", border: "border-rose-800", accentText: "text-rose-700",
     titleKey: "s3Title", descKey: "s3Desc",
     chipKeys: ["s3c1", "s3c2", "s3c3"],
   },
   {
     emoji: "👥",
-    gradientFrom: "from-violet-400", gradientTo: "to-purple-600",
-    shadowColor: "shadow-violet-300/60",
-    accentBg: "bg-violet-100", accentText: "text-violet-700",
+    bg: "bg-violet-700", border: "border-violet-800", accentText: "text-violet-700",
     titleKey: "s4Title", descKey: "s4Desc",
     chipKeys: ["s4c1", "s4c2", "s4c3"],
   },
   {
     emoji: "🏆",
-    gradientFrom: "from-emerald-400", gradientTo: "to-teal-500",
-    shadowColor: "shadow-emerald-300/60",
-    accentBg: "bg-emerald-100", accentText: "text-emerald-700",
+    bg: "bg-emerald-700", border: "border-emerald-800", accentText: "text-emerald-700",
     titleKey: "s5Title", descKey: "s5Desc",
     chipKeys: ["s5c1", "s5c2", "s5c3"],
   },
@@ -115,7 +103,7 @@ export default function Onboarding() {
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex flex-col bg-gradient-to-b from-amber-50 to-white"
+      className="fixed inset-0 z-[9999] flex flex-col bg-[#FAF8F3]"
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
@@ -130,10 +118,10 @@ export default function Onboarding() {
               aria-current={i === step}
               className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
                 i === step
-                  ? "w-6 bg-amber-500"
+                  ? "w-6 bg-[#14110F]"
                   : i < step
-                  ? "w-3 bg-amber-300"
-                  : "w-3 bg-stone-200"
+                  ? "w-3 bg-[#6B5D42]"
+                  : "w-3 bg-[#E3DCCB]"
               }`}
             />
           ))}
@@ -141,7 +129,7 @@ export default function Onboarding() {
         <button
           onClick={finish}
           aria-label="Skip onboarding"
-          className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-400 hover:text-stone-600 transition-colors cursor-pointer shadow-sm"
+          className="w-8 h-8 border border-[#14110F] flex items-center justify-center hover:bg-[#14110F] hover:text-[#FAF8F3] transition-colors cursor-pointer"
         >
           <X size={14} />
         </button>
@@ -152,19 +140,15 @@ export default function Onboarding() {
         {/* Illustration card */}
         <div
           key={step}
-          className={`relative w-52 h-52 rounded-[2.5rem] bg-gradient-to-br ${slide.gradientFrom} ${slide.gradientTo} shadow-2xl ${slide.shadowColor} flex items-center justify-center mb-8 animate-bounce-in`}
+          className={`w-52 h-52 ${slide.bg} border ${slide.border} flex items-center justify-center mb-8 animate-bounce-in`}
         >
-          {/* Decorative ring */}
-          <div className="absolute inset-0 rounded-[2.5rem] border-4 border-white/20" />
-          {/* Inner glow */}
-          <div className="absolute inset-4 rounded-[2rem] bg-white/10" />
-          <span className="text-8xl select-none relative z-10">{slide.emoji}</span>
+          <span className="text-8xl select-none">{slide.emoji}</span>
         </div>
 
         {/* Title */}
         <h1
           key={`title-${step}`}
-          className="font-display text-3xl text-center text-stone-900 leading-tight mb-4 animate-slide-up whitespace-pre-line"
+          className="display text-3xl text-center leading-tight mb-4 animate-slide-up whitespace-pre-line"
         >
           {o[slide.titleKey] as string}
         </h1>
@@ -172,7 +156,7 @@ export default function Onboarding() {
         {/* Description */}
         <p
           key={`desc-${step}`}
-          className="text-stone-500 text-center text-sm font-semibold leading-relaxed mb-6 max-w-xs animate-slide-up"
+          className="text-[#4A3F2C] text-center text-sm font-medium leading-relaxed mb-6 max-w-xs animate-slide-up"
           style={{ animationDelay: "60ms" }}
         >
           {o[slide.descKey] as string}
@@ -187,7 +171,7 @@ export default function Onboarding() {
           {slide.chipKeys.map((key) => (
             <span
               key={key}
-              className={`text-xs font-bold px-3 py-1.5 rounded-full ${slide.accentBg} ${slide.accentText} border border-current/20`}
+              className={`text-xs font-bold px-3 py-1.5 border border-current ${slide.accentText}`}
             >
               {o[key] as string}
             </span>
@@ -199,10 +183,10 @@ export default function Onboarding() {
       <div className="px-6 pb-12 flex-shrink-0">
         <button
           onClick={handleNext}
-          className={`w-full h-14 flex items-center justify-center gap-3 font-bold text-base rounded-2xl transition-all cursor-pointer ${
+          className={`w-full h-14 flex items-center justify-center gap-3 font-bold text-base transition-colors cursor-pointer ${
             isLast
-              ? "btn-gold shadow-xl shadow-amber-200"
-              : "bg-stone-900 text-white hover:bg-stone-800 shadow-lg shadow-stone-900/20"
+              ? "btn-gold"
+              : "bg-[#14110F] text-[#FAF8F3] hover:bg-[#322C24]"
           }`}
         >
           {isLast ? o.letsgo : (
@@ -214,7 +198,7 @@ export default function Onboarding() {
         </button>
 
         {/* Step counter */}
-        <p className="text-center text-stone-400 text-xs font-semibold mt-4">
+        <p className="text-center text-[#6B5D42] text-xs font-medium mt-4">
           {step + 1} / {SLIDES.length}
         </p>
       </div>

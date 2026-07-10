@@ -16,7 +16,7 @@ export default function EditAccountButton({ username, city, fullWidth }: Props) 
         onClick={() => setOpen(true)}
         className={`flex items-center justify-center gap-1.5 text-sm font-bold text-amber-700 hover:text-amber-800 transition-colors cursor-pointer ${
           fullWidth
-            ? "w-full h-10 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl"
+            ? "w-full h-10 bg-amber-50 hover:bg-amber-100 border border-amber-700"
             : "text-xs"
         }`}
       >

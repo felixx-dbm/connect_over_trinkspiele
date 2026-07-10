@@ -33,30 +33,28 @@ export default function ProfileChallengeQR({ userId, t }: { userId: string; t: T
     <div className="mb-5">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center gap-3 bg-white border border-amber-200 rounded-2xl p-4 hover:bg-amber-50 transition-colors cursor-pointer shadow-sm"
+        className="w-full flex items-center gap-3 border border-[#14110F] p-4 hover:bg-amber-50 transition-colors cursor-pointer"
       >
-        <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
-          <QrCode size={16} className="text-amber-700" />
-        </div>
+        <QrCode size={18} className="text-amber-700 flex-shrink-0" />
         <div className="flex-1 text-left">
-          <p className="text-stone-800 text-sm font-bold">
+          <p className="text-sm font-bold">
             {t.challenge.title} <span className="text-amber-700">{t.challenge.titleAccent}</span>
           </p>
-          <p className="text-stone-600 text-xs font-semibold">{t.challenge.qrHint}</p>
+          <p className="text-[#4A3F2C] text-xs font-medium">{t.challenge.qrHint}</p>
         </div>
-        <span className="text-stone-300 text-lg">{open ? "▲" : "▼"}</span>
+        <span className="text-[#6B5D42] text-lg">{open ? "▲" : "▼"}</span>
       </button>
 
       {open && (
-        <div className="bg-white border border-amber-100 rounded-2xl p-5 mt-2 flex flex-col items-center gap-4 shadow-sm">
-          <div className="bg-white p-3 rounded-2xl border border-stone-100 shadow-sm">
+        <div className="border border-[#14110F] border-t-0 p-5 flex flex-col items-center gap-4">
+          <div className="bg-white p-3 border border-[#E3DCCB]">
             <QRCodeSVG value={challengeUrl} size={180} />
           </div>
           <button
             onClick={copyLink}
-            className="flex items-center gap-2 bg-stone-50 border border-stone-200 rounded-xl px-4 py-2 text-sm font-bold text-stone-600 hover:bg-amber-50 hover:border-amber-300 transition-colors cursor-pointer"
+            className="flex items-center gap-2 border border-[#14110F] px-4 py-2 text-sm font-bold hover:bg-[#14110F] hover:text-[#FAF8F3] transition-colors cursor-pointer"
           >
-            {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
+            {copied ? <Check size={14} /> : <Copy size={14} />}
             {copied ? "Copied!" : t.challenge.copyLink}
           </button>
         </div>

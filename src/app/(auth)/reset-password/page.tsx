@@ -41,8 +41,8 @@ function ResetForm() {
   if (!sessionReady) {
     return (
       <div className="flex flex-col items-center justify-center gap-4 py-20">
-        <Loader2 size={32} className="text-amber-500 animate-spin" />
-        <p className="text-stone-500 text-sm font-semibold">Verifying reset link…</p>
+        <Loader2 size={32} className="text-[#14110F] animate-spin" />
+        <p className="text-[#4A3F2C] text-sm font-medium">Verifying reset link…</p>
       </div>
     );
   }
@@ -50,11 +50,11 @@ function ResetForm() {
   if (done) {
     return (
       <div className="text-center py-20">
-        <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center mx-auto mb-6 shadow-xl shadow-emerald-200/50">
+        <div className="w-20 h-20 bg-emerald-600 border border-emerald-700 flex items-center justify-center mx-auto mb-6">
           <CheckCircle size={36} className="text-white" />
         </div>
-        <h2 className="font-display text-2xl text-stone-900 mb-2">Password updated!</h2>
-        <p className="text-stone-500 text-sm font-semibold">Redirecting you to the app…</p>
+        <h2 className="display text-2xl mb-2">Password updated!</h2>
+        <p className="text-[#4A3F2C] text-sm font-medium">Redirecting you to the app…</p>
       </div>
     );
   }
@@ -62,34 +62,34 @@ function ResetForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className="relative">
-        <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
+        <Lock size={16} className="absolute left-0 top-1/2 -translate-y-1/2 text-[#6B5D42]" />
         <input
           type={showPw ? "text" : "password"}
           required
           placeholder="New password (8+ chars)"
           value={password}
           onChange={(e) => { setPassword(e.target.value); setError(null); }}
-          className="w-full h-13 pl-11 pr-12 bg-white border border-amber-200 rounded-2xl text-sm text-stone-800 font-semibold placeholder:text-stone-300 focus:outline-none focus:border-amber-400 transition-colors shadow-sm"
+          className="w-full h-14 bg-transparent border-b border-[#14110F] pl-7 pr-12 text-[#14110F] placeholder:text-[#6B5D42] focus:outline-none focus:border-b-2 transition-all text-sm font-medium"
         />
-        <button type="button" onClick={() => setShowPw((v) => !v)} className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 cursor-pointer">
+        <button type="button" onClick={() => setShowPw((v) => !v)} aria-label={showPw ? "Hide password" : "Show password"} className="absolute right-0 top-1/2 -translate-y-1/2 text-[#6B5D42] hover:text-[#14110F] cursor-pointer">
           {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
         </button>
       </div>
 
       <div className="relative">
-        <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
+        <Lock size={16} className="absolute left-0 top-1/2 -translate-y-1/2 text-[#6B5D42]" />
         <input
           type={showPw ? "text" : "password"}
           required
           placeholder="Confirm new password"
           value={confirm}
           onChange={(e) => { setConfirm(e.target.value); setError(null); }}
-          className="w-full h-13 pl-11 pr-4 bg-white border border-amber-200 rounded-2xl text-sm text-stone-800 font-semibold placeholder:text-stone-300 focus:outline-none focus:border-amber-400 transition-colors shadow-sm"
+          className="w-full h-14 bg-transparent border-b border-[#14110F] pl-7 pr-4 text-[#14110F] placeholder:text-[#6B5D42] focus:outline-none focus:border-b-2 transition-all text-sm font-medium"
         />
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 text-rose-600 text-sm bg-rose-50 border border-rose-200 rounded-2xl px-4 py-3 font-semibold">
+        <div className="flex items-center gap-2 text-rose-700 text-sm border border-rose-700 bg-rose-50 px-4 py-3 font-semibold">
           <AlertCircle size={14} className="flex-shrink-0" />
           {error}
         </div>
@@ -98,7 +98,7 @@ function ResetForm() {
       <button
         type="submit"
         disabled={loading || !password || !confirm}
-        className="h-13 btn-gold rounded-2xl flex items-center justify-center gap-2 font-bold text-base disabled:opacity-60 cursor-pointer"
+        className="h-14 btn-gold flex items-center justify-center gap-2 font-bold text-base disabled:opacity-60 cursor-pointer mt-2"
       >
         {loading ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle size={18} />}
         {loading ? "Saving…" : "Set new password"}
@@ -111,11 +111,12 @@ export default function ResetPasswordPage() {
   return (
     <div className="min-h-screen flex flex-col px-6 pt-14 pb-8">
       <div className="flex-1 flex flex-col justify-center max-w-sm w-full mx-auto">
-        <h1 className="font-display text-3xl text-stone-900 mb-2">
-          New <span className="text-gradient">password</span>
+        <p className="eyebrow mb-2">Password reset</p>
+        <h1 className="display text-4xl mb-2">
+          New password
         </h1>
-        <p className="text-stone-500 text-sm font-semibold mb-8">Choose something you&apos;ll remember.</p>
-        <Suspense fallback={<Loader2 size={24} className="text-amber-500 animate-spin" />}>
+        <p className="text-[#4A3F2C] text-sm font-medium mb-8">Choose something you&apos;ll remember.</p>
+        <Suspense fallback={<Loader2 size={24} className="text-[#14110F] animate-spin" />}>
           <ResetForm />
         </Suspense>
       </div>

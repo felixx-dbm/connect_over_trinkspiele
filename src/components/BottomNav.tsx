@@ -52,7 +52,7 @@ export default function BottomNav() {
 
   return (
     <nav aria-label="Main navigation" className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-[max(10px,env(safe-area-inset-bottom))]">
-      <div className="max-w-lg mx-auto bg-white/92 backdrop-blur-2xl rounded-[22px] border border-amber-100/80 shadow-2xl shadow-amber-200/40">
+      <div className="max-w-lg mx-auto bg-[#FAF8F3]/95 backdrop-blur-xl border border-[#14110F]">
         <div className="flex items-center justify-around h-[62px] px-2">
           {tabs.map(({ href, label, Icon, activeColor, dotColor, isCTA }) => {
             const active = pathname === href || (href !== "/home" && pathname.startsWith(href));
@@ -64,12 +64,12 @@ export default function BottomNav() {
                   <Link
                     key="live-match"
                     href={`/matches/${liveMatchId}`}
-                    className="relative flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-green-500 cursor-pointer shrink-0 shadow-lg shadow-emerald-200/60"
+                    className="relative flex items-center justify-center w-12 h-12 border border-emerald-700 bg-emerald-600 cursor-pointer shrink-0"
                     aria-label="View live match"
                   >
                     <Swords size={20} className="text-white" strokeWidth={2.5} />
                     {!liveActive && (
-                      <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-emerald-400 border-2 border-white animate-pulse" />
+                      <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-emerald-400 border-2 border-[#FAF8F3] animate-pulse" />
                     )}
                   </Link>
                 );
@@ -78,10 +78,10 @@ export default function BottomNav() {
                 <Link
                   key={href}
                   href={href}
-                  className="flex items-center justify-center w-12 h-12 rounded-2xl btn-gold cursor-pointer shrink-0"
+                  className="flex items-center justify-center w-12 h-12 btn-gold cursor-pointer shrink-0"
                   aria-label="New match"
                 >
-                  <Icon size={22} className="text-white" strokeWidth={2.5} />
+                  <Icon size={22} className="text-[#FAF8F3]" strokeWidth={2.5} />
                 </Link>
               );
             }
@@ -90,8 +90,8 @@ export default function BottomNav() {
               <Link
                 key={href}
                 href={href}
-                className={`relative flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all duration-200 cursor-pointer ${
-                  active ? activeColor : "text-stone-600 hover:text-stone-700"
+                className={`relative flex flex-col items-center gap-0.5 px-3 py-2 transition-all duration-200 cursor-pointer ${
+                  active ? activeColor : "text-[#6B5D42] hover:text-[#14110F]"
                 }`}
               >
                 <Icon

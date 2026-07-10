@@ -46,14 +46,12 @@ export default function PrivacySettings({ showOnLeaderboard, allowDirectChalleng
     <div className="flex flex-col">
       {rows.map(({ key, label, hint, Icon }, i) => (
         <div key={key}>
-          {i !== 0 && <div className="h-px bg-amber-50 mx-1" />}
+          {i !== 0 && <div className="h-px bg-[#E3DCCB] mx-1" />}
           <div className="flex items-center gap-3 py-3.5">
-            <div className="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
-              <Icon size={13} className="text-amber-500" />
-            </div>
+            <Icon size={16} className="text-amber-700 flex-shrink-0" />
             <div className="flex-1">
-              <p className="text-stone-800 text-sm font-bold">{label}</p>
-              <p className="text-stone-600 text-xs font-semibold leading-snug">{hint}</p>
+              <p className="text-sm font-bold">{label}</p>
+              <p className="text-[#4A3F2C] text-xs font-medium leading-snug">{hint}</p>
             </div>
             <button
               type="button"
@@ -62,15 +60,15 @@ export default function PrivacySettings({ showOnLeaderboard, allowDirectChalleng
               role="switch"
               aria-checked={values[key]}
               aria-label={label}
-              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
-                values[key] ? "bg-amber-500" : "bg-stone-200"
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer border border-[#14110F] transition-colors duration-200 ease-in-out ${
+                values[key] ? "bg-emerald-600" : "bg-transparent"
               } ${saving === key ? "opacity-70" : ""}`}
             >
               <span
                 aria-hidden="true"
-                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
-                  values[key] ? "translate-x-5" : "translate-x-0"
-                }`}
+                className={`pointer-events-none inline-block h-4 w-4 mt-0.5 transform ${
+                  values[key] ? "bg-white translate-x-[22px]" : "bg-[#14110F] translate-x-0.5"
+                } transition duration-200 ease-in-out`}
               />
             </button>
           </div>

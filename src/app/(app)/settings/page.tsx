@@ -38,51 +38,47 @@ export default async function SettingsPage() {
   return (
     <div className="min-h-screen px-4 pt-12 pb-6">
       <div className="flex items-center gap-3 mb-8">
-        <Link href="/profile" aria-label="Back to profile" className="w-9 h-9 rounded-xl bg-white border border-amber-100 flex items-center justify-center text-stone-500 hover:border-amber-300 transition-colors cursor-pointer shadow-sm">
+        <Link href="/profile" aria-label="Back to profile" className="w-9 h-9 border border-[#14110F] flex items-center justify-center cursor-pointer">
           <ArrowLeft size={18} />
         </Link>
-        <h1 className="font-display text-xl text-stone-900">
-          {t.settings.title}<span className="text-gradient">{t.settings.titleAccent}</span>
-        </h1>
+        <div>
+          <p className="eyebrow mb-0.5">{t.settings.title}</p>
+          <h1 className="display text-2xl">{t.settings.titleAccent}</h1>
+        </div>
       </div>
 
       {/* Account info */}
-      <div className="bg-white border border-amber-100 rounded-3xl p-5 mb-4 shadow-sm">
+      <div className="border border-[#14110F] p-5 mb-4">
         <div className="flex items-center justify-between mb-4">
-          <p className="text-xs text-stone-600 font-bold uppercase tracking-widest">{t.settings.account}</p>
+          <p className="eyebrow">{t.settings.account}</p>
           <EditAccountButton username={p?.username ?? ""} city={p?.city ?? ""} />
         </div>
-        <div className="flex flex-col">
-          {accountRows.map(({ Icon, label, value }, i) => (
-            <div key={label}>
-              {i !== 0 && <div className="h-px bg-amber-50 mx-1" />}
-              <div className="flex items-center gap-3 py-3.5">
-                <div className="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
-                  <Icon size={13} className="text-amber-500" />
-                </div>
-                <span className="text-stone-500 text-sm font-semibold flex-1">{label}</span>
-                <span className={`text-sm font-bold truncate max-w-[160px] ${value ? "text-stone-800" : "text-stone-300"}`}>
-                  {value ?? t.settings.notSet}
-                </span>
-              </div>
+        <div className="flex flex-col divide-y divide-[#E3DCCB]">
+          {accountRows.map(({ Icon, label, value }) => (
+            <div key={label} className="flex items-center gap-3 py-3.5">
+              <Icon size={14} className="text-amber-700 flex-shrink-0" />
+              <span className="text-[#4A3F2C] text-sm font-medium flex-1">{label}</span>
+              <span className={`text-sm font-bold truncate max-w-[160px] ${value ? "" : "text-[#6B5D42]"}`}>
+                {value ?? t.settings.notSet}
+              </span>
             </div>
           ))}
         </div>
-        <div className="mt-2 pt-3 border-t border-amber-50">
+        <div className="mt-2 pt-3 border-t border-[#E3DCCB]">
           <EditAccountButton username={p?.username ?? ""} city={p?.city ?? ""} fullWidth />
         </div>
       </div>
 
       {/* Language switcher */}
-      <div className="bg-white border border-amber-100 rounded-3xl p-5 mb-4 shadow-sm">
+      <div className="border border-[#14110F] p-5 mb-4">
         <LanguageSwitcher currentLocale={locale} />
       </div>
 
       {/* Privacy settings */}
-      <div className="bg-white border border-amber-100 rounded-3xl p-5 mb-4 shadow-sm">
+      <div className="border border-[#14110F] p-5 mb-4">
         <div className="flex items-center gap-2 mb-1">
-          <Shield size={13} className="text-amber-500" />
-          <p className="text-xs text-stone-600 font-bold uppercase tracking-widest">{t.settings.privacy}</p>
+          <Shield size={13} className="text-amber-700" />
+          <p className="eyebrow">{t.settings.privacy}</p>
         </div>
         <PrivacySettings
           showOnLeaderboard={p?.show_on_leaderboard ?? true}
@@ -100,12 +96,12 @@ export default async function SettingsPage() {
       </div>
 
       {/* Coming soon */}
-      <div className="bg-white border border-amber-100 rounded-3xl p-5 mb-4 shadow-sm">
-        <p className="text-xs text-stone-600 font-bold uppercase tracking-widest mb-3">{t.settings.comingSoonTitle}</p>
-        <p className="text-stone-500 text-sm font-semibold mb-3 leading-relaxed">{t.settings.comingSoonText}</p>
+      <div className="border border-[#14110F] p-5 mb-4">
+        <p className="eyebrow mb-3">{t.settings.comingSoonTitle}</p>
+        <p className="text-[#4A3F2C] text-sm font-medium mb-3 leading-relaxed">{t.settings.comingSoonText}</p>
         <div className="flex flex-wrap gap-2">
           {t.settings.comingSoonTags.map((label) => (
-            <span key={label} className="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1.5 rounded-full font-bold">
+            <span key={label} className="text-xs border border-amber-700 text-amber-700 px-3 py-1.5 font-bold">
               {label}
             </span>
           ))}
@@ -113,14 +109,12 @@ export default async function SettingsPage() {
       </div>
 
       {/* Danger zone */}
-      <div className="bg-white border border-rose-100 rounded-3xl p-5 mb-6 shadow-sm">
-        <p className="text-xs text-rose-700 font-bold uppercase tracking-widest mb-3">{t.settings.dangerZone}</p>
+      <div className="border border-rose-700 p-5 mb-6">
+        <p className="eyebrow mb-3 text-rose-700">{t.settings.dangerZone}</p>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-rose-50 flex items-center justify-center">
-              <Trash2 size={13} className="text-rose-700" />
-            </div>
-            <span className="text-stone-500 text-sm font-semibold">{t.settings.deleteAccount}</span>
+            <Trash2 size={16} className="text-rose-700" />
+            <span className="text-[#4A3F2C] text-sm font-medium">{t.settings.deleteAccount}</span>
           </div>
           <DeleteAccountButton />
         </div>
@@ -129,7 +123,7 @@ export default async function SettingsPage() {
       <form action={signOut}>
         <button
           type="submit"
-          className="w-full h-12 flex items-center justify-center text-rose-700 border border-rose-200 hover:bg-rose-50 rounded-2xl text-sm font-bold transition-all cursor-pointer"
+          className="w-full h-12 flex items-center justify-center text-rose-700 border border-rose-700 hover:bg-rose-50 text-sm font-bold transition-colors cursor-pointer"
         >
           {t.common.signOut}
         </button>

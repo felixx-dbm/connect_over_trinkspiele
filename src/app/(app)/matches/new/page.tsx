@@ -15,12 +15,12 @@ import { containsSlur } from "@/lib/filter";
 
 type GameType = { id: string; name: string; team_size: number };
 
-const GAME_STYLE: Record<string, { emoji: string; color: string; border: string; activeColor: string }> = {
-  beer_pong:   { emoji: "🏓", color: "bg-amber-50",   border: "border-amber-200",  activeColor: "bg-amber-100 border-amber-500" },
-  flunky_ball: { emoji: "⚽", color: "bg-emerald-50", border: "border-emerald-200", activeColor: "bg-emerald-100 border-emerald-500" },
-  freestyle:   { emoji: "🎲", color: "bg-violet-50",  border: "border-violet-200",  activeColor: "bg-violet-100 border-violet-500" },
+const GAME_STYLE: Record<string, { emoji: string; accent: string; activeBg: string }> = {
+  beer_pong:   { emoji: "🏓", accent: "border-amber-700",   activeBg: "bg-amber-50" },
+  flunky_ball: { emoji: "⚽", accent: "border-emerald-700", activeBg: "bg-emerald-50" },
+  freestyle:   { emoji: "🎲", accent: "border-violet-700",  activeBg: "bg-violet-50" },
 };
-const FALLBACK_STYLE = { emoji: "🍺", color: "bg-amber-50", border: "border-amber-200", activeColor: "bg-amber-100 border-amber-500" };
+const FALLBACK_STYLE = { emoji: "🍺", accent: "border-amber-700", activeBg: "bg-amber-50" };
 
 const BEER_PONG_SIZES  = [1, 2, 3];
 const FLUNKY_SIZES     = [3, 10];
@@ -171,20 +171,21 @@ export default function NewMatchPage() {
   return (
     <div className="min-h-screen px-4 pt-12 pb-6">
       <div className="flex items-center gap-3 mb-8">
-        <Link href="/home" className="w-9 h-9 rounded-xl bg-white border border-amber-100 flex items-center justify-center text-stone-500 hover:border-amber-300 transition-colors cursor-pointer shadow-sm">
+        <Link href="/home" className="w-9 h-9 border border-[#14110F] flex items-center justify-center cursor-pointer">
           <ArrowLeft size={18} />
         </Link>
-        <h1 className="font-display text-xl text-stone-900">
-          {t.matches.newTitle} <span className="text-gradient">{t.matches.newAccent}</span>
-        </h1>
+        <div>
+          <p className="eyebrow mb-0.5">{t.matches.newTitle}</p>
+          <h1 className="display text-2xl">{t.matches.newAccent}</h1>
+        </div>
       </div>
 
-      <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">{t.matches.chooseGame}</p>
+      <p className="eyebrow mb-3">{t.matches.chooseGame}</p>
 
       <div className="flex flex-col gap-3 mb-6">
         {gameTypes.length === 0 && (
           [1, 2, 3].map((i) => (
-            <div key={i} className="h-20 bg-white border border-amber-100 rounded-2xl animate-pulse shadow-sm" />
+            <div key={i} className="h-20 border border-[#E3DCCB] animate-pulse" />
           ))
         )}
         {gameTypes.map((g) => {
@@ -197,33 +198,31 @@ export default function NewMatchPage() {
             <button
               key={g.id}
               onClick={() => { setGameTypeId(g.id); setError(null); }}
-              className={`flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer text-left shadow-sm ${
-                active
-                  ? style.activeColor + " shadow-md"
-                  : style.color + " " + style.border + " hover:shadow-md"
+              className={`flex items-center gap-4 p-4 border transition-colors duration-150 cursor-pointer text-left ${
+                active ? `${style.accent} ${style.activeBg}` : "border-[#E3DCCB] hover:border-[#14110F]"
               }`}
             >
               <span className="text-4xl select-none">{style.emoji}</span>
               <div className="flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <p className={`font-extrabold text-sm ${active ? "text-stone-900" : "text-stone-700"}`}>
+                  <p className="font-bold text-sm">
                     {g.name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
                   </p>
                   {isFlunky ? (
-                    <span className="text-[10px] bg-emerald-100 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded-full font-bold flex items-center gap-1">
+                    <span className="text-[10px] border border-emerald-700 text-emerald-700 px-1.5 py-0.5 font-bold flex items-center gap-1">
                       <Users size={9} />{t.matches.openLobbyBadge}
                     </span>
                   ) : isFlexSize ? (
-                    <span className="text-[10px] bg-stone-100 text-stone-500 border border-stone-200 px-1.5 py-0.5 rounded-full font-bold">
+                    <span className="text-[10px] border border-[#E3DCCB] text-[#6B5D42] px-1.5 py-0.5 font-bold">
                       flexible
                     </span>
                   ) : null}
                 </div>
-                <p className="text-stone-500 text-xs font-semibold mt-0.5">{desc}</p>
+                <p className="text-[#4A3F2C] text-xs font-medium mt-0.5">{desc}</p>
               </div>
               {active && (
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0 shadow-md shadow-amber-200/50">
-                  <div className="w-2.5 h-2.5 rounded-full bg-white" />
+                <div className={`w-5 h-5 flex items-center justify-center flex-shrink-0 border ${style.accent}`}>
+                  <div className={`w-2 h-2 ${style.accent.replace("border-", "bg-")}`} />
                 </div>
               )}
             </button>
@@ -234,16 +233,16 @@ export default function NewMatchPage() {
       {/* Team size picker */}
       {teamSizeOptions && selectedGame && (
         <div className="mb-5">
-          <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">{t.matches.teamSizeLabel}</p>
+          <p className="eyebrow mb-3">{t.matches.teamSizeLabel}</p>
           <div className="flex gap-2">
             {teamSizeOptions.map((n) => (
               <button
                 key={n}
                 onClick={() => setTeamSize(n)}
-                className={`flex-1 h-11 rounded-2xl border-2 font-bold text-sm transition-all cursor-pointer ${
+                className={`flex-1 h-11 border font-bold text-sm transition-colors cursor-pointer ${
                   teamSize === n
-                    ? "bg-gradient-to-br from-amber-400 to-orange-500 border-amber-400 text-white shadow-md shadow-amber-200/50"
-                    : "bg-white border-stone-200 text-stone-600 hover:border-amber-300"
+                    ? "bg-[#14110F] border-[#14110F] text-[#FAF8F3]"
+                    : "border-[#E3DCCB] text-[#4A3F2C] hover:border-[#14110F]"
                 }`}
               >
                 {n === 1 ? "1v1" : `${n}v${n}`}
@@ -255,22 +254,22 @@ export default function NewMatchPage() {
 
       {/* Open lobby explanation: flunky always, freestyle when team > 1 */}
       {isFlunkyBall && (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-4 flex items-start gap-3">
-          <Users size={15} className="text-emerald-500 mt-0.5 flex-shrink-0" />
-          <p className="text-xs text-stone-600 leading-relaxed font-semibold">{t.matches.openLobbyHint}</p>
+        <div className="border border-emerald-700 p-4 mb-4 flex items-start gap-3">
+          <Users size={15} className="text-emerald-700 mt-0.5 flex-shrink-0" />
+          <p className="text-xs text-[#4A3F2C] leading-relaxed font-medium">{t.matches.openLobbyHint}</p>
         </div>
       )}
       {isFreestyle && teamSize > 1 && (
-        <div className="bg-violet-50 border border-violet-200 rounded-2xl p-4 mb-4 flex items-start gap-3">
-          <Users size={15} className="text-violet-500 mt-0.5 flex-shrink-0" />
-          <p className="text-xs text-stone-600 leading-relaxed font-semibold">{t.matches.freestyleOpenLobbyHint}</p>
+        <div className="border border-violet-700 p-4 mb-4 flex items-start gap-3">
+          <Users size={15} className="text-violet-700 mt-0.5 flex-shrink-0" />
+          <p className="text-xs text-[#4A3F2C] leading-relaxed font-medium">{t.matches.freestyleOpenLobbyHint}</p>
         </div>
       )}
 
       {/* Freestyle: custom game name */}
       {isFreestyle && (
         <div className="mb-4">
-          <label className="text-xs text-stone-400 font-bold uppercase tracking-widest block mb-2">
+          <label className="eyebrow block mb-2">
             {t.matches.customGameNameLabel}
           </label>
           <input
@@ -279,22 +278,22 @@ export default function NewMatchPage() {
             value={customGameName}
             onChange={(e) => { setCustomGameName(e.target.value); setError(null); }}
             placeholder={t.matches.customGameNamePlaceholder}
-            className="w-full h-12 px-4 bg-white border border-violet-200 rounded-2xl text-sm text-stone-800 font-semibold placeholder:text-stone-300 focus:outline-none focus:border-violet-400 transition-colors shadow-sm"
+            className="w-full h-12 px-4 bg-transparent border border-violet-700 text-sm font-medium placeholder:text-[#6B5D42] focus:outline-none transition-colors"
           />
         </div>
       )}
 
       {/* Location info */}
-      <div className="bg-sky-50 border border-sky-200 rounded-2xl p-4 mb-4 flex items-start gap-3">
-        <Navigation size={15} className="text-sky-500 mt-0.5 flex-shrink-0" />
-        <p className="text-xs text-stone-500 leading-relaxed font-semibold">
+      <div className="border border-sky-700 p-4 mb-4 flex items-start gap-3">
+        <Navigation size={15} className="text-sky-700 mt-0.5 flex-shrink-0" />
+        <p className="text-xs text-[#4A3F2C] leading-relaxed font-medium">
           {t.matches.locationNote}
         </p>
       </div>
 
       {/* Meeting hint */}
       <div className="mb-6">
-        <label className="text-xs text-stone-400 font-bold uppercase tracking-widest block mb-2">
+        <label className="eyebrow block mb-2">
           {t.matches.meetingHintLabel}
         </label>
         <input
@@ -303,13 +302,13 @@ export default function NewMatchPage() {
           value={meetingHint}
           onChange={(e) => setMeetingHint(e.target.value)}
           placeholder={t.matches.meetingHintPlaceholder}
-          className="w-full h-12 px-4 bg-white border border-amber-200 rounded-2xl text-sm text-stone-800 font-semibold placeholder:text-stone-300 focus:outline-none focus:border-amber-400 transition-colors shadow-sm"
+          className="w-full h-12 px-4 bg-transparent border border-[#14110F] text-sm font-medium placeholder:text-[#6B5D42] focus:outline-none transition-colors"
         />
-        <p className="text-xs text-stone-400 font-semibold mt-2 px-1">{t.matches.meetingHintNote}</p>
+        <p className="text-xs text-[#6B5D42] font-medium mt-2 px-1">{t.matches.meetingHintNote}</p>
       </div>
 
       {error && (
-        <div className="text-rose-600 text-sm bg-rose-50 border border-rose-200 rounded-2xl px-4 py-3 mb-4 font-semibold">
+        <div className="text-rose-700 text-sm border border-rose-700 bg-rose-50 px-4 py-3 mb-4 font-semibold">
           {error}
         </div>
       )}
@@ -317,10 +316,10 @@ export default function NewMatchPage() {
       <button
         onClick={handlePost}
         disabled={!gameTypeId || posting || (isFreestyle && !customGameName.trim())}
-        className={`w-full h-14 flex items-center justify-center gap-3 text-base rounded-2xl cursor-pointer ${
+        className={`w-full h-14 flex items-center justify-center gap-3 text-base cursor-pointer ${
           gameTypeId && !posting
             ? "btn-gold"
-            : "bg-amber-100 text-amber-400 cursor-not-allowed font-bold"
+            : "border border-[#E3DCCB] text-[#6B5D42] cursor-not-allowed font-bold"
         }`}
       >
         {posting

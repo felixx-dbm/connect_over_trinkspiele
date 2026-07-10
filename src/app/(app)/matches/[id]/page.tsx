@@ -48,10 +48,10 @@ type MatchMember = {
 };
 
 const STATUS_STYLE = {
-  open:      { color: "text-sky-600",     bg: "bg-sky-50 border-sky-200"       },
-  active:    { color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-200" },
-  completed: { color: "text-stone-500",   bg: "bg-stone-50 border-stone-200"   },
-  cancelled: { color: "text-rose-600",    bg: "bg-rose-50 border-rose-200"     },
+  open:      { color: "text-sky-700",     border: "border-sky-700"     },
+  active:    { color: "text-emerald-700", border: "border-emerald-700" },
+  completed: { color: "text-[#4A3F2C]",   border: "border-[#E3DCCB]"   },
+  cancelled: { color: "text-rose-700",    border: "border-rose-700"    },
 };
 
 export default function MatchPage() {
@@ -289,7 +289,7 @@ export default function MatchPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 size={32} className="text-amber-500 animate-spin" />
+        <Loader2 size={32} className="text-[#14110F] animate-spin" />
       </div>
     );
   }
@@ -299,8 +299,8 @@ export default function MatchPage() {
       <div className="min-h-screen flex items-center justify-center px-4 text-center">
         <div>
           <div className="text-5xl mb-4">🤔</div>
-          <p className="text-stone-500 font-semibold mb-4">{t.matches.notFound}</p>
-          <Link href="/home" className="text-amber-600 font-bold hover:text-amber-700">← {t.matches.backHome}</Link>
+          <p className="text-[#4A3F2C] font-medium mb-4">{t.matches.notFound}</p>
+          <Link href="/home" className="link-arrow text-sm">{t.matches.backHome}</Link>
         </div>
       </div>
     );
@@ -330,54 +330,54 @@ export default function MatchPage() {
     return (
       <div className="min-h-screen px-4 pt-12 pb-6 flex flex-col items-center justify-center text-center gap-6">
         {match.disputed && (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 text-amber-700 text-xs font-bold w-full max-w-xs">
+          <div className="border border-amber-700 px-4 py-3 text-amber-700 text-xs font-bold w-full max-w-xs">
             {t.matches.disputedSub}
           </div>
         )}
-        <div className={`w-28 h-28 rounded-3xl flex items-center justify-center ${
+        <div className={`w-28 h-28 flex items-center justify-center ${
           !isParticipant
-            ? "bg-stone-100 border-2 border-stone-200"
+            ? "border border-[#E3DCCB]"
             : isWinner
-            ? "bg-gradient-to-br from-amber-400 to-orange-500 shadow-2xl shadow-amber-300/50"
-            : "bg-stone-100 border-2 border-stone-200"
+            ? "bg-emerald-600 border border-emerald-700"
+            : "border border-[#E3DCCB]"
         }`}>
           {!isParticipant
-            ? <Trophy size={44} className="text-stone-400" />
+            ? <Trophy size={44} className="text-[#6B5D42]" />
             : isWinner
             ? <Trophy size={44} className="text-white" />
-            : <XCircle size={44} className="text-stone-400" />}
+            : <XCircle size={44} className="text-rose-700" />}
         </div>
         <div>
           {!isParticipant ? (
             <>
-              <h2 className="font-display text-3xl text-stone-900 mb-1">
-                <span className="text-gradient">{winnerName.toUpperCase()}</span> {t.matches.wins}
+              <h2 className="display italic text-3xl mb-1">
+                {winnerName.toUpperCase()} {t.matches.wins}
               </h2>
-              <p className="text-stone-500 text-sm font-semibold capitalize">{gameName}</p>
+              <p className="text-[#4A3F2C] text-sm font-medium capitalize">{gameName}</p>
             </>
           ) : isWinner ? (
             <>
-              <h2 className="font-display text-3xl text-stone-900 mb-1">
-                {t.matches.youWin.split("WIN!")[0]}<span className="text-gradient">WIN!</span> 🎉
+              <h2 className="display italic text-3xl mb-1 text-emerald-700">
+                {t.matches.youWin}
               </h2>
-              <p className="text-stone-500 text-sm font-semibold">{t.matches.winRecord}</p>
+              <p className="text-[#4A3F2C] text-sm font-medium">{t.matches.winRecord}</p>
             </>
           ) : match.winner_id ? (
             <>
-              <h2 className="font-display text-3xl text-stone-900 mb-1">{t.matches.betterLuck}</h2>
-              <p className="text-stone-500 text-sm font-semibold">{t.matches.lossAck}</p>
-              <p className="text-stone-400 text-xs font-semibold mt-1">{t.matches.lossAckSub}</p>
+              <h2 className="display italic text-3xl mb-1 text-rose-700">{t.matches.betterLuck}</h2>
+              <p className="text-[#4A3F2C] text-sm font-medium">{t.matches.lossAck}</p>
+              <p className="text-[#6B5D42] text-xs font-medium mt-1">{t.matches.lossAckSub}</p>
             </>
           ) : (
-            <h2 className="font-display text-3xl text-stone-900 mb-1">{t.matches.matchEnded}</h2>
+            <h2 className="display italic text-3xl mb-1">{t.matches.matchEnded}</h2>
           )}
         </div>
         <div className="flex flex-col gap-3 w-full max-w-xs">
-          <Link href="/matches/new" className="h-12 px-8 btn-gold rounded-2xl flex items-center justify-center gap-2 cursor-pointer">
+          <Link href="/matches/new" className="h-12 px-8 btn-gold flex items-center justify-center gap-2 cursor-pointer">
             <RefreshCw size={16} /> {t.matches.rematch}
           </Link>
-          <Link href="/home" className="h-12 px-8 bg-white border border-amber-200 hover:border-amber-400 text-stone-700 font-bold rounded-2xl flex items-center justify-center gap-2 cursor-pointer transition-all shadow-sm">
-            <Swords size={16} className="text-amber-500" /> {t.matches.backHome}
+          <Link href="/home" className="h-12 px-8 btn-outline font-bold flex items-center justify-center gap-2 cursor-pointer">
+            <Swords size={16} /> {t.matches.backHome}
           </Link>
         </div>
       </div>
@@ -392,30 +392,31 @@ export default function MatchPage() {
   return (
     <div className="min-h-screen px-4 pt-12 pb-6">
       <div className="flex items-center gap-3 mb-8">
-        <Link href="/home" className="w-9 h-9 rounded-xl bg-white border border-amber-100 flex items-center justify-center text-stone-500 hover:border-amber-300 transition-colors cursor-pointer shadow-sm">
+        <Link href="/home" className="w-9 h-9 border border-[#14110F] flex items-center justify-center cursor-pointer">
           <ArrowLeft size={18} />
         </Link>
-        <h1 className="font-display text-xl text-stone-900">
-          {t.matches.lobbyTitle} <span className="text-gradient">{t.matches.lobbyAccent}</span>
-        </h1>
+        <div>
+          <p className="eyebrow mb-0.5">{t.matches.lobbyTitle}</p>
+          <h1 className="display text-2xl">{t.matches.lobbyAccent}</h1>
+        </div>
       </div>
 
       {/* Status badges */}
       <div className="flex flex-wrap items-center gap-2 mb-6">
-        <span className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border font-bold ${statusStyle.bg} ${statusStyle.color}`}>
-          {match.status === "active" && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />}
+        <span className={`flex items-center gap-1.5 text-xs px-3 py-1.5 border font-bold ${statusStyle.border} ${statusStyle.color}`}>
+          {match.status === "active" && <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />}
           {statusLabel}
         </span>
-        <span className="text-xs bg-white border border-amber-100 px-3 py-1.5 rounded-full text-stone-600 font-bold capitalize shadow-sm">
+        <span className="text-xs border border-[#14110F] px-3 py-1.5 font-bold capitalize">
           {gameName}
         </span>
         {isOpenLobby && (
-          <span className="text-xs bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full text-emerald-700 font-bold shadow-sm flex items-center gap-1">
+          <span className="text-xs border border-emerald-700 px-3 py-1.5 text-emerald-700 font-bold flex items-center gap-1">
             <Users size={10} />{t.matches.openLobbyBadge}
           </span>
         )}
         {isTeamGame && !isOpenLobby && (
-          <span className="text-xs bg-violet-50 border border-violet-200 px-3 py-1.5 rounded-full text-violet-700 font-bold shadow-sm">
+          <span className="text-xs border border-violet-700 px-3 py-1.5 text-violet-700 font-bold">
             {match.team_size}v{match.team_size}
           </span>
         )}
@@ -423,21 +424,21 @@ export default function MatchPage() {
 
       {/* Notifications */}
       {notification && (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-4 py-3 mb-4 flex items-center gap-2 text-emerald-700 text-sm font-bold">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
+        <div className="border border-emerald-700 px-4 py-3 mb-4 flex items-center gap-2 text-emerald-700 text-sm font-bold">
+          <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse flex-shrink-0" />
           {notification}
         </div>
       )}
 
       {/* Opponent reported, waiting for me */}
       {match.status === "active" && isParticipant && theirResult !== null && !iAlreadySubmitted && (
-        <div className="bg-amber-50 border border-amber-300 rounded-2xl px-4 py-3 mb-4 text-amber-800 text-sm font-bold">
+        <div className="border border-amber-700 px-4 py-3 mb-4 text-amber-800 text-sm font-bold">
           <div className="flex items-center gap-2 mb-0.5">
             <span className="text-lg leading-none">👆</span>
             {t.matches.opponentReported}
           </div>
           {resolveCountdown && (
-            <p className="text-amber-600 text-xs font-semibold mt-1 pl-1">
+            <p className="text-amber-700 text-xs font-semibold mt-1 pl-1">
               {t.matches.autoResolvesIn.replace("{time}", resolveCountdown)}
             </p>
           )}
@@ -446,147 +447,144 @@ export default function MatchPage() {
 
       {/* Waiting for opponent to confirm after I submitted */}
       {(resultStatus === "waiting" || (mySubmittedResult !== null && theirResult === null)) && match.status === "active" && (
-        <div className="bg-sky-50 border border-sky-200 rounded-2xl px-4 py-3 mb-4 text-sky-700 text-sm font-bold">
+        <div className="border border-sky-700 px-4 py-3 mb-4 text-sky-700 text-sm font-bold">
           <div className="flex items-center gap-2 mb-0.5">
             <Loader2 size={13} className="animate-spin flex-shrink-0" />
             {t.matches.waitingConfirmation}
           </div>
           {resolveCountdown ? (
-            <p className="text-sky-500 text-xs font-semibold pl-5">
+            <p className="text-sky-700 text-xs font-semibold pl-5">
               {t.matches.autoResolvesIn.replace("{time}", resolveCountdown)}
             </p>
           ) : (
-            <p className="text-sky-500 text-xs font-semibold pl-5">{t.matches.waitingConfirmationHint}</p>
+            <p className="text-sky-700 text-xs font-semibold pl-5">{t.matches.waitingConfirmationHint}</p>
           )}
         </div>
       )}
 
       {/* VS card */}
-      <div className="relative bg-white border border-amber-100 rounded-3xl p-6 mb-5 overflow-hidden shadow-md shadow-amber-100/40">
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-50/80 to-orange-50/40 pointer-events-none" />
-        <div className="relative">
-          {isTeamGame ? (
-            /* ── Team slot display ── */
-            <div className="flex items-start justify-between gap-4">
-              {/* Challenger team */}
-              <div className="flex-1">
-                <p className="text-[10px] text-amber-500 font-bold uppercase tracking-widest mb-2">{challengerName}</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {Array.from({ length: match.team_size }).map((_, i) => {
-                    const member = challengerMembers[i];
-                    return (
-                      <div key={i} className={`relative w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center font-display text-sm ${
-                        member
-                          ? member.user_id === currentUserId
-                            ? "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-md shadow-amber-200/50"
-                            : "bg-stone-100 border border-stone-200 text-stone-600"
-                          : "border-2 border-dashed border-amber-200 text-amber-300"
-                      }`}>
-                        {member
-                          ? member.users?.avatar_url
-                            ? <Image src={member.users.avatar_url} alt="" fill sizes="40px" className="object-cover" />
-                            : (member.users?.username?.slice(0, 2).toUpperCase() ?? "??")
-                          : "+"}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className="flex flex-col items-center gap-1 flex-shrink-0 pt-2">
-                <span className="font-display text-xl text-gradient">VS</span>
-                <Swords size={12} className="text-stone-300" />
-              </div>
-              {/* Opponent team */}
-              <div className="flex-1 text-right">
-                <p className="text-[10px] text-violet-400 font-bold uppercase tracking-widest mb-2">
-                  {match.opponent ? opponentName : "???"}
-                </p>
-                <div className="flex flex-wrap gap-1.5 justify-end">
-                  {Array.from({ length: match.team_size }).map((_, i) => {
-                    const member = opponentMembers[i];
-                    return (
-                      <div key={i} className={`relative w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center font-display text-sm ${
-                        member
-                          ? member.user_id === currentUserId
-                            ? "bg-gradient-to-br from-violet-400 to-purple-500 text-white shadow-md shadow-violet-200/50"
-                            : "bg-stone-100 border border-stone-200 text-stone-600"
-                          : "border-2 border-dashed border-violet-200 text-violet-300"
-                      }`}>
-                        {member
-                          ? member.users?.avatar_url
-                            ? <Image src={member.users.avatar_url} alt="" fill sizes="40px" className="object-cover" />
-                            : (member.users?.username?.slice(0, 2).toUpperCase() ?? "??")
-                          : "+"}
-                      </div>
-                    );
-                  })}
-                </div>
+      <div className="border border-[#14110F] p-6 mb-5">
+        {isTeamGame ? (
+          /* ── Team slot display ── */
+          <div className="flex items-start justify-between gap-4">
+            {/* Challenger team */}
+            <div className="flex-1">
+              <p className="text-[10px] text-amber-700 font-bold uppercase tracking-widest mb-2">{challengerName}</p>
+              <div className="flex flex-wrap gap-1.5">
+                {Array.from({ length: match.team_size }).map((_, i) => {
+                  const member = challengerMembers[i];
+                  return (
+                    <div key={i} className={`relative w-10 h-10 overflow-hidden flex items-center justify-center display-upright text-sm ${
+                      member
+                        ? member.user_id === currentUserId
+                          ? "bg-amber-600 text-white"
+                          : "border border-[#E3DCCB] text-[#4A3F2C]"
+                        : "border border-dashed border-amber-300 text-amber-400"
+                    }`}>
+                      {member
+                        ? member.users?.avatar_url
+                          ? <Image src={member.users.avatar_url} alt="" fill sizes="40px" className="object-cover" />
+                          : (member.users?.username?.slice(0, 2).toUpperCase() ?? "??")
+                        : "+"}
+                    </div>
+                  );
+                })}
               </div>
             </div>
-          ) : (
-            /* ── 1v1 display ── */
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex flex-col items-center gap-2 flex-1">
-                <div className={`relative w-16 h-16 rounded-2xl overflow-hidden flex items-center justify-center font-display text-lg shadow-md ${
-                  isChallenger
-                    ? "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-amber-200/60"
-                    : "bg-stone-100 border border-stone-200 text-stone-600"
-                }`}>
-                  {match.challenger?.avatar_url
-                    ? <Image src={match.challenger.avatar_url} alt="" fill sizes="64px" className="object-cover" />
-                    : challengerName.slice(0, 2).toUpperCase()}
-                </div>
-                <p className="text-stone-800 font-bold text-sm text-center">{challengerName}</p>
-                {isChallenger && <span className="text-xs bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full font-bold">{t.matches.you}</span>}
-              </div>
-              <div className="flex flex-col items-center gap-1">
-                <span className="font-display text-2xl text-gradient">VS</span>
-                <Swords size={16} className="text-stone-300" />
-              </div>
-              <div className="flex flex-col items-center gap-2 flex-1">
-                <div className={`relative w-16 h-16 rounded-2xl overflow-hidden flex items-center justify-center font-display text-lg shadow-md ${
-                  !isChallenger && match.opponent
-                    ? "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-amber-200/60"
-                    : "bg-stone-100 border border-stone-200 text-stone-600"
-                }`}>
-                  {match.opponent?.avatar_url
-                    ? <Image src={match.opponent.avatar_url} alt="" fill sizes="64px" className="object-cover" />
-                    : match.opponent ? opponentName.slice(0, 2).toUpperCase() : "?"}
-                </div>
-                <p className="text-stone-800 font-bold text-sm text-center">{opponentName}</p>
-                {!isChallenger && match.opponent && <span className="text-xs bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full font-bold">{t.matches.you}</span>}
+            <div className="flex flex-col items-center gap-1 flex-shrink-0 pt-2">
+              <span className="display italic text-xl">VS</span>
+              <Swords size={12} className="text-[#E3DCCB]" />
+            </div>
+            {/* Opponent team */}
+            <div className="flex-1 text-right">
+              <p className="text-[10px] text-violet-700 font-bold uppercase tracking-widest mb-2">
+                {match.opponent ? opponentName : "???"}
+              </p>
+              <div className="flex flex-wrap gap-1.5 justify-end">
+                {Array.from({ length: match.team_size }).map((_, i) => {
+                  const member = opponentMembers[i];
+                  return (
+                    <div key={i} className={`relative w-10 h-10 overflow-hidden flex items-center justify-center display-upright text-sm ${
+                      member
+                        ? member.user_id === currentUserId
+                          ? "bg-violet-700 text-white"
+                          : "border border-[#E3DCCB] text-[#4A3F2C]"
+                        : "border border-dashed border-violet-300 text-violet-400"
+                    }`}>
+                      {member
+                        ? member.users?.avatar_url
+                          ? <Image src={member.users.avatar_url} alt="" fill sizes="40px" className="object-cover" />
+                          : (member.users?.username?.slice(0, 2).toUpperCase() ?? "??")
+                        : "+"}
+                    </div>
+                  );
+                })}
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          /* ── 1v1 display ── */
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col items-center gap-2 flex-1">
+              <div className={`relative w-16 h-16 overflow-hidden flex items-center justify-center display-upright text-lg ${
+                isChallenger
+                  ? "bg-amber-600 text-white"
+                  : "border border-[#E3DCCB] text-[#4A3F2C]"
+              }`}>
+                {match.challenger?.avatar_url
+                  ? <Image src={match.challenger.avatar_url} alt="" fill sizes="64px" className="object-cover" />
+                  : challengerName.slice(0, 2).toUpperCase()}
+              </div>
+              <p className="font-bold text-sm text-center">{challengerName}</p>
+              {isChallenger && <span className="text-xs border border-amber-700 text-amber-700 px-2 py-0.5 font-bold">{t.matches.you}</span>}
+            </div>
+            <div className="flex flex-col items-center gap-1">
+              <span className="display italic text-2xl">VS</span>
+              <Swords size={16} className="text-[#E3DCCB]" />
+            </div>
+            <div className="flex flex-col items-center gap-2 flex-1">
+              <div className={`relative w-16 h-16 overflow-hidden flex items-center justify-center display-upright text-lg ${
+                !isChallenger && match.opponent
+                  ? "bg-amber-600 text-white"
+                  : "border border-[#E3DCCB] text-[#4A3F2C]"
+              }`}>
+                {match.opponent?.avatar_url
+                  ? <Image src={match.opponent.avatar_url} alt="" fill sizes="64px" className="object-cover" />
+                  : match.opponent ? opponentName.slice(0, 2).toUpperCase() : "?"}
+              </div>
+              <p className="font-bold text-sm text-center">{opponentName}</p>
+              {!isChallenger && match.opponent && <span className="text-xs border border-amber-700 text-amber-700 px-2 py-0.5 font-bold">{t.matches.you}</span>}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Match info chips */}
       <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="bg-white border border-amber-100 rounded-2xl p-3 flex items-center gap-2 shadow-sm">
-          <Clock size={14} className="text-amber-400 flex-shrink-0" />
+        <div className="border border-[#14110F] p-3 flex items-center gap-2">
+          <Clock size={14} className="text-[#6B5D42] flex-shrink-0" />
           <div>
-            <p className="text-stone-400 text-xs font-bold">{t.matches.started}</p>
-            <p className="text-stone-700 text-sm font-extrabold">
+            <p className="text-[#6B5D42] text-xs font-bold">{t.matches.started}</p>
+            <p className="text-sm font-extrabold">
               {new Date(match.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
             </p>
           </div>
         </div>
-        <div className="bg-white border border-amber-100 rounded-2xl p-3 flex items-center gap-2 shadow-sm">
+        <div className="border border-[#14110F] p-3 flex items-center gap-2">
           {timeLeft ? (
             <>
-              <Timer size={14} className="text-amber-400 flex-shrink-0" />
+              <Timer size={14} className="text-[#6B5D42] flex-shrink-0" />
               <div>
-                <p className="text-stone-400 text-xs font-bold">{t.matches.expiresIn}</p>
-                <p className="text-stone-700 text-sm font-extrabold">{timeLeft}</p>
+                <p className="text-[#6B5D42] text-xs font-bold">{t.matches.expiresIn}</p>
+                <p className="text-sm font-extrabold">{timeLeft}</p>
               </div>
             </>
           ) : (
             <>
-              <MapPin size={14} className="text-amber-400 flex-shrink-0" />
+              <MapPin size={14} className="text-[#6B5D42] flex-shrink-0" />
               <div>
-                <p className="text-stone-400 text-xs font-bold">{t.matches.mode}</p>
-                <p className="text-stone-700 text-sm font-extrabold capitalize">{match.mode}</p>
+                <p className="text-[#6B5D42] text-xs font-bold">{t.matches.mode}</p>
+                <p className="text-sm font-extrabold capitalize">{match.mode}</p>
               </div>
             </>
           )}
@@ -595,12 +593,12 @@ export default function MatchPage() {
 
       {/* Meeting point */}
       {(match.meeting_hint || match.fuzzy_lat) && match.status !== "cancelled" && (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-5 flex items-start gap-3">
-          <MapPin size={15} className="text-emerald-500 mt-0.5 flex-shrink-0" />
+        <div className="border border-emerald-700 p-4 mb-5 flex items-start gap-3">
+          <MapPin size={15} className="text-emerald-700 mt-0.5 flex-shrink-0" />
           <div className="flex-1 min-w-0">
             <p className="text-xs text-emerald-700 font-bold uppercase tracking-widest mb-0.5">{t.matches.meetingPoint}</p>
             {match.meeting_hint && (
-              <p className="text-stone-800 text-sm font-semibold leading-snug">{match.meeting_hint}</p>
+              <p className="text-sm font-semibold leading-snug">{match.meeting_hint}</p>
             )}
           </div>
           {match.fuzzy_lat && match.fuzzy_lng && (
@@ -608,7 +606,7 @@ export default function MatchPage() {
               href={`https://maps.google.com/?q=${match.fuzzy_lat},${match.fuzzy_lng}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-shrink-0 flex items-center gap-1.5 bg-emerald-500 text-white text-xs font-bold px-3 py-2 rounded-xl shadow-sm hover:bg-emerald-600 transition-colors"
+              className="flex-shrink-0 flex items-center gap-1.5 bg-emerald-700 text-white text-xs font-bold px-3 py-2 hover:bg-emerald-800 transition-colors"
             >
               <Navigation size={12} />
               {t.matches.navigate}
@@ -619,8 +617,8 @@ export default function MatchPage() {
 
       {/* ── ACTIVE: match started banner ── */}
       {match.status === "active" && isParticipant && (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-4 py-3 mb-4 flex items-center gap-2 text-emerald-700 text-sm font-bold">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
+        <div className="border border-emerald-700 px-4 py-3 mb-4 flex items-center gap-2 text-emerald-700 text-sm font-bold">
+          <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse flex-shrink-0" />
           {t.matches.matchStarted}
         </div>
       )}
@@ -628,19 +626,19 @@ export default function MatchPage() {
       {/* ── ACTIVE: Result submission ── */}
       {match.status === "active" && isParticipant && !iAlreadySubmitted && (
         <div>
-          <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-1">{t.matches.submitResult}</p>
-          <p className="text-stone-400 text-xs font-semibold mb-3">{t.matches.submitHint}</p>
+          <p className="eyebrow mb-1">{t.matches.submitResult}</p>
+          <p className="text-[#6B5D42] text-xs font-medium mb-3">{t.matches.submitHint}</p>
           <div className="grid grid-cols-2 gap-3 mb-4">
             {(["win", "loss"] as const).map((r) => (
               <button
                 key={r}
                 onClick={() => setMyResult(r)}
-                className={`h-14 rounded-2xl border-2 flex items-center justify-center gap-2 font-bold text-sm transition-all cursor-pointer ${
+                className={`h-14 border-2 flex items-center justify-center gap-2 font-bold text-sm transition-colors cursor-pointer ${
                   myResult === r
                     ? r === "win"
-                      ? "bg-gradient-to-br from-emerald-400 to-green-500 border-emerald-400 text-white shadow-lg shadow-emerald-200/60"
-                      : "bg-rose-50 border-rose-400 text-rose-600 shadow-sm"
-                    : "bg-white border-amber-100 text-stone-500 hover:border-amber-300 shadow-sm"
+                      ? "bg-emerald-600 border-emerald-700 text-white"
+                      : "bg-rose-50 border-rose-700 text-rose-700"
+                    : "border-[#E3DCCB] text-[#4A3F2C] hover:border-[#14110F]"
                 }`}
               >
                 {r === "win"
@@ -650,13 +648,13 @@ export default function MatchPage() {
             ))}
           </div>
           {submitError && (
-            <div className="text-rose-600 text-sm bg-rose-50 border border-rose-200 rounded-2xl px-4 py-3 mb-4 font-semibold">{submitError}</div>
+            <div className="text-rose-700 text-sm border border-rose-700 bg-rose-50 px-4 py-3 mb-4 font-semibold">{submitError}</div>
           )}
           <button
             onClick={handleSubmit}
             disabled={!myResult || submitting}
-            className={`w-full h-14 flex items-center justify-center gap-2 font-bold text-base rounded-2xl cursor-pointer ${
-              myResult && !submitting ? "btn-gold" : "bg-amber-100 text-amber-400 cursor-not-allowed"
+            className={`w-full h-14 flex items-center justify-center gap-2 font-bold text-base cursor-pointer ${
+              myResult && !submitting ? "btn-gold" : "border border-[#E3DCCB] text-[#6B5D42] cursor-not-allowed"
             }`}
           >
             {submitting ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle size={18} />}
@@ -667,12 +665,12 @@ export default function MatchPage() {
 
       {/* ── OPEN (team game): join slots ── */}
       {match.status === "open" && isTeamGame && currentUserId && (
-        <div className="bg-white border border-amber-200 rounded-3xl p-6 mb-5 shadow-sm">
+        <div className="border border-[#14110F] p-6 mb-5">
           <div className="text-4xl mb-3 text-center">⚔️</div>
 
           {/* Player counts for open lobby */}
           {isOpenLobby && (
-            <p className="text-stone-600 font-bold text-center text-sm mb-4">
+            <p className="font-bold text-center text-sm mb-4">
               {t.matches.playersReady
                 .replace("{c}", String(match.slots_challenger))
                 .replace("{o}", String(match.slots_opponent))}
@@ -681,12 +679,12 @@ export default function MatchPage() {
 
           {!isOpenLobby && (
             <>
-              <p className="text-stone-800 font-extrabold text-center mb-1">{match.team_size}v{match.team_size} · {gameName}</p>
-              <p className="text-stone-500 text-sm font-semibold text-center mb-5">{t.matches.shareHint}</p>
+              <p className="font-extrabold text-center mb-1">{match.team_size}v{match.team_size} · {gameName}</p>
+              <p className="text-[#4A3F2C] text-sm font-medium text-center mb-5">{t.matches.shareHint}</p>
             </>
           )}
 
-          {joinError && <p className="text-rose-600 text-sm font-semibold mb-3 text-center">{joinError}</p>}
+          {joinError && <p className="text-rose-700 text-sm font-semibold mb-3 text-center">{joinError}</p>}
 
           {/* Join buttons — always shown for team games while open */}
           {!alreadyJoined && (
@@ -694,7 +692,7 @@ export default function MatchPage() {
               <button
                 onClick={() => handleJoinTeam("challenger")}
                 disabled={joining !== null || (!isOpenLobby && match.slots_challenger >= match.team_size)}
-                className="h-12 flex items-center justify-center gap-2 bg-amber-50 border-2 border-amber-300 hover:border-amber-500 text-amber-700 font-bold rounded-2xl cursor-pointer disabled:opacity-50 transition-all text-sm"
+                className="h-12 flex items-center justify-center gap-2 border-2 border-amber-700 hover:bg-amber-50 text-amber-700 font-bold cursor-pointer disabled:opacity-50 transition-colors text-sm"
               >
                 {joining === "challenger" ? <Loader2 size={14} className="animate-spin" /> : <UserPlus size={14} />}
                 {!isOpenLobby && match.slots_challenger >= match.team_size ? t.matches.teamFull : t.matches.joinChallengers}
@@ -702,7 +700,7 @@ export default function MatchPage() {
               <button
                 onClick={() => handleJoinTeam("opponent")}
                 disabled={joining !== null || (!isOpenLobby && match.slots_opponent >= match.team_size)}
-                className="h-12 flex items-center justify-center gap-2 bg-violet-50 border-2 border-violet-300 hover:border-violet-500 text-violet-700 font-bold rounded-2xl cursor-pointer disabled:opacity-50 transition-all text-sm"
+                className="h-12 flex items-center justify-center gap-2 border-2 border-violet-700 hover:bg-violet-50 text-violet-700 font-bold cursor-pointer disabled:opacity-50 transition-colors text-sm"
               >
                 {joining === "opponent" ? <Loader2 size={14} className="animate-spin" /> : <Swords size={14} />}
                 {!isOpenLobby && match.slots_opponent >= match.team_size ? t.matches.teamFull : t.matches.acceptChallenge}
@@ -713,33 +711,33 @@ export default function MatchPage() {
           {/* Open lobby host controls */}
           {isOpenLobby && isChallenger && (
             <div className="flex flex-col gap-2 mt-2">
-              {startError && <p className="text-rose-600 text-xs font-semibold text-center">{startError}</p>}
+              {startError && <p className="text-rose-700 text-xs font-semibold text-center">{startError}</p>}
               <button
                 onClick={handleStart}
                 disabled={starting || match.slots_challenger < 1 || match.slots_opponent < 1}
-                className={`w-full h-14 flex items-center justify-center gap-2 font-bold text-base rounded-2xl cursor-pointer ${
+                className={`w-full h-14 flex items-center justify-center gap-2 font-bold text-base cursor-pointer ${
                   !starting && match.slots_challenger >= 1 && match.slots_opponent >= 1
                     ? "btn-gold"
-                    : "bg-amber-100 text-amber-400 cursor-not-allowed"
+                    : "border border-[#E3DCCB] text-[#6B5D42] cursor-not-allowed"
                 }`}
               >
                 {starting ? <Loader2 size={18} className="animate-spin" /> : <Play size={18} />}
                 {starting ? t.matches.starting : t.matches.startBattle}
               </button>
               {(match.slots_challenger < 1 || match.slots_opponent < 1) && (
-                <p className="text-stone-400 text-xs font-semibold text-center">{t.matches.needBothTeams}</p>
+                <p className="text-[#6B5D42] text-xs font-medium text-center">{t.matches.needBothTeams}</p>
               )}
-              <button onClick={shareMatch} className="w-full flex items-center justify-center gap-2 text-sm bg-stone-50 border border-stone-200 hover:bg-stone-100 text-stone-600 font-bold px-5 py-2.5 rounded-xl transition-all cursor-pointer">
-                {copied ? <><Check size={14} className="text-emerald-500" /> {t.common.copied}</> : <><Share2 size={14} /> {t.matches.shareLink}</>}
+              <button onClick={shareMatch} className="w-full flex items-center justify-center gap-2 text-sm border border-[#14110F] hover:bg-[#14110F] hover:text-[#FAF8F3] font-bold px-5 py-2.5 transition-colors cursor-pointer">
+                {copied ? <><Check size={14} /> {t.common.copied}</> : <><Share2 size={14} /> {t.matches.shareLink}</>}
               </button>
-              {cancelError && <p className="text-rose-600 text-xs font-semibold text-center">{cancelError}</p>}
+              {cancelError && <p className="text-rose-700 text-xs font-semibold text-center">{cancelError}</p>}
               <button
                 onClick={handleCancel}
                 disabled={cancelling}
-                className={`flex items-center gap-2 text-xs px-4 py-2 rounded-xl transition-all cursor-pointer mx-auto border font-bold ${
+                className={`flex items-center gap-2 text-xs px-4 py-2 transition-colors cursor-pointer mx-auto border font-bold ${
                   cancelConfirm
-                    ? "text-rose-600 border-rose-300 bg-rose-50 hover:bg-rose-100"
-                    : "text-stone-400 border-stone-200 hover:text-stone-600 hover:border-stone-300"
+                    ? "text-rose-700 border-rose-700 bg-rose-50 hover:bg-rose-100"
+                    : "text-[#6B5D42] border-[#E3DCCB] hover:text-[#14110F] hover:border-[#14110F]"
                 }`}
               >
                 {cancelling ? <Loader2 size={11} className="animate-spin" /> : <Trash2 size={11} />}
@@ -750,8 +748,8 @@ export default function MatchPage() {
 
           {/* Open lobby non-host: waiting message */}
           {isOpenLobby && !isChallenger && alreadyJoined && (
-            <div className="flex items-center justify-center gap-2 mt-2 text-stone-500 text-sm font-semibold">
-              <Loader2 size={14} className="animate-spin text-amber-400" />
+            <div className="flex items-center justify-center gap-2 mt-2 text-[#4A3F2C] text-sm font-medium">
+              <Loader2 size={14} className="animate-spin" />
               {t.matches.waitingForHost}
             </div>
           )}
@@ -762,48 +760,48 @@ export default function MatchPage() {
       {match.status === "open" && !isTeamGame && (
         <>
           {currentUserId && currentUserId !== match.challenger_id && !match.opponent_id ? (
-            <div className="bg-amber-50 border border-amber-200 rounded-3xl p-6 text-center shadow-sm">
+            <div className="border border-amber-700 p-6 text-center">
               <div className="text-4xl mb-3">⚔️</div>
-              <p className="text-stone-800 font-extrabold mb-1">{t.matches.invited}</p>
-              <p className="text-stone-500 text-sm font-semibold mb-5">
+              <p className="font-extrabold mb-1">{t.matches.invited}</p>
+              <p className="text-[#4A3F2C] text-sm font-medium mb-5">
                 {match.challenger?.username} {t.matches.invitedHint} {gameName}
               </p>
-              {joinError && <p className="text-rose-600 text-sm font-semibold mb-3">{joinError}</p>}
+              {joinError && <p className="text-rose-700 text-sm font-semibold mb-3">{joinError}</p>}
               <button
                 onClick={handleAccept}
                 disabled={joining !== null}
-                className="w-full h-14 flex items-center justify-center gap-2 btn-gold rounded-2xl cursor-pointer disabled:opacity-60"
+                className="w-full h-14 flex items-center justify-center gap-2 btn-gold cursor-pointer disabled:opacity-60"
               >
                 {joining ? <Loader2 size={18} className="animate-spin" /> : <Swords size={18} />}
                 {joining ? t.matches.joining : t.matches.acceptChallenge}
               </button>
             </div>
           ) : (currentUserId === match.challenger_id || !currentUserId) && (
-            <div className="bg-white border border-amber-200 rounded-3xl p-6 text-center shadow-sm">
-              <Loader2 size={28} className="text-amber-500 animate-spin mx-auto mb-3" />
-              <p className="text-stone-800 font-bold mb-1">{t.matches.waitingOpponent}</p>
-              <p className="text-stone-500 text-sm font-semibold mt-1">{t.matches.shareHint}</p>
+            <div className="border border-[#14110F] p-6 text-center">
+              <Loader2 size={28} className="animate-spin mx-auto mb-3" />
+              <p className="font-bold mb-1">{t.matches.waitingOpponent}</p>
+              <p className="text-[#4A3F2C] text-sm font-medium mt-1">{t.matches.shareHint}</p>
               <div className="flex flex-col items-center gap-2 mt-4">
-                <button onClick={shareMatch} className="flex items-center gap-2 text-sm bg-amber-50 border border-amber-200 hover:bg-amber-100 text-amber-700 font-bold px-5 py-2.5 rounded-xl transition-all cursor-pointer">
-                  {copied ? <><Check size={14} className="text-emerald-500" /> {t.common.copied}</> : <><Share2 size={14} /> {t.matches.shareLink}</>}
+                <button onClick={shareMatch} className="flex items-center gap-2 text-sm border border-amber-700 hover:bg-amber-50 text-amber-700 font-bold px-5 py-2.5 transition-colors cursor-pointer">
+                  {copied ? <><Check size={14} /> {t.common.copied}</> : <><Share2 size={14} /> {t.matches.shareLink}</>}
                 </button>
                 <button
                   onClick={() => copyToClipboard(`${window.location.origin}/matches/${id}`).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); })}
-                  className="flex items-center gap-2 text-xs text-stone-400 hover:text-stone-600 px-4 py-1.5 rounded-xl transition-all cursor-pointer"
+                  className="flex items-center gap-2 text-xs text-[#6B5D42] hover:text-[#14110F] px-4 py-1.5 transition-colors cursor-pointer"
                 >
                   <Copy size={11} /> {t.matches.copyLink}
                 </button>
               </div>
               {currentUserId === match.challenger_id && (
                 <div className="mt-5">
-                  {cancelError && <p className="text-rose-600 text-xs mb-2 font-semibold">{cancelError}</p>}
+                  {cancelError && <p className="text-rose-700 text-xs mb-2 font-semibold">{cancelError}</p>}
                   <button
                     onClick={handleCancel}
                     disabled={cancelling}
-                    className={`flex items-center gap-2 text-xs px-4 py-2 rounded-xl transition-all cursor-pointer mx-auto border font-bold ${
+                    className={`flex items-center gap-2 text-xs px-4 py-2 transition-colors cursor-pointer mx-auto border font-bold ${
                       cancelConfirm
-                        ? "text-rose-600 border-rose-300 bg-rose-50 hover:bg-rose-100"
-                        : "text-stone-400 border-stone-200 hover:text-stone-600 hover:border-stone-300"
+                        ? "text-rose-700 border-rose-700 bg-rose-50 hover:bg-rose-100"
+                        : "text-[#6B5D42] border-[#E3DCCB] hover:text-[#14110F] hover:border-[#14110F]"
                     }`}
                   >
                     {cancelling ? <Loader2 size={11} className="animate-spin" /> : <Trash2 size={11} />}
@@ -818,26 +816,26 @@ export default function MatchPage() {
 
       {/* ── OPEN (non-open-lobby team game): waiting + share for creator ── */}
       {match.status === "open" && isTeamGame && !isOpenLobby && currentUserId === match.challenger_id && (
-        <div className="bg-white border border-amber-200 rounded-2xl p-5 mt-4 shadow-sm text-center">
+        <div className="border border-[#14110F] p-5 mt-4 text-center">
           <div className="flex items-center justify-center gap-3 mb-3">
-            <Users size={14} className="text-amber-400" />
-            <p className="text-stone-600 text-sm font-bold">
+            <Users size={14} className="text-[#6B5D42]" />
+            <p className="text-sm font-bold">
               {match.slots_challenger}/{match.team_size} vs {match.slots_opponent}/{match.team_size}
             </p>
           </div>
-          <p className="text-stone-500 text-xs font-semibold mb-3">{t.matches.waitingTeam}</p>
-          <button onClick={shareMatch} className="flex items-center gap-2 text-sm bg-amber-50 border border-amber-200 hover:bg-amber-100 text-amber-700 font-bold px-5 py-2 rounded-xl transition-all cursor-pointer mx-auto">
-            {copied ? <><Check size={14} className="text-emerald-500" /> {t.common.copied}</> : <><Share2 size={14} /> {t.matches.shareLink}</>}
+          <p className="text-[#4A3F2C] text-xs font-medium mb-3">{t.matches.waitingTeam}</p>
+          <button onClick={shareMatch} className="flex items-center gap-2 text-sm border border-amber-700 hover:bg-amber-50 text-amber-700 font-bold px-5 py-2 transition-colors cursor-pointer mx-auto">
+            {copied ? <><Check size={14} /> {t.common.copied}</> : <><Share2 size={14} /> {t.matches.shareLink}</>}
           </button>
           <div className="mt-4">
-            {cancelError && <p className="text-rose-600 text-xs mb-2 font-semibold">{cancelError}</p>}
+            {cancelError && <p className="text-rose-700 text-xs mb-2 font-semibold">{cancelError}</p>}
             <button
               onClick={handleCancel}
               disabled={cancelling}
-              className={`flex items-center gap-2 text-xs px-4 py-2 rounded-xl transition-all cursor-pointer mx-auto border font-bold ${
+              className={`flex items-center gap-2 text-xs px-4 py-2 transition-colors cursor-pointer mx-auto border font-bold ${
                 cancelConfirm
-                  ? "text-rose-600 border-rose-300 bg-rose-50 hover:bg-rose-100"
-                  : "text-stone-400 border-stone-200 hover:text-stone-600 hover:border-stone-300"
+                  ? "text-rose-700 border-rose-700 bg-rose-50 hover:bg-rose-100"
+                  : "text-[#6B5D42] border-[#E3DCCB] hover:text-[#14110F] hover:border-[#14110F]"
               }`}
             >
               {cancelling ? <Loader2 size={11} className="animate-spin" /> : <Trash2 size={11} />}
@@ -851,7 +849,7 @@ export default function MatchPage() {
         <div className="flex justify-center mt-6">
           <button
             onClick={() => setShowReport(true)}
-            className="flex items-center gap-1.5 text-xs text-stone-400 hover:text-rose-500 font-semibold transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 text-xs text-[#6B5D42] hover:text-rose-700 font-semibold transition-colors cursor-pointer"
           >
             <Flag size={11} /> Report user
           </button>

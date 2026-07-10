@@ -38,7 +38,7 @@ export default function MapPage() {
               className={`flex-shrink-0 px-4 py-2 border text-xs font-bold uppercase tracking-wide transition-colors cursor-pointer ${
                 filter === value
                   ? "bg-[#14110F] border-[#14110F] text-[#FAF8F3]"
-                  : "bg-transparent border-[#E3DCCB] text-[#8C7A5B] hover:border-[#14110F] hover:text-[#14110F]"
+                  : "bg-transparent border-[#E3DCCB] text-[#6B5D42] hover:border-[#14110F] hover:text-[#14110F]"
               }`}
             >
               {label}

@@ -65,8 +65,8 @@ export default function ChallengePage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4 text-center gap-4">
         <div className="text-5xl">😅</div>
-        <p className="text-stone-600 font-semibold">You can&apos;t challenge yourself.</p>
-        <Link href="/home" className="text-amber-600 font-bold text-sm">Go home</Link>
+        <p className="text-[#4A3F2C] font-medium">You can&apos;t challenge yourself.</p>
+        <Link href="/home" className="link-arrow text-sm">Go home</Link>
       </div>
     );
   }
@@ -74,7 +74,7 @@ export default function ChallengePage() {
   if (notFound) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
-        <p className="text-stone-500 font-semibold">{t.challenge.notFound}</p>
+        <p className="text-[#4A3F2C] font-medium">{t.challenge.notFound}</p>
       </div>
     );
   }
@@ -82,7 +82,7 @@ export default function ChallengePage() {
   if (!target) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[#14110F] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -93,68 +93,64 @@ export default function ChallengePage() {
     <div className="min-h-screen px-4 pt-12 pb-24">
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
-        <Link href="/home" className="w-9 h-9 rounded-xl bg-white border border-amber-100 flex items-center justify-center shadow-sm cursor-pointer">
-          <ChevronLeft size={16} className="text-stone-500" />
+        <Link href="/home" className="w-9 h-9 border border-[#14110F] flex items-center justify-center cursor-pointer">
+          <ChevronLeft size={16} />
         </Link>
-        <h1 className="font-display text-xl text-stone-900">
-          {t.challenge.challengeTitle} <span className="text-gradient">{target.username.toUpperCase()}</span>
-        </h1>
+        <div>
+          <p className="eyebrow mb-0.5">{t.challenge.challengeTitle}</p>
+          <h1 className="display text-2xl">{target.username.toUpperCase()}</h1>
+        </div>
       </div>
 
       {/* Target profile card */}
-      <div className="relative bg-white border border-amber-200 rounded-3xl p-5 mb-6 overflow-hidden shadow-md shadow-amber-100/40 text-center">
-        <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-        <div className="relative flex flex-col items-center gap-3">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center font-display text-white text-3xl shadow-lg shadow-amber-200/50">
+      <div className="border border-[#14110F] p-5 mb-6 text-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-20 h-20 bg-[#14110F] flex items-center justify-center display-upright text-[#FAF8F3] text-3xl">
             {targetInitials}
           </div>
           <div>
-            <p className="font-display text-2xl text-stone-900">{target.username}</p>
-            {target.city && <p className="text-stone-400 text-xs font-semibold mt-0.5">{target.city}</p>}
+            <p className="display text-2xl">{target.username}</p>
+            {target.city && <p className="text-[#6B5D42] text-xs font-medium mt-0.5">{target.city}</p>}
           </div>
-          <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 rounded-xl px-3 py-1.5">
-            <span className="font-display text-lg text-amber-600">{target.wins}</span>
-            <span className="text-stone-400 text-xs font-semibold">wins</span>
+          <div className="flex items-center gap-1.5 border border-amber-700 px-3 py-1.5">
+            <span className="display text-lg text-amber-700">{target.wins}</span>
+            <span className="text-[#6B5D42] text-xs font-medium">wins</span>
           </div>
         </div>
       </div>
 
       {/* Game picker */}
       <form onSubmit={handleSend}>
-        <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-3">{t.challenge.chooseGame}</p>
+        <p className="eyebrow mb-3">{t.challenge.chooseGame}</p>
         <div className="flex flex-col gap-2 mb-6">
           {gameTypes.filter((g) => g.team_size === 1).map((g) => (
             <button
               key={g.id}
               type="button"
               onClick={() => setSelectedGame(g.id)}
-              className={`flex items-center gap-3 rounded-2xl p-4 border transition-all cursor-pointer text-left ${
+              className={`flex items-center gap-3 p-4 border transition-colors cursor-pointer text-left ${
                 selectedGame === g.id
-                  ? "bg-amber-50 border-amber-400 shadow-sm"
-                  : "bg-white border-stone-200 hover:border-amber-200"
+                  ? "bg-amber-50 border-amber-700"
+                  : "border-[#E3DCCB] hover:border-[#14110F]"
               }`}
             >
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                selectedGame === g.id ? "bg-amber-100" : "bg-stone-100"
-              }`}>
-                <Swords size={14} className={selectedGame === g.id ? "text-amber-600" : "text-stone-400"} />
-              </div>
-              <span className={`font-bold text-sm capitalize ${selectedGame === g.id ? "text-stone-900" : "text-stone-600"}`}>
+              <Swords size={14} className={selectedGame === g.id ? "text-amber-700" : "text-[#6B5D42]"} />
+              <span className="font-bold text-sm capitalize">
                 {g.name.replace("_", " ")}
               </span>
               {selectedGame === g.id && (
-                <span className="ml-auto w-5 h-5 rounded-full bg-amber-400 flex items-center justify-center text-white text-xs font-bold">✓</span>
+                <span className="ml-auto w-5 h-5 bg-amber-700 flex items-center justify-center text-white text-xs font-bold">✓</span>
               )}
             </button>
           ))}
         </div>
 
-        {error && <p className="text-rose-500 text-xs font-semibold mb-3">{error}</p>}
+        {error && <p className="text-rose-700 text-xs font-semibold mb-3">{error}</p>}
 
         <button
           type="submit"
           disabled={!selectedGame || sending}
-          className="w-full h-14 btn-gold rounded-2xl font-bold text-base disabled:opacity-50 cursor-pointer"
+          className="w-full h-14 btn-gold font-bold text-base disabled:opacity-50 cursor-pointer"
         >
           {sending ? t.challenge.sending : t.challenge.send}
         </button>

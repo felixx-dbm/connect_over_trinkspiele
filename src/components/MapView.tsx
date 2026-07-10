@@ -238,22 +238,22 @@ export default function MapView({ filter }: { filter: string }) {
 
   if (!location && !locationError) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center gap-3 bg-amber-50">
-        <Loader2 size={28} className="text-amber-500 animate-spin" />
-        <p className="text-stone-500 text-sm font-semibold">{t.map.gettingLocation}</p>
+      <div className="flex-1 flex flex-col items-center justify-center gap-3 bg-[#FAF8F3]">
+        <Loader2 size={28} className="text-[#14110F] animate-spin" />
+        <p className="text-[#4A3F2C] text-sm font-medium">{t.map.gettingLocation}</p>
       </div>
     );
   }
 
   if (locationError && !location) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center gap-4 bg-amber-50 px-6 text-center">
-        <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center">
-          <AlertCircle size={24} className="text-rose-400" />
+      <div className="flex-1 flex flex-col items-center justify-center gap-4 bg-[#FAF8F3] px-6 text-center">
+        <div className="w-14 h-14 border border-rose-700 flex items-center justify-center">
+          <AlertCircle size={24} className="text-rose-700" />
         </div>
         <div>
-          <p className="text-stone-700 font-bold text-sm mb-1">{t.map.locationRequired}</p>
-          <p className="text-stone-400 text-sm font-semibold">{t.map.locationHint}</p>
+          <p className="font-bold text-sm mb-1">{t.map.locationRequired}</p>
+          <p className="text-[#6B5D42] text-sm font-medium">{t.map.locationHint}</p>
         </div>
       </div>
     );

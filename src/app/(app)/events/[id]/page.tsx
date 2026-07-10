@@ -102,7 +102,7 @@ export default function EventDetailPage() {
   if (notFound) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
-        <p className="text-stone-500 font-semibold">{t.events.notFound}</p>
+        <p className="text-[#4A3F2C] font-medium">{t.events.notFound}</p>
       </div>
     );
   }
@@ -110,7 +110,7 @@ export default function EventDetailPage() {
   if (!event) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[#14110F] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -132,70 +132,66 @@ export default function EventDetailPage() {
     }))
     .sort((a, b) => b.eventWins - a.eventWins || b.eventMatches - a.eventMatches);
 
+  const RANK_COLOR = ["text-amber-600", "text-stone-500", "text-orange-700"];
+
   return (
     <div className="min-h-screen px-4 pt-12 pb-24">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <Link href="/events" className="w-9 h-9 rounded-xl bg-white border border-amber-100 flex items-center justify-center shadow-sm cursor-pointer">
-          <ChevronLeft size={16} className="text-stone-500" />
+        <Link href="/events" className="w-9 h-9 border border-[#14110F] flex items-center justify-center cursor-pointer">
+          <ChevronLeft size={16} />
         </Link>
         <div className="flex-1 min-w-0">
-          <h1 className="font-display text-xl text-stone-900 truncate">{event.name}</h1>
-          {event.city && <p className="text-stone-600 text-xs font-semibold">{event.city}</p>}
+          <h1 className="display text-2xl truncate">{event.name}</h1>
+          {event.city && <p className="text-[#4A3F2C] text-xs font-medium">{event.city}</p>}
         </div>
         <button
           onClick={copyCode}
-          className="flex items-center gap-1.5 bg-white border border-amber-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-700 hover:bg-amber-50 transition-colors cursor-pointer shadow-sm"
+          className="flex items-center gap-1.5 border border-[#14110F] px-3 py-2 text-xs font-bold hover:bg-[#14110F] hover:text-[#FAF8F3] transition-colors cursor-pointer"
         >
-          <Share2 size={12} className="text-amber-500" />
+          <Share2 size={12} />
           {copied ? t.common.copied : event.join_code}
         </button>
       </div>
 
       {/* Code card */}
-      <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-5 flex items-center justify-between shadow-sm">
+      <div className="border border-[#14110F] p-4 mb-5 flex items-center justify-between">
         <div>
-          <p className="text-[10px] text-amber-600 uppercase tracking-widest font-bold mb-1">{t.events.eventCode}</p>
-          <p className="font-display text-3xl text-amber-700 tracking-[0.3em]">{event.join_code}</p>
+          <p className="eyebrow mb-1">{t.events.eventCode}</p>
+          <p className="display text-3xl text-amber-700 tracking-[0.3em]">{event.join_code}</p>
         </div>
         <div className="text-right">
-          <p className="text-xs text-stone-600 font-semibold">{t.events.participants}</p>
-          <p className="font-display text-2xl text-stone-700">{members.length}</p>
+          <p className="text-xs text-[#4A3F2C] font-medium">{t.events.participants}</p>
+          <p className="display text-2xl">{members.length}</p>
         </div>
       </div>
 
       {/* Leaderboard */}
-      <p className="text-xs text-stone-600 font-bold uppercase tracking-widest mb-3">{t.events.topPlayers}</p>
+      <p className="eyebrow mb-3">{t.events.topPlayers}</p>
       {leaderboard.length === 0 ? (
-        <div className="bg-white border border-amber-100 rounded-2xl p-6 text-center mb-5 shadow-sm">
-          <Swords size={32} className="text-stone-200 mx-auto mb-2" />
-          <p className="text-stone-600 text-sm font-semibold">{t.events.noBattles}</p>
+        <div className="border border-[#14110F] p-6 text-center mb-5">
+          <Swords size={28} className="text-[#E3DCCB] mx-auto mb-2" />
+          <p className="text-[#4A3F2C] text-sm font-medium">{t.events.noBattles}</p>
         </div>
       ) : (
-        <div className="flex flex-col gap-2 mb-5">
+        <div className="flex flex-col divide-y divide-[#E3DCCB] border-t border-b border-[#14110F] mb-5">
           {leaderboard.map((p, i) => (
             <div
               key={p.user_id}
-              className={`flex items-center gap-3 rounded-2xl p-3 border shadow-sm ${
-                p.user_id === userId
-                  ? "bg-amber-50 border-amber-300"
-                  : "bg-white border-amber-100"
-              }`}
+              className={`flex items-center gap-3 py-3 ${p.user_id === userId ? "bg-amber-50" : ""}`}
             >
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-display text-sm flex-shrink-0 ${
-                i === 0 ? "bg-amber-100 text-amber-600" :
-                i === 1 ? "bg-stone-100 text-stone-600" :
-                i === 2 ? "bg-orange-100 text-orange-600" : "bg-stone-50 text-stone-600"
+              <div className={`w-8 h-8 flex items-center justify-center display-upright text-sm flex-shrink-0 ${
+                i < 3 ? RANK_COLOR[i] : "text-[#4A3F2C]"
               }`}>
                 {i + 1}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-stone-800 text-sm font-bold truncate">{p.username}</p>
-                <p className="text-stone-600 text-xs font-semibold">{p.eventMatches} {t.events.battles}</p>
+                <p className="text-sm font-semibold truncate">{p.username}</p>
+                <p className="text-[#4A3F2C] text-xs font-medium">{p.eventMatches} {t.events.battles}</p>
               </div>
               <div className="flex items-center gap-1 flex-shrink-0">
-                <Trophy size={13} className="text-amber-500" />
-                <span className="font-display text-base text-amber-600">{p.eventWins}</span>
+                <Trophy size={13} className="text-amber-600" />
+                <span className="display text-base text-amber-700">{p.eventWins}</span>
               </div>
             </div>
           ))}
@@ -203,12 +199,12 @@ export default function EventDetailPage() {
       )}
 
       {/* Members */}
-      <p className="text-xs text-stone-600 font-bold uppercase tracking-widest mb-3">{t.events.participants} ({members.length})</p>
+      <p className="eyebrow mb-3">{t.events.participants} ({members.length})</p>
       <div className="flex flex-wrap gap-2 mb-5">
         {members.map((m) => (
-          <div key={m.user_id} className="flex items-center gap-1.5 bg-white border border-stone-100 rounded-xl px-3 py-1.5 shadow-sm">
-            <Users size={11} className="text-stone-600" />
-            <span className="text-stone-700 text-xs font-bold">{m.users?.username ?? "?"}</span>
+          <div key={m.user_id} className="flex items-center gap-1.5 border border-[#E3DCCB] px-3 py-1.5">
+            <Users size={11} className="text-[#4A3F2C]" />
+            <span className="text-xs font-bold">{m.users?.username ?? "?"}</span>
           </div>
         ))}
       </div>
@@ -216,28 +212,28 @@ export default function EventDetailPage() {
       {/* Recent battles */}
       {battles.length > 0 && (
         <>
-          <p className="text-xs text-stone-600 font-bold uppercase tracking-widest mb-3">{t.events.recentBattles}</p>
-          <div className="flex flex-col gap-2">
+          <p className="eyebrow mb-3">{t.events.recentBattles}</p>
+          <div className="flex flex-col divide-y divide-[#E3DCCB] border-t border-b border-[#14110F]">
             {battles.map((b) => {
               const isWin = b.winner_id === userId;
               return (
                 <Link
                   key={b.id}
                   href={`/matches/${b.id}`}
-                  className="flex items-center gap-3 bg-white border border-amber-100 hover:border-amber-300 rounded-2xl p-3 transition-all cursor-pointer shadow-sm"
+                  className="flex items-center gap-3 py-3 hover:opacity-90 transition-opacity cursor-pointer"
                 >
-                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-display text-xs flex-shrink-0 ${
+                  <div className={`w-8 h-8 border flex items-center justify-center display-upright text-xs flex-shrink-0 ${
                     b.winner_id
-                      ? (isWin ? "bg-emerald-100 text-emerald-700 border border-emerald-200" : "bg-rose-50 text-rose-500 border border-rose-200")
-                      : "bg-stone-100 text-stone-500"
+                      ? (isWin ? "border-emerald-700 bg-emerald-600 text-white" : "border-rose-700 text-rose-700")
+                      : "border-[#E3DCCB] text-[#4A3F2C]"
                   }`}>
                     {b.winner_id ? (isWin ? "W" : "L") : "?"}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-stone-800 text-sm font-bold truncate">
+                    <p className="text-sm font-semibold truncate">
                       {b.challenger?.username} vs {b.opponent?.username ?? "?"}
                     </p>
-                    <p className="text-stone-600 text-xs font-semibold capitalize">{b.game_types?.name?.replace("_", " ")}</p>
+                    <p className="text-[#4A3F2C] text-xs font-medium capitalize">{b.game_types?.name?.replace("_", " ")}</p>
                   </div>
                 </Link>
               );
@@ -248,14 +244,14 @@ export default function EventDetailPage() {
       {/* Delete event — creator only */}
       {event.created_by === userId && (
         <div className="mt-6 text-center">
-          {deleteError && <p className="text-rose-600 text-xs mb-2 font-semibold">{deleteError}</p>}
+          {deleteError && <p className="text-rose-700 text-xs mb-2 font-semibold">{deleteError}</p>}
           <button
             onClick={handleDelete}
             disabled={deleting}
-            className={`inline-flex items-center gap-2 text-xs px-4 py-2 rounded-xl border font-bold transition-all cursor-pointer ${
+            className={`inline-flex items-center gap-2 text-xs px-4 py-2 border font-bold transition-colors cursor-pointer ${
               deleteConfirm
-                ? "text-rose-600 border-rose-300 bg-rose-50 hover:bg-rose-100"
-                : "text-stone-600 border-stone-200 hover:text-stone-600 hover:border-stone-300"
+                ? "text-rose-700 border-rose-700 bg-rose-50 hover:bg-rose-100"
+                : "text-[#4A3F2C] border-[#E3DCCB] hover:border-[#14110F] hover:text-[#14110F]"
             }`}
           >
             {deleting ? <Loader2 size={11} className="animate-spin" /> : <Trash2 size={11} />}

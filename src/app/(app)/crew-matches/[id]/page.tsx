@@ -11,10 +11,10 @@ import { useT } from "@/components/LanguageProvider";
 import type { CrewMatchRow, CrewMatchParticipantRow } from "@/lib/types";
 
 const STATUS_STYLE = {
-  open:      { color: "text-sky-600",     bg: "bg-sky-50 border-sky-200"     },
-  active:    { color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-200" },
-  completed: { color: "text-stone-500",   bg: "bg-stone-50 border-stone-200"  },
-  cancelled: { color: "text-rose-600",    bg: "bg-rose-50 border-rose-200"    },
+  open:      { color: "text-sky-700",     border: "border-sky-700"     },
+  active:    { color: "text-emerald-700", border: "border-emerald-700" },
+  completed: { color: "text-[#4A3F2C]",   border: "border-[#E3DCCB]"   },
+  cancelled: { color: "text-rose-700",    border: "border-rose-700"    },
 };
 
 export default function CrewMatchPage() {
@@ -163,7 +163,7 @@ export default function CrewMatchPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 size={32} className="text-violet-500 animate-spin" />
+        <Loader2 size={32} className="text-violet-700 animate-spin" />
       </div>
     );
   }
@@ -173,8 +173,8 @@ export default function CrewMatchPage() {
       <div className="min-h-screen flex items-center justify-center px-4 text-center">
         <div>
           <div className="text-5xl mb-4">🤔</div>
-          <p className="text-stone-500 font-semibold mb-4">{t.crewMatches.notFound}</p>
-          <Link href="/crews" className="text-violet-600 font-bold hover:text-violet-700">← {t.crewMatches.backHome}</Link>
+          <p className="text-[#4A3F2C] font-medium mb-4">{t.crewMatches.notFound}</p>
+          <Link href="/crews" className="link-arrow text-sm">{t.crewMatches.backHome}</Link>
         </div>
       </div>
     );
@@ -197,38 +197,38 @@ export default function CrewMatchPage() {
   if (submitted || match.status === "completed") {
     return (
       <div className="min-h-screen px-4 pt-12 pb-6 flex flex-col items-center justify-center text-center gap-6">
-        <div className={`w-28 h-28 rounded-3xl flex items-center justify-center ${
+        <div className={`w-28 h-28 flex items-center justify-center ${
           isWinner
-            ? "bg-gradient-to-br from-violet-400 to-purple-600 shadow-2xl shadow-violet-300/50"
-            : "bg-stone-100 border-2 border-stone-200"
+            ? "bg-violet-700 border border-violet-800"
+            : "border border-[#E3DCCB]"
         }`}>
           {isWinner
             ? <Trophy size={44} className="text-white" />
-            : <XCircle size={44} className="text-stone-400" />}
+            : <XCircle size={44} className="text-rose-700" />}
         </div>
         <div>
           {isWinner ? (
             <>
-              <h2 className="font-display text-3xl text-stone-900 mb-1">{t.crewMatches.yourCrewWins}</h2>
-              <p className="text-stone-500 text-sm font-semibold">{t.crewMatches.crewWinsRecord}</p>
+              <h2 className="display italic text-3xl mb-1 text-violet-700">{t.crewMatches.yourCrewWins}</h2>
+              <p className="text-[#4A3F2C] text-sm font-medium">{t.crewMatches.crewWinsRecord}</p>
             </>
           ) : match.winner_crew_id ? (
             <>
-              <h2 className="font-display text-3xl text-stone-900 mb-1">
-                <span className="text-gradient">{winnerName.toUpperCase()}</span> {t.crewMatches.status.completed === "Completed" ? "WINS!" : "GEWINNT!"}
+              <h2 className="display italic text-3xl mb-1">
+                {winnerName.toUpperCase()} {t.crewMatches.status.completed === "Completed" ? "WINS!" : "GEWINNT!"}
               </h2>
-              <p className="text-stone-500 text-sm font-semibold">{t.crewMatches.betterLuck}</p>
+              <p className="text-[#4A3F2C] text-sm font-medium">{t.crewMatches.betterLuck}</p>
             </>
           ) : (
-            <h2 className="font-display text-3xl text-stone-900 mb-1">{t.matches.matchEnded}</h2>
+            <h2 className="display italic text-3xl mb-1">{t.matches.matchEnded}</h2>
           )}
         </div>
         <div className="flex flex-col gap-3 w-full max-w-xs">
-          <Link href="/matches/new" className="h-12 px-8 btn-gold rounded-2xl flex items-center justify-center gap-2 cursor-pointer">
+          <Link href="/matches/new" className="h-12 px-8 btn-gold flex items-center justify-center gap-2 cursor-pointer">
             <RefreshCw size={16} /> {t.crewMatches.rematch}
           </Link>
-          <Link href="/crews" className="h-12 px-8 bg-white border border-violet-200 hover:border-violet-400 text-stone-700 font-bold rounded-2xl flex items-center justify-center gap-2 cursor-pointer transition-all shadow-sm">
-            <Users size={16} className="text-violet-500" /> {t.crewMatches.backHome}
+          <Link href="/crews" className="h-12 px-8 btn-outline font-bold flex items-center justify-center gap-2 cursor-pointer">
+            <Users size={16} /> {t.crewMatches.backHome}
           </Link>
         </div>
       </div>
@@ -239,97 +239,95 @@ export default function CrewMatchPage() {
     <div className="min-h-screen px-4 pt-12 pb-6">
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
-        <Link href="/crews" className="w-9 h-9 rounded-xl bg-white border border-violet-100 flex items-center justify-center text-stone-500 hover:border-violet-300 transition-colors cursor-pointer shadow-sm">
+        <Link href="/crews" className="w-9 h-9 border border-[#14110F] flex items-center justify-center cursor-pointer">
           <ArrowLeft size={18} />
         </Link>
-        <h1 className="font-display text-xl text-stone-900">
-          {t.crewMatches.lobbyTitle} <span className="text-gradient">{t.crewMatches.lobbyAccent}</span>
-        </h1>
+        <div>
+          <p className="eyebrow mb-0.5">{t.crewMatches.lobbyTitle}</p>
+          <h1 className="display text-2xl">{t.crewMatches.lobbyAccent}</h1>
+        </div>
       </div>
 
       {/* Status badges */}
       <div className="flex flex-wrap items-center gap-2 mb-6">
-        <span className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border font-bold ${statusStyle.bg} ${statusStyle.color}`}>
-          {match.status === "active" && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />}
+        <span className={`flex items-center gap-1.5 text-xs px-3 py-1.5 border font-bold ${statusStyle.border} ${statusStyle.color}`}>
+          {match.status === "active" && <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />}
           {statusLabel}
         </span>
-        <span className="text-xs bg-white border border-violet-100 px-3 py-1.5 rounded-full text-stone-600 font-bold capitalize shadow-sm">
+        <span className="text-xs border border-[#14110F] px-3 py-1.5 font-bold capitalize">
           {(match.game_types as unknown as { name: string } | null)?.name?.replace(/_/g, " ")}
         </span>
       </div>
 
       {/* Opponent joined notification */}
       {opponentJoined && (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-4 py-3 mb-4 flex items-center gap-2 text-emerald-700 text-sm font-bold">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
+        <div className="border border-emerald-700 px-4 py-3 mb-4 flex items-center gap-2 text-emerald-700 text-sm font-bold">
+          <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse flex-shrink-0" />
           Crew joined — battle is on! ⚔️
         </div>
       )}
 
       {/* VS card */}
-      <div className="relative bg-white border border-violet-100 rounded-3xl p-6 mb-5 overflow-hidden shadow-md shadow-violet-100/40">
-        <div className="absolute inset-0 bg-gradient-to-br from-violet-50/80 to-purple-50/40 pointer-events-none" />
-        <div className="relative">
-          <div className="flex items-start justify-between gap-4 mb-5">
-            {/* Challenger crew */}
-            <div className="flex-1">
-              <p className="text-[10px] text-violet-400 font-bold uppercase tracking-widest mb-1">{t.crewMatches.challengerCrew}</p>
-              <p className="font-display text-lg text-stone-900 leading-tight">{challengerName}</p>
-              <div className="mt-2 flex flex-wrap gap-1">
-                {challengerParticipants.length === 0 ? (
-                  <span className="text-stone-300 text-xs font-semibold">—</span>
-                ) : (
-                  challengerParticipants.map((p) => (
-                    <span key={p.id} className={`text-xs px-2 py-0.5 rounded-full font-bold ${
-                      p.user_id === currentUserId
-                        ? "bg-violet-100 text-violet-700 border border-violet-200"
-                        : "bg-stone-100 text-stone-600 border border-stone-200"
-                    }`}>
-                      {(p.users as unknown as { username: string; avatar_url: string | null } | null)?.avatar_url && (
-                        <Image src={(p.users as unknown as { avatar_url: string }).avatar_url} alt="" width={16} height={16} className="rounded-full object-cover flex-shrink-0" />
-                      )}
-                      {(p.users as unknown as { username: string } | null)?.username ?? "?"}
-                    </span>
-                  ))
-                )}
-              </div>
-            </div>
-
-            {/* VS divider */}
-            <div className="flex flex-col items-center gap-1 flex-shrink-0 pt-4">
-              <span className="font-display text-2xl text-gradient">VS</span>
-              <Swords size={14} className="text-stone-300" />
-            </div>
-
-            {/* Opponent crew */}
-            <div className="flex-1 text-right">
-              <p className="text-[10px] text-amber-400 font-bold uppercase tracking-widest mb-1">{t.crewMatches.opponentCrew}</p>
-              {match.opponent_crew_id ? (
-                <>
-                  <p className="font-display text-lg text-stone-900 leading-tight">{opponentName}</p>
-                  <div className="mt-2 flex flex-wrap gap-1 justify-end">
-                    {opponentParticipants.length === 0 ? (
-                      <span className="text-stone-300 text-xs font-semibold">—</span>
-                    ) : (
-                      opponentParticipants.map((p) => (
-                        <span key={p.id} className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-bold ${
-                          p.user_id === currentUserId
-                            ? "bg-amber-100 text-amber-700 border border-amber-200"
-                            : "bg-stone-100 text-stone-600 border border-stone-200"
-                        }`}>
-                          {(p.users as unknown as { username: string; avatar_url: string | null } | null)?.avatar_url && (
-                        <Image src={(p.users as unknown as { avatar_url: string }).avatar_url} alt="" width={16} height={16} className="rounded-full object-cover flex-shrink-0" />
-                      )}
-                      {(p.users as unknown as { username: string } | null)?.username ?? "?"}
-                        </span>
-                      ))
-                    )}
-                  </div>
-                </>
+      <div className="border border-violet-700 p-6 mb-5">
+        <div className="flex items-start justify-between gap-4 mb-5">
+          {/* Challenger crew */}
+          <div className="flex-1">
+            <p className="text-[10px] text-violet-700 font-bold uppercase tracking-widest mb-1">{t.crewMatches.challengerCrew}</p>
+            <p className="display text-lg leading-tight">{challengerName}</p>
+            <div className="mt-2 flex flex-wrap gap-1">
+              {challengerParticipants.length === 0 ? (
+                <span className="text-[#6B5D42] text-xs font-medium">—</span>
               ) : (
-                <p className="text-stone-300 font-bold text-sm mt-1">???</p>
+                challengerParticipants.map((p) => (
+                  <span key={p.id} className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 font-bold border ${
+                    p.user_id === currentUserId
+                      ? "border-violet-700 text-violet-700"
+                      : "border-[#E3DCCB] text-[#4A3F2C]"
+                  }`}>
+                    {(p.users as unknown as { username: string; avatar_url: string | null } | null)?.avatar_url && (
+                      <Image src={(p.users as unknown as { avatar_url: string }).avatar_url} alt="" width={16} height={16} className="rounded-full object-cover flex-shrink-0" />
+                    )}
+                    {(p.users as unknown as { username: string } | null)?.username ?? "?"}
+                  </span>
+                ))
               )}
             </div>
+          </div>
+
+          {/* VS divider */}
+          <div className="flex flex-col items-center gap-1 flex-shrink-0 pt-4">
+            <span className="display italic text-2xl">VS</span>
+            <Swords size={14} className="text-[#E3DCCB]" />
+          </div>
+
+          {/* Opponent crew */}
+          <div className="flex-1 text-right">
+            <p className="text-[10px] text-amber-700 font-bold uppercase tracking-widest mb-1">{t.crewMatches.opponentCrew}</p>
+            {match.opponent_crew_id ? (
+              <>
+                <p className="display text-lg leading-tight">{opponentName}</p>
+                <div className="mt-2 flex flex-wrap gap-1 justify-end">
+                  {opponentParticipants.length === 0 ? (
+                    <span className="text-[#6B5D42] text-xs font-medium">—</span>
+                  ) : (
+                    opponentParticipants.map((p) => (
+                      <span key={p.id} className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 font-bold border ${
+                        p.user_id === currentUserId
+                          ? "border-amber-700 text-amber-700"
+                          : "border-[#E3DCCB] text-[#4A3F2C]"
+                      }`}>
+                        {(p.users as unknown as { username: string; avatar_url: string | null } | null)?.avatar_url && (
+                          <Image src={(p.users as unknown as { avatar_url: string }).avatar_url} alt="" width={16} height={16} className="rounded-full object-cover flex-shrink-0" />
+                        )}
+                        {(p.users as unknown as { username: string } | null)?.username ?? "?"}
+                      </span>
+                    ))
+                  )}
+                </div>
+              </>
+            ) : (
+              <p className="text-[#6B5D42] font-bold text-sm mt-1">???</p>
+            )}
           </div>
         </div>
       </div>
@@ -339,7 +337,7 @@ export default function CrewMatchPage() {
         <button
           onClick={handleJoin}
           disabled={joining}
-          className="w-full h-12 mb-4 flex items-center justify-center gap-2 bg-violet-50 border-2 border-violet-300 hover:border-violet-500 text-violet-700 font-bold rounded-2xl transition-all cursor-pointer disabled:opacity-60"
+          className="w-full h-12 mb-4 flex items-center justify-center gap-2 border-2 border-violet-700 hover:bg-violet-50 text-violet-700 font-bold transition-colors cursor-pointer disabled:opacity-60"
         >
           {joining ? <Loader2 size={16} className="animate-spin" /> : <Users size={16} />}
           {joining ? t.crewMatches.joining : t.crewMatches.joinBattle}
@@ -348,15 +346,15 @@ export default function CrewMatchPage() {
 
       {/* Accept challenge block (opponent crew) */}
       {match.status === "open" && userCrewId && !isInChallengerCrew && !match.opponent_crew_id && (
-        <div className="bg-amber-50 border border-amber-200 rounded-3xl p-6 text-center mb-5 shadow-sm">
+        <div className="border border-amber-700 p-6 text-center mb-5">
           <div className="text-4xl mb-3">⚔️</div>
-          <p className="text-stone-800 font-extrabold mb-1">{t.crewMatches.title} {t.crewMatches.titleAccent}</p>
-          <p className="text-stone-500 text-sm font-semibold mb-5">{challengerName} {t.matches.invitedHint} {(match.game_types as unknown as { name: string } | null)?.name?.replace(/_/g, " ")}</p>
-          {acceptError && <p className="text-rose-600 text-sm font-semibold mb-3">{acceptError}</p>}
+          <p className="font-extrabold mb-1">{t.crewMatches.title} {t.crewMatches.titleAccent}</p>
+          <p className="text-[#4A3F2C] text-sm font-medium mb-5">{challengerName} {t.matches.invitedHint} {(match.game_types as unknown as { name: string } | null)?.name?.replace(/_/g, " ")}</p>
+          {acceptError && <p className="text-rose-700 text-sm font-semibold mb-3">{acceptError}</p>}
           <button
             onClick={handleAccept}
             disabled={accepting}
-            className="w-full h-14 flex items-center justify-center gap-2 btn-gold rounded-2xl cursor-pointer disabled:opacity-60"
+            className="w-full h-14 flex items-center justify-center gap-2 btn-gold cursor-pointer disabled:opacity-60"
           >
             {accepting ? <Loader2 size={18} className="animate-spin" /> : <Swords size={18} />}
             {accepting ? t.crewMatches.accepting : t.crewMatches.acceptChallenge}
@@ -366,31 +364,31 @@ export default function CrewMatchPage() {
 
       {/* Waiting for opponent + QR code */}
       {match.status === "open" && (isInChallengerCrew || !currentUserId) && (
-        <div className="bg-white border border-violet-200 rounded-3xl p-6 text-center shadow-sm mb-5">
-          <Loader2 size={28} className="text-violet-500 animate-spin mx-auto mb-3" />
-          <p className="text-stone-800 font-bold mb-1">{t.crewMatches.waitingCrew}</p>
-          <p className="text-stone-500 text-sm font-semibold mb-5">{t.crewMatches.shareQR}</p>
+        <div className="border border-violet-700 p-6 text-center mb-5">
+          <Loader2 size={28} className="text-violet-700 animate-spin mx-auto mb-3" />
+          <p className="font-bold mb-1">{t.crewMatches.waitingCrew}</p>
+          <p className="text-[#4A3F2C] text-sm font-medium mb-5">{t.crewMatches.shareQR}</p>
           {lobbyUrl && (
             <div className="flex flex-col items-center gap-4">
-              <div className="p-3 bg-white border-2 border-violet-200 rounded-2xl shadow-sm">
+              <div className="p-3 bg-white border border-violet-700">
                 <QRCodeSVG value={lobbyUrl} size={180} />
               </div>
               <div className="text-center">
-                <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest mb-1">{t.crewMatches.joinCode}</p>
-                <p className="font-display text-2xl text-gradient tracking-widest">{match.join_code}</p>
+                <p className="eyebrow mb-1">{t.crewMatches.joinCode}</p>
+                <p className="display text-2xl tracking-widest">{match.join_code}</p>
               </div>
             </div>
           )}
           {isInChallengerCrew && (
             <div className="mt-5">
-              {cancelError && <p className="text-rose-600 text-xs mb-2 font-semibold">{cancelError}</p>}
+              {cancelError && <p className="text-rose-700 text-xs mb-2 font-semibold">{cancelError}</p>}
               <button
                 onClick={handleCancel}
                 disabled={cancelling}
-                className={`flex items-center gap-2 text-xs px-4 py-2 rounded-xl transition-all cursor-pointer mx-auto border font-bold ${
+                className={`flex items-center gap-2 text-xs px-4 py-2 transition-colors cursor-pointer mx-auto border font-bold ${
                   cancelConfirm
-                    ? "text-rose-600 border-rose-300 bg-rose-50 hover:bg-rose-100"
-                    : "text-stone-400 border-stone-200 hover:text-stone-600 hover:border-stone-300"
+                    ? "text-rose-700 border-rose-700 bg-rose-50 hover:bg-rose-100"
+                    : "text-[#6B5D42] border-[#E3DCCB] hover:text-[#14110F] hover:border-[#14110F]"
                 }`}
               >
                 {cancelling ? <Loader2 size={11} className="animate-spin" /> : <Trash2 size={11} />}
@@ -403,15 +401,15 @@ export default function CrewMatchPage() {
 
       {/* QR code also shown in active state for in-person late joiners */}
       {match.status === "active" && (isInChallengerCrew || isInOpponentCrew) && lobbyUrl && (
-        <div className="bg-white border border-violet-100 rounded-2xl p-4 mb-5 shadow-sm">
-          <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest mb-3 text-center">{t.crewMatches.shareQR}</p>
+        <div className="border border-violet-700 p-4 mb-5">
+          <p className="eyebrow mb-3 text-center">{t.crewMatches.shareQR}</p>
           <div className="flex items-center justify-center gap-6">
-            <div className="p-2 bg-white border border-violet-200 rounded-xl">
+            <div className="p-2 bg-white border border-violet-700">
               <QRCodeSVG value={lobbyUrl} size={100} />
             </div>
             <div>
-              <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest mb-1">{t.crewMatches.joinCode}</p>
-              <p className="font-display text-xl text-gradient tracking-widest">{match.join_code}</p>
+              <p className="eyebrow mb-1">{t.crewMatches.joinCode}</p>
+              <p className="display text-xl tracking-widest">{match.join_code}</p>
             </div>
           </div>
         </div>
@@ -420,8 +418,8 @@ export default function CrewMatchPage() {
       {/* Submit result — shown to participants once match is active */}
       {match.status === "active" && isParticipant && (
         <div>
-          <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-2">{t.crewMatches.submitResult}</p>
-          <p className="text-stone-400 text-xs font-semibold mb-3">{t.matches.submitHint}</p>
+          <p className="eyebrow mb-2">{t.crewMatches.submitResult}</p>
+          <p className="text-[#6B5D42] text-xs font-medium mb-3">{t.matches.submitHint}</p>
           <div className="grid grid-cols-2 gap-3 mb-4">
             {([
               { label: t.crewMatches.weWon, crewId: userCrewId!, isWin: true },
@@ -430,12 +428,12 @@ export default function CrewMatchPage() {
               <button
                 key={label}
                 onClick={() => setSelectedWinner(crewId)}
-                className={`h-14 rounded-2xl border-2 flex items-center justify-center gap-2 font-bold text-sm transition-all cursor-pointer ${
+                className={`h-14 border-2 flex items-center justify-center gap-2 font-bold text-sm transition-colors cursor-pointer ${
                   selectedWinner === crewId
                     ? isWin
-                      ? "bg-gradient-to-br from-emerald-400 to-green-500 border-emerald-400 text-white shadow-lg shadow-emerald-200/60"
-                      : "bg-rose-50 border-rose-400 text-rose-600 shadow-sm"
-                    : "bg-white border-violet-100 text-stone-500 hover:border-violet-300 shadow-sm"
+                      ? "bg-emerald-600 border-emerald-700 text-white"
+                      : "bg-rose-50 border-rose-700 text-rose-700"
+                    : "border-[#E3DCCB] text-[#4A3F2C] hover:border-[#14110F]"
                 }`}
               >
                 {isWin ? <Trophy size={16} /> : <XCircle size={16} />}
@@ -444,13 +442,13 @@ export default function CrewMatchPage() {
             ))}
           </div>
           {submitError && (
-            <div className="text-rose-600 text-sm bg-rose-50 border border-rose-200 rounded-2xl px-4 py-3 mb-4 font-semibold">{submitError}</div>
+            <div className="text-rose-700 text-sm border border-rose-700 bg-rose-50 px-4 py-3 mb-4 font-semibold">{submitError}</div>
           )}
           <button
             onClick={handleSubmit}
             disabled={!selectedWinner || submitting}
-            className={`w-full h-14 flex items-center justify-center gap-2 font-bold text-base rounded-2xl cursor-pointer ${
-              selectedWinner && !submitting ? "btn-gold" : "bg-amber-100 text-amber-400 cursor-not-allowed"
+            className={`w-full h-14 flex items-center justify-center gap-2 font-bold text-base cursor-pointer ${
+              selectedWinner && !submitting ? "btn-gold" : "border border-[#E3DCCB] text-[#6B5D42] cursor-not-allowed"
             }`}
           >
             {submitting ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle size={18} />}

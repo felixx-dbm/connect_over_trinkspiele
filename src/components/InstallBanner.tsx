@@ -30,19 +30,19 @@ export default function InstallBanner() {
 
   return (
     <div className="fixed bottom-28 left-4 right-4 z-[9998] animate-slide-up">
-      <div className="bg-stone-900 text-white rounded-2xl p-4 flex items-center gap-3 shadow-2xl shadow-stone-900/40">
-        <Image src="/Icon_192.png" alt="Prost" width={40} height={40} className="rounded-xl flex-shrink-0" />
+      <div className="bg-[#14110F] text-[#FAF8F3] border border-[#14110F] p-4 flex items-center gap-3">
+        <Image src="/Icon_192.png" alt="Prost" width={40} height={40} className="flex-shrink-0" />
         <div className="flex-1 min-w-0">
           <p className="text-sm font-bold leading-snug">Install Prost</p>
-          <p className="text-xs text-stone-400 font-semibold mt-0.5 leading-snug flex items-center gap-1 flex-wrap">
-            Tap <Share size={11} className="inline text-stone-300 flex-shrink-0" /> then
-            <span className="text-white font-bold">Add to Home Screen</span>
+          <p className="text-xs text-[#FAF8F3]/60 font-medium mt-0.5 leading-snug flex items-center gap-1 flex-wrap">
+            Tap <Share size={11} className="inline text-[#FAF8F3]/60 flex-shrink-0" /> then
+            <span className="text-[#FAF8F3] font-bold">Add to Home Screen</span>
           </p>
         </div>
         <button
           onClick={dismiss}
           aria-label="Dismiss install banner"
-          className="w-7 h-7 rounded-full bg-stone-700 flex items-center justify-center flex-shrink-0 cursor-pointer hover:bg-stone-600 transition-colors"
+          className="w-7 h-7 border border-[#FAF8F3]/30 flex items-center justify-center flex-shrink-0 cursor-pointer hover:bg-[#FAF8F3]/10 transition-colors"
         >
           <X size={13} />
         </button>

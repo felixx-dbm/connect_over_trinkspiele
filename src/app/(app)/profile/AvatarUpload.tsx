@@ -50,9 +50,9 @@ export default function AvatarUpload({ userId, initials, avatarUrl }: Props) {
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        className="w-full h-full ring-gradient rounded-2xl p-0.5 shadow-lg shadow-amber-200/50 cursor-pointer group"
+        className="w-full h-full border border-[#14110F] cursor-pointer group"
       >
-        <div className="w-full h-full rounded-[14px] overflow-hidden bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center font-display text-white text-2xl relative">
+        <div className="w-full h-full overflow-hidden bg-[#14110F] flex items-center justify-center display-upright text-[#FAF8F3] text-2xl relative">
           {preview && (
             <Image src={preview} alt="Avatar" fill className="object-cover" unoptimized />
           )}
@@ -78,7 +78,7 @@ export default function AvatarUpload({ userId, initials, avatarUrl }: Props) {
       />
 
       {error && (
-        <p className="absolute top-full left-0 mt-1 text-rose-500 text-[10px] font-bold whitespace-nowrap">{error}</p>
+        <p className="absolute top-full left-0 mt-1 text-rose-700 text-[10px] font-bold whitespace-nowrap">{error}</p>
       )}
     </div>
   );
