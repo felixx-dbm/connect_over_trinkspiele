@@ -21,8 +21,8 @@ L.Icon.Default.mergeOptions({
 });
 
 const challengeIcon = new L.DivIcon({
-  html: `<div style="width:36px;height:36px;background:#f59e0b;border-radius:50%;border:2px solid #fbbf24;display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(245,158,11,0.5)">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#09090b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  html: `<div style="width:36px;height:36px;background:#14110F;border-radius:50%;border:2px solid #8C7A5B;display:flex;align-items:center;justify-content:center">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FAF8F3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"></polyline><line x1="13" x2="19" y1="6" y2="12"></line><line x1="6" x2="13" y1="13" y2="19"></line><line x1="16" x2="20" y1="17" y2="21"></line><line x1="4" x2="8" y1="3" y2="7"></line>
     </svg>
   </div>`,
@@ -32,8 +32,8 @@ const challengeIcon = new L.DivIcon({
 });
 
 const ownChallengeIcon = new L.DivIcon({
-  html: `<div class="own-match-pulse" style="width:42px;height:42px;background:#6366f1;border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  html: `<div class="own-match-pulse" style="width:42px;height:42px;background:#8C7A5B;border-radius:50%;border:3px solid #FAF8F3;display:flex;align-items:center;justify-content:center;">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FAF8F3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"></polyline><line x1="13" x2="19" y1="6" y2="12"></line><line x1="6" x2="13" y1="13" y2="19"></line><line x1="16" x2="20" y1="17" y2="21"></line><line x1="4" x2="8" y1="3" y2="7"></line>
     </svg>
   </div>`,
@@ -43,8 +43,8 @@ const ownChallengeIcon = new L.DivIcon({
 });
 
 const crewChallengeIcon = new L.DivIcon({
-  html: `<div style="width:36px;height:36px;background:#8b5cf6;border-radius:8px;border:2px solid #a78bfa;display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(139,92,246,0.5)">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  html: `<div style="width:36px;height:36px;background:#8C7A5B;border-radius:4px;border:2px solid #14110F;display:flex;align-items:center;justify-content:center">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FAF8F3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
     </svg>
   </div>`,
@@ -54,7 +54,7 @@ const crewChallengeIcon = new L.DivIcon({
 });
 
 const userIcon = new L.DivIcon({
-  html: `<div style="width:20px;height:20px;background:#3b82f6;border-radius:50%;border:3px solid #93c5fd;box-shadow:0 0 0 8px rgba(59,130,246,0.15)"></div>`,
+  html: `<div style="width:20px;height:20px;background:#14110F;border-radius:50%;border:3px solid #FAF8F3;box-shadow:0 0 0 8px rgba(20,17,15,0.12)"></div>`,
   iconSize: [20, 20],
   iconAnchor: [10, 10],
   className: "",
@@ -157,11 +157,10 @@ export default function MapView({ filter }: { filter: string }) {
   }, []);
 
   useEffect(() => {
-    function fail() { setLocationError(true); }
-    if (!navigator.geolocation) { fail(); return; }
+    if (!navigator.geolocation) { setLocationError(true); return; }
     navigator.geolocation.getCurrentPosition(
       (pos) => setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      fail,
+      () => setLocationError(true),
       { timeout: 10000 }
     );
   }, []);
@@ -253,7 +252,7 @@ export default function MapView({ filter }: { filter: string }) {
         </div>
         <div>
           <p className="text-stone-700 font-bold text-sm mb-1">{t.map.locationRequired}</p>
-          <p className="text-stone-600 text-sm font-semibold">{t.map.locationHint}</p>
+          <p className="text-stone-400 text-sm font-semibold">{t.map.locationHint}</p>
         </div>
       </div>
     );
@@ -270,8 +269,8 @@ export default function MapView({ filter }: { filter: string }) {
         zoomControl={false}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://carto.com/attributions">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         />
         <RecenterOnce lat={center[0]} lng={center[1]} />
 
@@ -279,7 +278,7 @@ export default function MapView({ filter }: { filter: string }) {
         <Circle
           center={center}
           radius={200}
-          pathOptions={{ color: "#3b82f6", fillColor: "#3b82f6", fillOpacity: 0.08, weight: 1 }}
+          pathOptions={{ color: "#14110F", fillColor: "#14110F", fillOpacity: 0.06, weight: 1 }}
         />
 
         {filteredMatches.map((m) => (
@@ -370,49 +369,49 @@ export default function MapView({ filter }: { filter: string }) {
       </MapContainer>
 
       {/* Live match tracker pill */}
-      {liveMatch && (
-        <button
-          onClick={() => router.push(`/matches/${liveMatch.id}`)}
-          className="absolute top-3 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-2 bg-white/95 backdrop-blur border border-indigo-200 rounded-2xl px-4 py-2.5 shadow-lg shadow-indigo-100/60 cursor-pointer hover:border-indigo-400 transition-colors"
-        >
-          <span className="relative flex-shrink-0">
-            <span className="w-2 h-2 rounded-full bg-indigo-500 block" />
-            <span className="absolute inset-0 rounded-full bg-indigo-400 animate-ping opacity-75" />
-          </span>
-          <div className="text-left">
-            <p className="text-indigo-700 font-bold text-xs leading-none mb-0.5">
-              {liveMatch.status === "active" ? "Match läuft" : "Warten auf Gegner"}
-            </p>
-            <p className="text-stone-600 text-[10px] font-semibold capitalize leading-none">
-              {(liveMatch.game_types as unknown as { name: string } | null)?.name?.replace(/_/g, " ")}
-              {liveMatch.status === "active" && liveMatch.opponent_id && liveMatch.challenger_id !== liveUserId
-                ? ` · vs ${(liveMatch.challenger as unknown as { username: string } | null)?.username ?? "?"}`
-                : liveMatch.status === "active" && liveMatch.opponent_id
-                ? ` · vs ${(liveMatch.opponent as unknown as { username: string } | null)?.username ?? "?"}`
-                : ""}
-            </p>
-          </div>
-          <Zap size={12} className="text-indigo-400 flex-shrink-0" />
-        </button>
-      )}
+  { liveMatch && (
+      <button
+        onClick={() => router.push(`/matches/${liveMatch.id}`)}
+        className="absolute top-3 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-2 bg-[#FAF8F3] border border-[#14110F] px-4 py-2.5 cursor-pointer hover:bg-[#14110F] hover:text-[#FAF8F3] transition-colors group"
+      >
+      <span className="relative flex-shrink-0">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#14110F] group-hover:bg-[#FAF8F3] block" />
+        <span className="absolute inset-0 rounded-full bg-[#14110F] group-hover:bg-[#FAF8F3] animate-ping opacity-75" />
+      </span>
+      <div className="text-left">
+        <p className="text-[#14110F] group-hover:text-[#FAF8F3] font-bold text-xs leading-none mb-0.5">
+          {liveMatch.status === "active" ? "Match läuft" : "Warten auf Gegner"}
+        </p>
+        <p className="text-[#6B5D42] group-hover:text-[#FAF8F3]/60 text-[10px] font-semibold capitalize leading-none">
+          {(liveMatch.game_types as unknown as { name: string } | null)?.name?.replace(/_/g, " ")}
+          {liveMatch.status === "active" && liveMatch.opponent_id && liveMatch.challenger_id !== liveUserId
+            ? ` · vs ${(liveMatch.challenger as unknown as { username: string } | null)?.username ?? "?"}`
+            : liveMatch.status === "active" && liveMatch.opponent_id
+            ? ` · vs ${(liveMatch.opponent as unknown as { username: string } | null)?.username ?? "?"}`
+            : ""}
+        </p>
+      </div>
+      <Zap size={12} className="text-[#6B5D42] group-hover:text-[#FAF8F3]/60 flex-shrink-0" />
+    </button>
+  )}
 
       {/* Nearby count badge */}
       {totalExternal > 0 && (
-        <div className="absolute top-3 right-3 z-[1000] bg-white/92 backdrop-blur border border-amber-200 rounded-xl px-3 py-2 flex items-center gap-2 shadow-sm shadow-amber-100/50">
-          <Users size={12} className="text-amber-500" />
-          <span className="text-amber-600 text-xs font-bold">{totalExternal} {t.map.nearby}</span>
+        <div className="absolute top-3 right-3 z-[1000] bg-[#FAF8F3] border border-[#14110F] px-3 py-2 flex items-center gap-2">
+          <Users size={12} className="text-[#6B5D42]" />
+          <span className="text-[#14110F] text-xs font-bold">{totalExternal} {t.map.nearby}</span>
         </div>
       )}
 
       {/* Empty state overlay */}
       {!hasNearby && lastRefresh && (
         <div className="absolute inset-0 z-[999] pointer-events-none flex items-end justify-center pb-32">
-          <div className="pointer-events-auto bg-white/95 backdrop-blur border border-amber-100 rounded-2xl px-5 py-4 mx-4 text-center max-w-xs shadow-lg shadow-amber-100/40">
-            <p className="text-stone-700 font-bold text-sm mb-1">{t.map.noBattles}</p>
-            <p className="text-stone-600 text-xs font-semibold mb-3">{t.map.noBattlesHint}</p>
+          <div className="pointer-events-auto bg-[#FAF8F3] border border-[#14110F] px-5 py-4 mx-4 text-center max-w-xs">
+            <p className="display italic text-lg mb-1">{t.map.noBattles}</p>
+            <p className="text-[#6B5D42] text-xs font-semibold mb-3">{t.map.noBattlesHint}</p>
             <button
               onClick={() => location && fetchChallenges(location)}
-              className="flex items-center gap-1.5 text-xs text-amber-600 hover:text-amber-700 mx-auto cursor-pointer transition-colors font-bold"
+              className="flex items-center gap-1.5 text-xs text-[#14110F] hover:text-[#6B5D42] mx-auto cursor-pointer transition-colors font-bold uppercase tracking-wide"
             >
               <RefreshCw size={11} />
               {t.matches.refresh}
@@ -423,175 +422,175 @@ export default function MapView({ filter }: { filter: string }) {
 
       {/* Last refreshed indicator */}
       {lastRefresh && (
-        <div className="absolute bottom-16 left-3 z-[1000] bg-white/80 backdrop-blur rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 border border-amber-100 shadow-sm">
-          <RefreshCw size={10} className="text-stone-600" />
-          <span className="text-stone-600 text-[10px] font-semibold">
+        <div className="absolute bottom-16 left-3 z-[1000] bg-[#FAF8F3] px-2.5 py-1.5 flex items-center gap-1.5 border border-[#E3DCCB]">
+          <RefreshCw size={10} className="text-[#6B5D42]" />
+          <span className="text-[#6B5D42] text-[10px] font-semibold">
             {lastRefresh.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
           </span>
         </div>
       )}
 
       {/* Match list bottom sheet */}
-      <div
-        className="absolute left-0 right-0 bottom-0 z-[1001] transition-transform duration-300 ease-in-out"
-        style={{ transform: listOpen ? "translateY(0)" : "translateY(calc(100% - 56px))" }}
-        onTouchStart={(e) => e.stopPropagation()}
-        onTouchMove={(e) => e.stopPropagation()}
-        onTouchEnd={(e) => e.stopPropagation()}
-      >
-        {/* Sheet handle / toggle bar */}
-        <button
-          onClick={() => setListOpen((v) => !v)}
-          className="w-full bg-white/95 backdrop-blur border-t border-amber-100 px-4 py-3 flex items-center justify-between cursor-pointer shadow-md shadow-amber-100/30"
-          style={{ position: "relative", zIndex: 1 }}
-        >
-          <div className="flex items-center gap-2">
-            <Swords size={14} className="text-amber-500" />
-            <span className="text-stone-800 text-sm font-bold">
-              {totalExternal === 0
-                ? t.map.noBattles
-                : `${totalExternal} ${totalExternal !== 1 ? t.map.battlePlural : t.map.battleSingular} ${t.map.nearby}`}
-            </span>
-            {ownMatches.length > 0 && (
-              <span className="text-[10px] bg-violet-50 text-violet-600 border border-violet-200 px-2 py-0.5 rounded-full font-bold">
-                {ownMatches.length} {t.map.yours}
-              </span>
-            )}
-          </div>
-          {listOpen ? <ChevronDown size={16} className="text-stone-600" /> : <ChevronUp size={16} className="text-stone-600" />}
-        </button>
-
-        {/* Sheet content */}
-        {listOpen && (
-          <div className="bg-white border-t border-amber-50 max-h-[55vh] overflow-y-auto">
-            {/* Own crew challenges */}
-            {ownCrewMatches.length > 0 && (
-              <div className="px-4 pt-4 pb-2">
-                <p className="text-[10px] text-violet-500 uppercase tracking-widest mb-2 font-bold">{t.map.yourChallenges} · Crew</p>
-                <div className="flex flex-col gap-2">
-                  {ownCrewMatches.map((cm) => (
-                    <button
-                      key={cm.id}
-                      onClick={() => router.push(`/crew-matches/${cm.id}`)}
-                      className="flex items-center gap-3 bg-violet-50 border border-violet-200 rounded-xl p-3 text-left cursor-pointer hover:border-violet-400 transition-colors w-full"
-                    >
-                      <span className="text-xl flex-shrink-0">👥</span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-violet-700 text-sm font-bold">{cm.challenger_crew_name}</p>
-                        <p className="text-stone-600 text-xs font-semibold capitalize flex items-center gap-1 mt-0.5">
-                          <Navigation size={9} />
-                          {cm.game_type_name.replace(/_/g, " ")} · {t.map.waitingOpponent}
-                        </p>
-                      </div>
-                      <span className="text-xs text-violet-500 font-bold flex-shrink-0">View →</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Own challenges */}
-            {ownMatches.length > 0 && (
-              <div className="px-4 pt-4 pb-2">
-                <p className="text-[10px] text-violet-500 uppercase tracking-widest mb-2 font-bold">{t.map.yourChallenges}</p>
-                <div className="flex flex-col gap-2">
-                  {ownMatches.map((m) => (
-                    <button
-                      key={m.id}
-                      onClick={() => router.push(`/matches/${m.id}`)}
-                      className="flex items-center gap-3 bg-violet-50 border border-violet-200 rounded-xl p-3 text-left cursor-pointer hover:border-violet-400 transition-colors w-full"
-                    >
-                      <span className="text-xl flex-shrink-0">{GAME_ICONS[m.game_type_name] ?? "🎮"}</span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-violet-700 text-sm font-bold capitalize">
-                          {m.game_type_name.replace(/_/g, " ")}
-                        </p>
-                        <p className="text-stone-600 text-xs font-semibold flex items-center gap-1 mt-0.5">
-                          <Navigation size={9} />
-                          {t.map.waitingOpponent}
-                        </p>
-                      </div>
-                      <span className="text-xs text-violet-500 font-bold flex-shrink-0">View →</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Nearby battles */}
-            {externalMatches.length > 0 && (
-              <div className="px-4 pt-3 pb-2">
-                <p className="text-[10px] text-amber-500 uppercase tracking-widest mb-2 font-bold">{t.map.nearbyBattles}</p>
-                <div className="flex flex-col gap-2">
-                  {externalMatches.map((m) => (
-                    <div
-                      key={m.id}
-                      className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl p-3"
-                    >
-                      <span className="text-xl flex-shrink-0">{GAME_ICONS[m.game_type_name] ?? "🎮"}</span>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <p className="text-stone-800 text-sm font-bold">{m.challenger_username}</p>
-                          {m.team_size > 1 && (
-                            <span className="text-[9px] bg-violet-100 text-violet-600 border border-violet-200 px-1 py-0.5 rounded-full font-bold leading-none">{m.team_size}v{m.team_size}</span>
-                          )}
-                        </div>
-                        <p className="text-stone-600 text-xs font-semibold capitalize flex items-center gap-1 mt-0.5">
-                          <MapPin size={9} />
-                          {m.game_type_name.replace(/_/g, " ")} · {Math.round(m.distance_m)}m
-                          {m.team_size > 1 && ` · ${m.slots_challenger}/${m.team_size} vs ${m.slots_opponent}/${m.team_size}`}
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => m.team_size > 1 ? router.push(`/matches/${m.id}`) : accept(m.id)}
-                        disabled={accepting !== null}
-                        className="flex-shrink-0 h-8 px-3 bg-gradient-to-r from-amber-400 to-orange-500 disabled:opacity-50 text-white text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1 shadow-sm shadow-amber-200/60"
-                      >
-                        {accepting === m.id ? <Loader2 size={11} className="animate-spin" /> : <Swords size={11} />}
-                        {m.team_size > 1 ? "View" : t.map.accept}
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Nearby crew battles */}
-            {externalCrewMatches.length > 0 && (
-              <div className="px-4 pt-3 pb-2">
-                <p className="text-[10px] text-violet-500 uppercase tracking-widest mb-2 font-bold">Crew Battles</p>
-                <div className="flex flex-col gap-2">
-                  {externalCrewMatches.map((cm) => (
-                    <button
-                      key={cm.id}
-                      onClick={() => router.push(`/crew-matches/${cm.id}`)}
-                      className="flex items-center gap-3 bg-violet-50 border border-violet-200 rounded-xl p-3 text-left cursor-pointer hover:border-violet-400 transition-colors w-full"
-                    >
-                      <span className="text-xl flex-shrink-0">👥</span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-violet-700 text-sm font-bold">{cm.challenger_crew_name}</p>
-                        <p className="text-stone-600 text-xs font-semibold capitalize flex items-center gap-1 mt-0.5">
-                          <MapPin size={9} />
-                          {cm.game_type_name.replace(/_/g, " ")} · {Math.round(cm.distance_m)}m
-                        </p>
-                      </div>
-                      <span className="text-xs text-violet-500 font-bold flex-shrink-0">View →</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {filteredMatches.length === 0 && crewMatches.length === 0 && (
-              <div className="px-4 py-8 text-center">
-                <p className="text-stone-600 text-sm font-semibold">{t.map.noBattlesFilter}</p>
-              </div>
-            )}
-
-            <div className="h-4" />
-          </div>
-        )}
-      </div>
+<div
+  className="absolute left-0 right-0 bottom-0 z-[1001] transition-transform duration-300 ease-in-out"
+  style={{ transform: listOpen ? "translateY(0)" : "translateY(calc(100% - 56px))" }}
+  onTouchStart={(e) => e.stopPropagation()}
+  onTouchMove={(e) => e.stopPropagation()}
+  onTouchEnd={(e) => e.stopPropagation()}
+>
+  {/* Sheet handle / toggle bar */}
+  <button
+    onClick={() => setListOpen((v) => !v)}
+    className="w-full bg-[#FAF8F3] border-t border-[#14110F] px-4 py-3 flex items-center justify-between cursor-pointer"
+    style={{ position: "relative", zIndex: 1 }}
+  >
+    <div className="flex items-center gap-2">
+      <Swords size={14} className="text-[#6B5D42]" />
+      <span className="text-[#14110F] text-sm font-bold">
+        {totalExternal === 0
+          ? t.map.noBattles
+          : `${totalExternal} ${totalExternal !== 1 ? t.map.battlePlural : t.map.battleSingular} ${t.map.nearby}`}
+      </span>
+      {ownMatches.length > 0 && (
+        <span className="text-[10px] bg-[#14110F] text-[#FAF8F3] px-2 py-0.5 font-bold">
+          {ownMatches.length} {t.map.yours}
+        </span>
+      )}
     </div>
-  );
+    {listOpen ? <ChevronDown size={16} className="text-[#6B5D42]" /> : <ChevronUp size={16} className="text-[#6B5D42]" />}
+  </button>
+
+  {/* Sheet content */}
+  {listOpen && (
+    <div className="bg-[#FAF8F3] border-t border-[#E3DCCB] max-h-[55vh] overflow-y-auto">
+      {/* Own crew challenges */}
+      {ownCrewMatches.length > 0 && (
+        <div className="px-4 pt-4 pb-2">
+          <p className="eyebrow mb-2">{t.map.yourChallenges} · Crew</p>
+          <div className="flex flex-col divide-y divide-[#E3DCCB] border-t border-b border-[#14110F]">
+            {ownCrewMatches.map((cm) => (
+              <button
+                key={cm.id}
+                onClick={() => router.push(`/crew-matches/${cm.id}`)}
+                className="flex items-center gap-3 py-3 text-left cursor-pointer hover:opacity-60 transition-opacity w-full"
+              >
+                <span className="text-xl flex-shrink-0">👥</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[#14110F] text-sm font-bold">{cm.challenger_crew_name}</p>
+                  <p className="text-[#6B5D42] text-xs font-semibold capitalize flex items-center gap-1 mt-0.5">
+                    <Navigation size={9} />
+                    {cm.game_type_name.replace(/_/g, " ")} · {t.map.waitingOpponent}
+                  </p>
+                </div>
+                <span className="link-arrow text-xs flex-shrink-0">View</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Own challenges */}
+      {ownMatches.length > 0 && (
+        <div className="px-4 pt-4 pb-2">
+          <p className="eyebrow mb-2">{t.map.yourChallenges}</p>
+          <div className="flex flex-col divide-y divide-[#E3DCCB] border-t border-b border-[#14110F]">
+            {ownMatches.map((m) => (
+              <button
+                key={m.id}
+                onClick={() => router.push(`/matches/${m.id}`)}
+                className="flex items-center gap-3 py-3 text-left cursor-pointer hover:opacity-60 transition-opacity w-full"
+              >
+                <span className="text-xl flex-shrink-0">{GAME_ICONS[m.game_type_name] ?? "🎮"}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[#14110F] text-sm font-bold capitalize">
+                    {m.game_type_name.replace(/_/g, " ")}
+                  </p>
+                  <p className="text-[#6B5D42] text-xs font-semibold flex items-center gap-1 mt-0.5">
+                    <Navigation size={9} />
+                    {t.map.waitingOpponent}
+                  </p>
+                </div>
+                <span className="link-arrow text-xs flex-shrink-0">View</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Nearby battles */}
+      {externalMatches.length > 0 && (
+        <div className="px-4 pt-3 pb-2">
+          <p className="eyebrow mb-2">{t.map.nearbyBattles}</p>
+          <div className="flex flex-col divide-y divide-[#E3DCCB] border-t border-b border-[#14110F]">
+            {externalMatches.map((m) => (
+              <div
+                key={m.id}
+                className="flex items-center gap-3 py-3"
+              >
+                <span className="text-xl flex-shrink-0">{GAME_ICONS[m.game_type_name] ?? "🎮"}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-[#14110F] text-sm font-bold">{m.challenger_username}</p>
+                    {m.team_size > 1 && (
+                      <span className="text-[9px] bg-[#6B5D42] text-[#FAF8F3] px-1 py-0.5 font-bold leading-none">{m.team_size}v{m.team_size}</span>
+                    )}
+                  </div>
+                  <p className="text-[#6B5D42] text-xs font-semibold capitalize flex items-center gap-1 mt-0.5">
+                    <MapPin size={9} />
+                    {m.game_type_name.replace(/_/g, " ")} · {Math.round(m.distance_m)}m
+                    {m.team_size > 1 && ` · ${m.slots_challenger}/${m.team_size} vs ${m.slots_opponent}/${m.team_size}`}
+                  </p>
+                </div>
+                <button
+                  onClick={() => m.team_size > 1 ? router.push(`/matches/${m.id}`) : accept(m.id)}
+                  disabled={accepting !== null}
+                  className="flex-shrink-0 h-8 px-3 bg-[#14110F] disabled:opacity-50 text-[#FAF8F3] text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 hover:bg-[#6B5D42]"
+                >
+                  {accepting === m.id ? <Loader2 size={11} className="animate-spin" /> : <Swords size={11} />}
+                  {m.team_size > 1 ? "View" : t.map.accept}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Nearby crew battles */}
+      {externalCrewMatches.length > 0 && (
+        <div className="px-4 pt-3 pb-2">
+          <p className="eyebrow mb-2">Crew Battles</p>
+          <div className="flex flex-col divide-y divide-[#E3DCCB] border-t border-b border-[#14110F]">
+            {externalCrewMatches.map((cm) => (
+              <button
+                key={cm.id}
+                onClick={() => router.push(`/crew-matches/${cm.id}`)}
+                className="flex items-center gap-3 py-3 text-left cursor-pointer hover:opacity-60 transition-opacity w-full"
+              >
+                <span className="text-xl flex-shrink-0">👥</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[#14110F] text-sm font-bold">{cm.challenger_crew_name}</p>
+                  <p className="text-[#6B5D42] text-xs font-semibold capitalize flex items-center gap-1 mt-0.5">
+                    <MapPin size={9} />
+                    {cm.game_type_name.replace(/_/g, " ")} · {Math.round(cm.distance_m)}m
+                  </p>
+                </div>
+                <span className="link-arrow text-xs flex-shrink-0">View</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {filteredMatches.length === 0 && crewMatches.length === 0 && (
+        <div className="px-4 py-8 text-center">
+          <p className="text-[#6B5D42] text-sm font-semibold">{t.map.noBattlesFilter}</p>
+        </div>
+      )}
+
+      <div className="h-4" />
+    </div>
+  )}
+</div>
+  </div>
+);
 }
