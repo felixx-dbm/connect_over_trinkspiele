@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Swords, ChevronLeft } from "lucide-react";
 import Link from "next/link";
@@ -14,7 +14,7 @@ export default function ChallengePage() {
   const { userId } = useParams() as { userId: string };
   const t = useT();
   const router = useRouter();
-  const supabase = createClient();
+  const [supabase] = useState(createClient);
 
   const [target, setTarget] = useState<TargetUser | null>(null);
   const [gameTypes, setGameTypes] = useState<GameType[]>([]);
@@ -24,22 +24,26 @@ export default function ChallengePage() {
   const [notFound, setNotFound] = useState(false);
   const [selfChallenge, setSelfChallenge] = useState(false);
 
-  const load = useCallback(async () => {
-    const [authResult, { data: user }, { data: games }] = await Promise.all([
-      supabase.auth.getUser(),
-      supabase.from("users").select("username, city, wins, allow_direct_challenges").eq("id", userId).single(),
-      supabase.from("game_types").select("id, name, team_size").order("name"),
-    ]);
+  useEffect(() => {
+    let ignore = false;
+    async function load() {
+      const [authResult, { data: user }, { data: games }] = await Promise.all([
+        supabase.auth.getUser(),
+        supabase.from("users").select("username, city, wins, allow_direct_challenges").eq("id", userId).single(),
+        supabase.from("game_types").select("id, name, team_size").order("name"),
+      ]);
+      if (ignore) return;
 
-    if (authResult.data.user?.id === userId) { setSelfChallenge(true); return; }
-    if (!user || user.allow_direct_challenges === false) { setNotFound(true); return; }
+      if (authResult.data.user?.id === userId) { setSelfChallenge(true); return; }
+      if (!user || user.allow_direct_challenges === false) { setNotFound(true); return; }
 
-    setTarget(user);
-    setGameTypes(games ?? []);
-    if (games && games.length > 0) setSelectedGame(games[0].id);
-  }, [userId]);
-
-  useEffect(() => { load(); }, [load]);
+      setTarget(user);
+      setGameTypes(games ?? []);
+      if (games && games.length > 0) setSelectedGame(games[0].id);
+    }
+    load();
+    return () => { ignore = true; };
+  }, [userId, supabase]);
 
   async function handleSend(e: React.FormEvent) {
     e.preventDefault();
@@ -61,7 +65,7 @@ export default function ChallengePage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4 text-center gap-4">
         <div className="text-5xl">😅</div>
-        <p className="text-stone-600 font-semibold">You can't challenge yourself.</p>
+        <p className="text-stone-600 font-semibold">You can&apos;t challenge yourself.</p>
         <Link href="/home" className="text-amber-600 font-bold text-sm">Go home</Link>
       </div>
     );

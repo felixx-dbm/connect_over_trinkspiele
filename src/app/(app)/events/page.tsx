@@ -23,7 +23,7 @@ type Membership = {
 export default function EventsPage() {
   const t = useT();
   const router = useRouter();
-  const supabase = createClient();
+  const [supabase] = useState(createClient);
 
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,20 +41,22 @@ export default function EventsPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    let ignore = false;
+    async function load() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (ignore || !user) return;
+      const { data } = await supabase
+        .from("event_members")
+        .select("is_active, events(id, name, join_code, city, created_by)")
+        .eq("user_id", user.id)
+        .order("joined_at", { ascending: false });
+      if (ignore) return;
+      setMemberships((data ?? []) as unknown as Membership[]);
+      setLoading(false);
+    }
     load();
-  }, []);
-
-  async function load() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    const { data } = await supabase
-      .from("event_members")
-      .select("is_active, events(id, name, join_code, city, created_by)")
-      .eq("user_id", user.id)
-      .order("joined_at", { ascending: false });
-    setMemberships((data ?? []) as unknown as Membership[]);
-    setLoading(false);
-  }
+    return () => { ignore = true; };
+  }, [supabase]);
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();

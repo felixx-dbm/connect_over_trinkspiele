@@ -74,7 +74,7 @@ test.describe("home dashboard", () => {
     const bell = page.getByRole("button", { name: /notification/i })
       .or(page.locator('[aria-label*="notification" i]'))
       .or(page.locator('a[href*="notification"], button').filter({ has: page.locator('svg') }).first());
-    // At minimum the page should have loaded without errors
+    await expect(bell.first()).toBeVisible();
     await expect(page).toHaveURL(/\/home/);
   });
 });

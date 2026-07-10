@@ -71,12 +71,12 @@ export default function Onboarding() {
   const o = t.onboarding;
   const [visible, setVisible] = useState(false);
   const [step, setStep] = useState(0);
-  const [animDir, setAnimDir] = useState<"in" | "out">("in");
   const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
+    function show() { setVisible(true); }
     if (typeof window !== "undefined" && !safeStorage.get(STORAGE_KEY)) {
-      setVisible(true);
+      show();
     }
   }, []);
 
@@ -87,7 +87,6 @@ export default function Onboarding() {
 
   const goTo = (next: number) => {
     if (next < 0 || next >= SLIDES.length) return;
-    setAnimDir(next > step ? "out" : "in");
     setStep(next);
   };
 

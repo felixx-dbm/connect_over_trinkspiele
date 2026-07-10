@@ -5,6 +5,7 @@
  * joining teams, live scoring, confirming the result and reporting players.
  */
 import { useState, useEffect, useCallback, useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, MapPin, Clock, CheckCircle, XCircle, Trophy, Swords, Loader2, Share2, Copy, Check, RefreshCw, Trash2, Users, UserPlus, Navigation, Timer, Play, Flag } from "lucide-react";
@@ -102,11 +103,20 @@ export default function MatchPage() {
     setLoading(false);
   }, [id]);
 
+  const showNotif = (msg: string) => {
+    setNotification(msg);
+    setTimeout(() => setNotification(null), 3500);
+  };
+
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data }) => setCurrentUserId(data.user?.id ?? null));
-    fetchMatch();
-    fetchMembers();
+
+    function init() {
+      fetchMatch();
+      fetchMembers();
+    }
+    init();
 
     const interval = setInterval(async () => {
       const supabase = createClient();
@@ -153,8 +163,9 @@ export default function MatchPage() {
 
   // Countdown to auto-resolve (10 min after first result submitted)
   useEffect(() => {
+    function reset() { setResolveCountdown(null); }
     if (!match?.first_result_at || match.status !== "active") {
-      setResolveCountdown(null);
+      reset();
       return;
     }
     const autoAt = new Date(match.first_result_at).getTime() + 10 * 60 * 1000;
@@ -191,11 +202,6 @@ export default function MatchPage() {
     autoResolveTriggered.current = true;
     fetch(`/api/matches/${id}/auto-resolve`, { method: "POST" }).then(() => fetchMatch());
   }, [match?.first_result_at, match?.status, id, fetchMatch]);
-
-  const showNotif = (msg: string) => {
-    setNotification(msg);
-    setTimeout(() => setNotification(null), 3500);
-  };
 
   const shareMatch = async () => {
     const url = `${window.location.origin}/matches/${id}`;
@@ -380,8 +386,6 @@ export default function MatchPage() {
 
   const challengerMembers = members.filter((m) => m.team === "challenger");
   const opponentMembers   = members.filter((m) => m.team === "opponent");
-  const myTeam = members.find((m) => m.user_id === currentUserId)?.team ??
-    (currentUserId === match.challenger_id ? "challenger" : null);
   const alreadyJoined = members.some((m) => m.user_id === currentUserId) ||
     currentUserId === match.challenger_id;
 
@@ -471,7 +475,7 @@ export default function MatchPage() {
                   {Array.from({ length: match.team_size }).map((_, i) => {
                     const member = challengerMembers[i];
                     return (
-                      <div key={i} className={`w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center font-display text-sm ${
+                      <div key={i} className={`relative w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center font-display text-sm ${
                         member
                           ? member.user_id === currentUserId
                             ? "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-md shadow-amber-200/50"
@@ -480,7 +484,7 @@ export default function MatchPage() {
                       }`}>
                         {member
                           ? member.users?.avatar_url
-                            ? <img src={member.users.avatar_url} alt="" className="w-full h-full object-cover" />
+                            ? <Image src={member.users.avatar_url} alt="" fill sizes="40px" className="object-cover" />
                             : (member.users?.username?.slice(0, 2).toUpperCase() ?? "??")
                           : "+"}
                       </div>
@@ -501,7 +505,7 @@ export default function MatchPage() {
                   {Array.from({ length: match.team_size }).map((_, i) => {
                     const member = opponentMembers[i];
                     return (
-                      <div key={i} className={`w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center font-display text-sm ${
+                      <div key={i} className={`relative w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center font-display text-sm ${
                         member
                           ? member.user_id === currentUserId
                             ? "bg-gradient-to-br from-violet-400 to-purple-500 text-white shadow-md shadow-violet-200/50"
@@ -510,7 +514,7 @@ export default function MatchPage() {
                       }`}>
                         {member
                           ? member.users?.avatar_url
-                            ? <img src={member.users.avatar_url} alt="" className="w-full h-full object-cover" />
+                            ? <Image src={member.users.avatar_url} alt="" fill sizes="40px" className="object-cover" />
                             : (member.users?.username?.slice(0, 2).toUpperCase() ?? "??")
                           : "+"}
                       </div>
@@ -523,13 +527,13 @@ export default function MatchPage() {
             /* ── 1v1 display ── */
             <div className="flex items-center justify-between gap-4">
               <div className="flex flex-col items-center gap-2 flex-1">
-                <div className={`w-16 h-16 rounded-2xl overflow-hidden flex items-center justify-center font-display text-lg shadow-md ${
+                <div className={`relative w-16 h-16 rounded-2xl overflow-hidden flex items-center justify-center font-display text-lg shadow-md ${
                   isChallenger
                     ? "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-amber-200/60"
                     : "bg-stone-100 border border-stone-200 text-stone-600"
                 }`}>
                   {match.challenger?.avatar_url
-                    ? <img src={match.challenger.avatar_url} alt="" className="w-full h-full object-cover" />
+                    ? <Image src={match.challenger.avatar_url} alt="" fill sizes="64px" className="object-cover" />
                     : challengerName.slice(0, 2).toUpperCase()}
                 </div>
                 <p className="text-stone-800 font-bold text-sm text-center">{challengerName}</p>
@@ -540,13 +544,13 @@ export default function MatchPage() {
                 <Swords size={16} className="text-stone-300" />
               </div>
               <div className="flex flex-col items-center gap-2 flex-1">
-                <div className={`w-16 h-16 rounded-2xl overflow-hidden flex items-center justify-center font-display text-lg shadow-md ${
+                <div className={`relative w-16 h-16 rounded-2xl overflow-hidden flex items-center justify-center font-display text-lg shadow-md ${
                   !isChallenger && match.opponent
                     ? "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-amber-200/60"
                     : "bg-stone-100 border border-stone-200 text-stone-600"
                 }`}>
                   {match.opponent?.avatar_url
-                    ? <img src={match.opponent.avatar_url} alt="" className="w-full h-full object-cover" />
+                    ? <Image src={match.opponent.avatar_url} alt="" fill sizes="64px" className="object-cover" />
                     : match.opponent ? opponentName.slice(0, 2).toUpperCase() : "?"}
                 </div>
                 <p className="text-stone-800 font-bold text-sm text-center">{opponentName}</p>

@@ -61,7 +61,7 @@ export default function ReportModal({ reportedUserId, matchId, onClose }: Props)
           <div className="text-center py-6">
             <CheckCircle size={40} className="text-emerald-500 mx-auto mb-3" />
             <p className="font-bold text-stone-800 mb-1">Report submitted</p>
-            <p className="text-stone-500 text-sm font-semibold">We'll review it shortly. Thanks for keeping Prost safe.</p>
+            <p className="text-stone-500 text-sm font-semibold">We&apos;ll review it shortly. Thanks for keeping Prost safe.</p>
             <button onClick={onClose} className="mt-5 h-12 w-full btn-gold rounded-2xl font-bold cursor-pointer">Done</button>
           </div>
         ) : (

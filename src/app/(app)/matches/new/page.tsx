@@ -73,9 +73,12 @@ export default function NewMatchPage() {
 
   // Reset team size to a sensible default when game changes
   useEffect(() => {
-    if (isBeerPong)   setTeamSize(2);
-    else if (isFlunkyBall) setTeamSize(10);
-    else              setTeamSize(1);
+    function resetTeamSize() {
+      if (isBeerPong)   setTeamSize(2);
+      else if (isFlunkyBall) setTeamSize(10);
+      else              setTeamSize(1);
+    }
+    resetTeamSize();
   }, [gameTypeId, isBeerPong, isFlunkyBall]);
 
   const teamSizeOptions: number[] | null =

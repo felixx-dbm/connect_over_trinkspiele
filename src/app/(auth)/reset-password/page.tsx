@@ -114,7 +114,7 @@ export default function ResetPasswordPage() {
         <h1 className="font-display text-3xl text-stone-900 mb-2">
           New <span className="text-gradient">password</span>
         </h1>
-        <p className="text-stone-500 text-sm font-semibold mb-8">Choose something you'll remember.</p>
+        <p className="text-stone-500 text-sm font-semibold mb-8">Choose something you&apos;ll remember.</p>
         <Suspense fallback={<Loader2 size={24} className="text-amber-500 animate-spin" />}>
           <ResetForm />
         </Suspense>

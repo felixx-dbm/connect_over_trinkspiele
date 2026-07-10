@@ -6,7 +6,6 @@ import { ArrowLeft, Eye, EyeOff, Mail, Lock, User, Calendar, AlertCircle, Check,
 import { signUp } from "@/app/actions/auth";
 import { validatePassword, passwordStrength } from "@/lib/validate";
 import { useT } from "@/components/LanguageProvider";
-import Marquee from "@/components/Marquee";
 
 function getAge(dob: string): number {
   return Math.floor((Date.now() - new Date(dob).getTime()) / (365.25 * 24 * 60 * 60 * 1000));

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { X, Share } from "lucide-react";
 import { safeStorage } from "@/lib/browser";
 
@@ -30,7 +31,7 @@ export default function InstallBanner() {
   return (
     <div className="fixed bottom-28 left-4 right-4 z-[9998] animate-slide-up">
       <div className="bg-stone-900 text-white rounded-2xl p-4 flex items-center gap-3 shadow-2xl shadow-stone-900/40">
-        <img src="/Icon_192.png" alt="Prost" className="w-10 h-10 rounded-xl flex-shrink-0" />
+        <Image src="/Icon_192.png" alt="Prost" width={40} height={40} className="rounded-xl flex-shrink-0" />
         <div className="flex-1 min-w-0">
           <p className="text-sm font-bold leading-snug">Install Prost</p>
           <p className="text-xs text-stone-400 font-semibold mt-0.5 leading-snug flex items-center gap-1 flex-wrap">

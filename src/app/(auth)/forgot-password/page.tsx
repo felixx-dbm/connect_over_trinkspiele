@@ -42,7 +42,7 @@ export default function ForgotPasswordPage() {
             <p className="text-stone-500 text-sm font-semibold leading-relaxed mb-8">
               We sent a reset link to <span className="text-stone-800 font-bold">{email}</span>. Click it to set a new password.
             </p>
-            <p className="text-stone-400 text-xs font-semibold">Didn't get it? Check spam or try again.</p>
+            <p className="text-stone-400 text-xs font-semibold">Didn&apos;t get it? Check spam or try again.</p>
             <button
               onClick={() => setSent(false)}
               className="mt-3 text-amber-600 hover:text-amber-700 text-sm font-bold cursor-pointer"
@@ -56,7 +56,7 @@ export default function ForgotPasswordPage() {
               Forgot <span className="text-gradient">password?</span>
             </h1>
             <p className="text-stone-500 text-sm font-semibold mb-8">
-              Enter your email and we'll send you a reset link.
+              Enter your email and we&apos;ll send you a reset link.
             </p>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">

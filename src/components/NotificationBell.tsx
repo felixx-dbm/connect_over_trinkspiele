@@ -32,6 +32,7 @@ export default function NotificationBell() {
   const [notifs, setNotifs] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [now, setNow] = useState(() => Date.now());
   const panelRef = useRef<HTMLDivElement>(null);
 
   const unread = notifs.filter((n) => !n.read).length;
@@ -72,6 +73,12 @@ export default function NotificationBell() {
     return () => { if (channel) supabase.removeChannel(channel); };
   }, []);
 
+  // Keep relative timestamps ("5m ago") fresh
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Close panel on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -101,7 +108,7 @@ export default function NotificationBell() {
   };
 
   const timeAgo = (iso: string) => {
-    const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+    const diff = Math.floor((now - new Date(iso).getTime()) / 1000);
     if (diff < 60)   return "just now";
     if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
     if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;

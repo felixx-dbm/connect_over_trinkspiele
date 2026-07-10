@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Trophy, Users, Swords, ChevronLeft, Share2, Trash2, Loader2 } from "lucide-react";
 import { useT } from "@/components/LanguageProvider";
 import { createClient } from "@/lib/supabase/client";
+import { copyToClipboard } from "@/lib/browser";
 
 type Event = {
   id: string;
@@ -35,7 +36,7 @@ export default function EventDetailPage() {
   const { id } = useParams() as { id: string };
   const t = useT();
   const router = useRouter();
-  const supabase = createClient();
+  const [supabase] = useState(createClient);
 
   const [event, setEvent] = useState<Event | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
@@ -47,33 +48,38 @@ export default function EventDetailPage() {
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) setUserId(user.id);
+  useEffect(() => {
+    let ignore = false;
+    async function load() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (ignore) return;
+      if (user) setUserId(user.id);
 
-    const [{ data: ev }, { data: mems }, { data: matchData }] = await Promise.all([
-      supabase.from("events").select("id, name, join_code, city, created_by").eq("id", id).single(),
-      supabase.from("event_members").select("user_id, users(username, wins, losses)").eq("event_id", id),
-      supabase
-        .from("matches")
-        .select("id, created_at, winner_id, challenger_id, opponent_id, game_types(name), challenger:challenger_id(username), opponent:opponent_id(username)")
-        .eq("event_id", id)
-        .eq("status", "completed")
-        .order("completed_at", { ascending: false })
-        .limit(20),
-    ]);
+      const [{ data: ev }, { data: mems }, { data: matchData }] = await Promise.all([
+        supabase.from("events").select("id, name, join_code, city, created_by").eq("id", id).single(),
+        supabase.from("event_members").select("user_id, users(username, wins, losses)").eq("event_id", id),
+        supabase
+          .from("matches")
+          .select("id, created_at, winner_id, challenger_id, opponent_id, game_types(name), challenger:challenger_id(username), opponent:opponent_id(username)")
+          .eq("event_id", id)
+          .eq("status", "completed")
+          .order("completed_at", { ascending: false })
+          .limit(20),
+      ]);
+      if (ignore) return;
 
-    if (!ev) { setNotFound(true); return; }
-    setEvent(ev);
-    setMembers((mems ?? []) as unknown as Member[]);
-    setBattles((matchData ?? []) as unknown as Battle[]);
-  }, [id]);
+      if (!ev) { setNotFound(true); return; }
+      setEvent(ev);
+      setMembers((mems ?? []) as unknown as Member[]);
+      setBattles((matchData ?? []) as unknown as Battle[]);
+    }
+    load();
+    return () => { ignore = true; };
+  }, [id, supabase]);
 
-  useEffect(() => { load(); }, [load]);
-
-  function copyCode() {
+  async function copyCode() {
     if (!event) return;
-    navigator.clipboard.writeText(event.join_code);
+    await copyToClipboard(event.join_code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
@@ -214,9 +220,6 @@ export default function EventDetailPage() {
           <div className="flex flex-col gap-2">
             {battles.map((b) => {
               const isWin = b.winner_id === userId;
-              const opponentName = b.challenger_id === userId
-                ? b.opponent?.username
-                : b.challenger?.username;
               return (
                 <Link
                   key={b.id}

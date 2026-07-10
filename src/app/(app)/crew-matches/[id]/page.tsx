@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Swords, Trophy, XCircle, Loader2, Users, RefreshCw, Trash2, CheckCircle } from "lucide-react";
@@ -73,8 +74,11 @@ export default function CrewMatchPage() {
           .then(({ data: m }) => setUserCrewId(m?.crew_id ?? null));
       }
     });
-    fetchMatch();
-    fetchParticipants();
+    function init() {
+      fetchMatch();
+      fetchParticipants();
+    }
+    init();
 
     const interval = setInterval(async () => {
       const supabase = createClient();
@@ -282,7 +286,7 @@ export default function CrewMatchPage() {
                         : "bg-stone-100 text-stone-600 border border-stone-200"
                     }`}>
                       {(p.users as unknown as { username: string; avatar_url: string | null } | null)?.avatar_url && (
-                        <img src={(p.users as unknown as { avatar_url: string }).avatar_url} alt="" className="w-4 h-4 rounded-full object-cover flex-shrink-0" />
+                        <Image src={(p.users as unknown as { avatar_url: string }).avatar_url} alt="" width={16} height={16} className="rounded-full object-cover flex-shrink-0" />
                       )}
                       {(p.users as unknown as { username: string } | null)?.username ?? "?"}
                     </span>
@@ -314,7 +318,7 @@ export default function CrewMatchPage() {
                             : "bg-stone-100 text-stone-600 border border-stone-200"
                         }`}>
                           {(p.users as unknown as { username: string; avatar_url: string | null } | null)?.avatar_url && (
-                        <img src={(p.users as unknown as { avatar_url: string }).avatar_url} alt="" className="w-4 h-4 rounded-full object-cover flex-shrink-0" />
+                        <Image src={(p.users as unknown as { avatar_url: string }).avatar_url} alt="" width={16} height={16} className="rounded-full object-cover flex-shrink-0" />
                       )}
                       {(p.users as unknown as { username: string } | null)?.username ?? "?"}
                         </span>
