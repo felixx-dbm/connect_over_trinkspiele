@@ -7,7 +7,6 @@ import Link from "next/link";
 import { Swords, Trophy, TrendingUp, Clock, ChevronRight, Flame, Users, MapPin, Zap } from "lucide-react";
 import Image from "next/image";
 import NotificationBell from "@/components/NotificationBell";
-import Marquee from "@/components/Marquee";
 import { createClient } from "@/lib/supabase/server";
 import { getT } from "@/lib/i18n-server";
 import type { MatchRow } from "@/lib/types";
@@ -73,11 +72,6 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen pb-6">
-      
-                    <div className="relative left-1/2 right-1/2 -mx-[50vw] w-screen">
-        <Marquee />
-      </div>
-
       {/* ── Header ── */}
       <div className="flex items-center justify-between px-4 pt-2 mb-6">
         <div>
