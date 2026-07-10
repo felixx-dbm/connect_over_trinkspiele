@@ -157,10 +157,11 @@ export default function MapView({ filter }: { filter: string }) {
   }, []);
 
   useEffect(() => {
-    if (!navigator.geolocation) { setLocationError(true); return; }
+    function fail() { setLocationError(true); }
+    if (!navigator.geolocation) { fail(); return; }
     navigator.geolocation.getCurrentPosition(
       (pos) => setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      () => setLocationError(true),
+      fail,
       { timeout: 10000 }
     );
   }, []);
