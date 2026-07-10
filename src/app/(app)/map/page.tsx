@@ -24,7 +24,7 @@ export default function MapPage() {
   const [filter, setFilter] = useState<string>("all");
 
   return (
-    <div className="h-screen flex flex-col pb-safe bg-[#FAF8F3]">
+    <div className="h-screen flex flex-col bg-[#FAF8F3]">
       {/* Header */}
       <div className="px-4 pt-12 pb-4 bg-[#FAF8F3] flex-shrink-0 z-10 border-b border-[#14110F]">
         <p className="eyebrow mb-1">{t.map.title}</p>
