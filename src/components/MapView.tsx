@@ -442,7 +442,7 @@ export default function MapView({ filter }: { filter: string }) {
   {/* Sheet handle / toggle bar */}
   <button
     onClick={() => setListOpen((v) => !v)}
-    className="w-full bg-[#FAF8F3] border-t border-[#14110F] px-4 py-3 flex items-center justify-between cursor-pointer"
+    className="w-full bg-[#FAF8F3] border-t border-[#14110F] px-4 py-3 pb-safe flex items-center justify-between cursor-pointer"
     style={{ position: "relative", zIndex: 1 }}
   >
     <div className="flex items-center gap-2">
