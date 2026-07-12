@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2, X, Loader2, AlertTriangle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -11,6 +11,16 @@ export default function DeleteAccountModal({ onClose }: { onClose: () => void })
   const [input, setInput] = useState("");
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
 
   const handleDelete = async () => {
     if (input !== "DELETE") return;
