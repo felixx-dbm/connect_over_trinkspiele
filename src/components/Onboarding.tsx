@@ -73,6 +73,17 @@ export default function Onboarding() {
     setVisible(false);
   };
 
+  useEffect(() => {
+    if (!visible) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        finish();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [visible]);
+
   const goTo = (next: number) => {
     if (next < 0 || next >= SLIDES.length) return;
     setStep(next);
