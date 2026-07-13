@@ -298,8 +298,8 @@ const translations = {
       vs: "vs",
     },
     settings: {
-      title: "SET",
-      titleAccent: "TINGS",
+      title: "APP",
+      titleAccent: "SETTINGS",
       account: "Account",
       username: "Username",
       city: "City",
@@ -708,8 +708,8 @@ const translations = {
       vs: "vs",
     },
     settings: {
-      title: "EIN",
-      titleAccent: "STELLUNGEN",
+      title: "APP",
+      titleAccent: "EINSTELLUNGEN",
       account: "Account",
       username: "Benutzername",
       city: "Stadt",
