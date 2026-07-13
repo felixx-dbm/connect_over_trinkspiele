@@ -149,8 +149,8 @@ const translations = {
       startFirst: "Start your first one →",
     },
     leaderboard: {
-      title: "LEADER",
-      titleAccent: "BOARD",
+      title: "GLOBAL",
+      titleAccent: "LEADERBOARD",
       tabPlayers: "Players",
       tabCrews: "Crews",
       podium: ["1st", "2nd", "3rd"] as const,
@@ -559,8 +559,8 @@ const translations = {
       startFirst: "Ersten starten →",
     },
     leaderboard: {
-      title: "RANG",
-      titleAccent: "LISTE",
+      title: "GLOBALE",
+      titleAccent: "RANGLISTE",
       tabPlayers: "Spieler",
       tabCrews: "Crews",
       podium: ["1.", "2.", "3."] as const,
