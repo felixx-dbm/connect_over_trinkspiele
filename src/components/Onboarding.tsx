@@ -109,21 +109,25 @@ export default function Onboarding() {
     >
       {/* Top bar: progress + skip */}
       <div className="flex items-center justify-between px-6 pt-14 pb-4 flex-shrink-0">
-        <div className="flex gap-1.5">
+        <div className="flex items-center gap-0.5">
           {SLIDES.map((_, i) => (
             <button
               key={i}
               onClick={() => goTo(i)}
               aria-label={`Go to slide ${i + 1} of ${SLIDES.length}`}
               aria-current={i === step}
-              className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                i === step
-                  ? "w-6 bg-[#14110F]"
-                  : i < step
-                  ? "w-3 bg-[#6B5D42]"
-                  : "w-3 bg-[#E3DCCB]"
-              }`}
-            />
+              className="h-11 px-1.5 flex items-center justify-center cursor-pointer group"
+            >
+              <div
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  i === step
+                    ? "w-6 bg-[#14110F]"
+                    : i < step
+                    ? "w-3 bg-[#6B5D42]"
+                    : "w-3 bg-[#E3DCCB]"
+                }`}
+              />
+            </button>
           ))}
         </div>
         <button
