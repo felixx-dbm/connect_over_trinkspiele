@@ -50,28 +50,43 @@ export default function NotificationBell() {
 
   useEffect(() => {
     const supabase = createClient();
-    let channel: ReturnType<typeof supabase.channel> | null = null;
+    const channel = supabase.channel("realtime_notifications");
 
-    supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) return;
-      setUserId(data.user.id);
-      fetchNotifs(data.user.id);
+    const setupRealtime = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
 
-      channel = supabase
-        .channel("notifications")
-        .on("postgres_changes", {
-          event: "INSERT",
-          schema: "public",
-          table: "notifications",
-          filter: `user_id=eq.${data.user.id}`,
-        }, (payload) => {
-          setNotifs((prev) => [payload.new as Notification, ...prev]);
-        })
-        .subscribe();
+    setUserId(user.id);
+    await fetchNotifs(user.id);
+
+      // Event zuerst registrieren
+    channel.on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "notifications",
+        filter: `user_id=eq.${user.id}`,
+      },
+      (payload) => {
+        setNotifs((prev) => [payload.new as Notification, ...prev]);
+      }
+    );
+    // Subscribe als zweites
+    channel.subscribe((status) => {
+      if (status === "SUBSCRIBED") {
+        console.log("Realtime-Verbindung für Benachrichtigungen steht!");
+      }
     });
+  };
 
-    return () => { if (channel) supabase.removeChannel(channel); };
-  }, []);
+  setupRealtime();
+
+  // 3. CLEANUP: Wird bei jedem Unmount oder Hot-Reload zuverlässig ausgeführt
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}, []);
 
   // Keep relative timestamps ("5m ago") fresh
   useEffect(() => {
