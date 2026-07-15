@@ -22,7 +22,7 @@ export default async function HomePage() {
     supabase.from("users").select("username, wins, losses, city, avatar_url").eq("id", user.id).single(),
     supabase
       .from("matches")
-      .select("id, status, mode, created_at, winner_id, game_types(name), opponent:opponent_id(username), challenger:challenger_id(username)")
+      .select("id, status, mode, created_at, winner_id, challenger_id, opponent_id, game_types(name), opponent:opponent_id(username), challenger:challenger_id(username)")
       .or(`challenger_id.eq.${user.id},opponent_id.eq.${user.id}`)
       .eq("status", "completed")
       .order("completed_at", { ascending: false })
