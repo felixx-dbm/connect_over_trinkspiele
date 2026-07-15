@@ -6,7 +6,7 @@
  */
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Home, MapPin, Plus, CalendarDays, User, Swords } from "lucide-react";
 import { useT } from "@/components/LanguageProvider";
 import { createClient } from "@/lib/supabase/client";
@@ -21,20 +21,31 @@ export default function BottomNav() {
     let userId = "";
 
     const check = async () => {
-      if (!userId) {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-        userId = user.id;
+      try {
+        if (!userId) {
+          const { data: { user }, error: userError } = await supabase.auth.getUser();
+          if (userError || !user) return;
+          userId = user.id;
+        }
+
+        const { data, error: matchError } = await supabase
+          .from("matches")
+          .select("id")
+          .eq("challenger_id", userId)
+          .in("status", ["open", "active"])
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (matchError) {
+          console.error("Error fetching live match:", matchError.message);
+          return;
+        }
+
+        setLiveMatchId(data?.id ?? null);
+      } catch (err) {
+        console.error("Unexpected error in live match checker:", err);
       }
-      const { data } = await supabase
-        .from("matches")
-        .select("id")
-        .eq("challenger_id", userId)
-        .in("status", ["open", "active"])
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      setLiveMatchId(data?.id ?? null);
     };
 
     check();
@@ -42,13 +53,16 @@ export default function BottomNav() {
     return () => clearInterval(interval);
   }, [pathname]);
 
-  const tabs = [
-    { href: "/home",        label: t.nav.home,   Icon: Home,         activeColor: "text-amber-700",   dotColor: "bg-amber-500"   },
-    { href: "/map",         label: t.nav.map,    Icon: MapPin,       activeColor: "text-rose-700",    dotColor: "bg-rose-500"    },
-    { href: "/matches/new", label: null,          Icon: Plus,         activeColor: "",                 dotColor: "",              isCTA: true },
-    { href: "/events",      label: t.nav.events, Icon: CalendarDays, activeColor: "text-violet-700",  dotColor: "bg-violet-500"  },
-    { href: "/profile",     label: t.nav.me,     Icon: User,         activeColor: "text-emerald-700", dotColor: "bg-emerald-500" },
-  ];
+  // Memoize tab configurations to prevent unnecessary re-allocations on render
+  const tabs = useMemo(() => {
+    return [
+      { href: "/home",        label: t.nav.home,   Icon: Home,         activeColor: "text-amber-700",   dotColor: "bg-amber-500"   },
+      { href: "/map",         label: t.nav.map,    Icon: MapPin,       activeColor: "text-rose-700",    dotColor: "bg-rose-500"    },
+      { href: "/matches/new", label: null,          Icon: Plus,         activeColor: "",                 dotColor: "",              isCTA: true },
+      { href: "/events",      label: t.nav.events, Icon: CalendarDays, activeColor: "text-violet-700",  dotColor: "bg-violet-500"  },
+      { href: "/profile",     label: t.nav.me,     Icon: User,         activeColor: "text-emerald-700", dotColor: "bg-emerald-500" },
+    ];
+  }, [t]);
 
   return (
     <nav aria-label="Main navigation" className="fixed bottom-0 left-0 right-0 z-[9999] px-4 pb-[max(10px,env(safe-area-inset-bottom))]">
