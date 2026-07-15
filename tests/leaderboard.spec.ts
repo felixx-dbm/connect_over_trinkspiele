@@ -27,8 +27,9 @@ test.describe("leaderboard page", () => {
   test("shows at least one ranked entry or an empty-state message", async ({ page }) => {
     // Wait for data to load
     await page.waitForLoadState("networkidle").catch(() => {});
-    // Leaderboard renders divs (not tr/li). Empty state messages vary by whether user has a city set.
-    const entry = page.locator("div.rounded-2xl").nth(3);
+    // Leaderboard renders entries in a flex/border list (no rounded-2xl classes).
+    // Each entry shows a wins counter like "5W"; empty state varies by city presence.
+    const entry = page.getByText(/\d+W/).first();
     const emptyMsg = page.getByText(/no.*yet|set your city|no players|no results/i).first();
     await expect(entry.or(emptyMsg).first()).toBeVisible({ timeout: 8_000 });
   });

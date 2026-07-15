@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, MapPin, Clock, CheckCircle, XCircle, Trophy, Swords, Loader2, Share2, Copy, Check, RefreshCw, Trash2, Users, UserPlus, Navigation, Timer, Play, Flag } from "lucide-react";
 import ReportModal from "@/components/ReportModal";
+import GameCompanion from "@/components/GameCompanion";
 import { createClient } from "@/lib/supabase/client";
 import { copyToClipboard } from "@/lib/browser";
 import { useT } from "@/components/LanguageProvider";
@@ -621,6 +622,16 @@ export default function MatchPage() {
           <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse flex-shrink-0" />
           {t.matches.matchStarted}
         </div>
+      )}
+
+      {match.status === "active" && isParticipant && (
+        <GameCompanion
+          gameType={match.game_types?.name ?? "freestyle"}
+          matchId={match.id}
+          challengerName={challengerName}
+          opponentName={opponentName}
+          isChallenger={isChallenger}
+        />
       )}
 
       {/* ── ACTIVE: Result submission ── */}
