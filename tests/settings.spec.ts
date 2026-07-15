@@ -45,4 +45,9 @@ test.describe("settings page", () => {
     const deleteBtn = page.getByRole("button", { name: /delete account|delete/i });
     await expect(deleteBtn).toBeVisible();
   });
+
+  test("legal section has a privacy policy link", async ({ page }) => {
+    const privacyLink = page.getByRole("link", { name: /privacy policy|datenschutz/i });
+    await expect(privacyLink).toBeVisible();
+  });
 });

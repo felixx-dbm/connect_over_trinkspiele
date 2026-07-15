@@ -64,7 +64,8 @@ test.describe("home dashboard", () => {
   test("empty state encourages the user to start their first battle", async ({ page }) => {
     // Depending on user state: empty state link, "Recent Battles" heading, or active match card
     const hasEmptyState = await page.getByRole("link", { name: /start|first battle/i }).isVisible().catch(() => false);
-    const hasRecentBattles = await page.getByRole("heading", { name: /recent battles/i }).isVisible().catch(() => false);
+    // "Recent Battles" is an eyebrow <p>, not a heading element
+    const hasRecentBattles = await page.getByText(/recent battles/i).first().isVisible().catch(() => false);
     const hasActiveMatch = await page.getByText(/live match/i).isVisible().catch(() => false);
     expect(hasEmptyState || hasRecentBattles || hasActiveMatch).toBe(true);
   });

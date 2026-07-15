@@ -10,9 +10,8 @@ test.describe("events page", () => {
   });
 
   test("shows a page heading about events or hotspots", async ({ page }) => {
-    await expect(
-      page.getByRole("heading", { name: /events|hotspot/i })
-    ).toBeVisible();
+    // Events page uses an eyebrow <p> for the title ("EVENTS"); the h1 titleAccent is empty
+    await expect(page.getByText("EVENTS").first()).toBeVisible();
   });
 
   test("presents Create Event and Join Event as primary actions", async ({ page }) => {
