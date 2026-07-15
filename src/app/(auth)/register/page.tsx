@@ -222,7 +222,10 @@ export default function RegisterPage() {
         </div>
 
         <p className="text-xs text-stone-600 text-center leading-relaxed font-semibold">
-          {t.auth.terms}
+          {t.auth.terms}{" "}
+          <Link href="/datenschutz" className="text-amber-700 underline font-bold">
+            {t.settings.privacyPolicy}
+          </Link>
         </p>
       </form>
 

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Trash2, User, Mail, MapPin, Shield } from "lucide-react";
+import { ArrowLeft, Trash2, User, Mail, MapPin, Shield, FileText } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/actions/auth";
 import { getT, getLocale } from "@/lib/i18n-server";
@@ -106,6 +106,24 @@ export default async function SettingsPage() {
             </span>
           ))}
         </div>
+      </div>
+
+      {/* Legal */}
+      <div className="border border-[#14110F] p-5 mb-4">
+        <div className="flex items-center gap-2 mb-3">
+          <FileText size={13} className="text-amber-700" />
+          <p className="eyebrow">{t.settings.legal}</p>
+        </div>
+        <Link
+          href="/datenschutz"
+          className="flex items-center justify-between py-2 group"
+        >
+          <div>
+            <p className="text-[#4A3F2C] text-sm font-bold">{t.settings.privacyPolicy}</p>
+            <p className="text-[#6B5D42] text-xs font-medium">{t.settings.privacyPolicyHint}</p>
+          </div>
+          <ArrowLeft size={14} className="text-[#6B5D42] rotate-180 group-hover:translate-x-0.5 transition-transform" />
+        </Link>
       </div>
 
       {/* Danger zone */}

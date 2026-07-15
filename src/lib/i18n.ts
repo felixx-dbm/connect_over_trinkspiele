@@ -321,6 +321,9 @@ const translations = {
       privacyLocation: "Share Location",
       privacyLocationHint: "Show approx. position on the map (±200 m fuzz)",
       challengesDisabled: "This player is not accepting challenges.",
+      legal: "Legal",
+      privacyPolicy: "Privacy Policy",
+      privacyPolicyHint: "How we handle your data",
     },
     editProfile: {
       title: "Edit Profile",
@@ -731,6 +734,9 @@ const translations = {
       privacyLocation: "Standort teilen",
       privacyLocationHint: "Ungefähre Position auf der Karte anzeigen (±200 m)",
       challengesDisabled: "Dieser Spieler nimmt keine Herausforderungen an.",
+      legal: "Rechtliches",
+      privacyPolicy: "Datenschutzerklärung",
+      privacyPolicyHint: "Wie wir deine Daten verarbeiten",
     },
     editProfile: {
       title: "Profil bearbeiten",
