@@ -421,9 +421,9 @@ export default function MapView({ filter }: { filter: string }) {
         </div>
       )}
 
-      {/* Last refreshed indicator */}
+{/* Last refreshed indicator */}
       {lastRefresh && (
-        <div className="absolute bottom-16 left-3 z-[1000] bg-[#FAF8F3] px-2.5 py-1.5 flex items-center gap-1.5 border border-[#E3DCCB]">
+        <div className="absolute bottom-25 left-3 z-[1000] bg-[#FAF8F3] px-2.5 py-1.5 flex items-center gap-1.5 border border-[#E3DCCB]">
           <RefreshCw size={10} className="text-[#6B5D42]" />
           <span className="text-[#6B5D42] text-[10px] font-semibold">
             {lastRefresh.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
@@ -432,13 +432,13 @@ export default function MapView({ filter }: { filter: string }) {
       )}
 
       {/* Match list bottom sheet */}
-<div
-  className="absolute left-0 right-0 bottom-0 z-[1001] transition-transform duration-300 ease-in-out"
-  style={{ transform: listOpen ? "translateY(0)" : "translateY(calc(100% - 56px))" }}
-  onTouchStart={(e) => e.stopPropagation()}
-  onTouchMove={(e) => e.stopPropagation()}
-  onTouchEnd={(e) => e.stopPropagation()}
->
+      <div
+        className="absolute left-0 right-0 bottom-21 z-[1001] transition-transform duration-300 ease-in-out"
+        style={{ transform: listOpen ? "translateY(0)" : "translateY(calc(100% - 56px))" }}
+        onTouchStart={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
+        onTouchEnd={(e) => e.stopPropagation()}
+      >
   {/* Sheet handle / toggle bar */}
   <button
     onClick={() => setListOpen((v) => !v)}

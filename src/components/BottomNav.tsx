@@ -51,7 +51,7 @@ export default function BottomNav() {
   ];
 
   return (
-    <nav aria-label="Main navigation" className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-[max(10px,env(safe-area-inset-bottom))]">
+    <nav aria-label="Main navigation" className="fixed bottom-0 left-0 right-0 z-[9999] px-4 pb-[max(10px,env(safe-area-inset-bottom))]">
       <div className="max-w-lg mx-auto bg-[#FAF8F3]/95 backdrop-blur-xl border border-[#14110F]">
         <div className="flex items-center justify-around h-[62px] px-2">
           {tabs.map(({ href, label, Icon, activeColor, dotColor, isCTA }) => {
