@@ -48,30 +48,49 @@ export default function NotificationBell() {
     if (data) setNotifs(data as Notification[]);
   };
 
+  //get userId
   useEffect(() => {
     const supabase = createClient();
-    let channel: ReturnType<typeof supabase.channel> | null = null;
-
     supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) return;
-      setUserId(data.user.id);
-      fetchNotifs(data.user.id);
+      if (data.user) {
+        setUserId(data.user.id);
+        fetchNotifs(data.user.id);
+      }
+    });
+  }, []);
 
-      channel = supabase
-        .channel("notifications")
-        .on("postgres_changes", {
+  // Realtime erst, wenn User da ist
+  useEffect(() => {
+    if (!userId) return;
+
+    const supabase = createClient();
+  
+    const uniqueChannelName = `user-notifs-${userId}-${Date.now()}`;
+    const channel = supabase.channel(uniqueChannelName);
+
+    channel
+      .on(
+        "postgres_changes",
+        {
           event: "INSERT",
           schema: "public",
           table: "notifications",
-          filter: `user_id=eq.${data.user.id}`,
-        }, (payload) => {
+          filter: `user_id=eq.${userId}`,
+        },
+        (payload) => {
           setNotifs((prev) => [payload.new as Notification, ...prev]);
-        })
-        .subscribe();
-    });
+        }
+      )
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") {
+          console.log(`Successfully subscribed to channel: ${uniqueChannelName}`);
+        }
+      });
 
-    return () => { if (channel) supabase.removeChannel(channel); };
-  }, []);
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [userId]);
 
   // Keep relative timestamps ("5m ago") fresh
   useEffect(() => {

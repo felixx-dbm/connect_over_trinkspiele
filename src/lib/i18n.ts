@@ -186,6 +186,10 @@ const translations = {
       codePlaceholder: "e.g. BIER-4821",
       joining: "Joining…",
       joinBtn: "Join Crew",
+      confirmLeave: "Are you sure you want to leave this crew?",
+      cannotLeaveCaptain: "As captain, you cannot leave the crew without deleting it or transferring your role.",
+      leaveBtn: "Leave Crew",
+      leaving: "Leaving Crew...",
     },
     matches: {
       newTitle: "NEW",
@@ -596,6 +600,10 @@ const translations = {
       codePlaceholder: "z.B. BIER-4821",
       joining: "Beitritt läuft…",
       joinBtn: "Beitreten",
+      confirmLeave: "Möchtest du diese Crew wirklich verlassen?",
+      cannotLeaveCaptain: "Als Captain kannst du die Crew nicht verlassen, ohne sie vorher aufzulösen oder deine Rolle zu übergeben.",
+      leaveBtn: "Crew verlassen",
+      leaving: "Verlasse Crew...",
     },
     matches: {
       newTitle: "NEUES",

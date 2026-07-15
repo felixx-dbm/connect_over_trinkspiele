@@ -7,12 +7,13 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Users, Crown, Copy, Plus, LogIn, Swords, Check, AlertCircle, Shield, Loader2, Trophy } from "lucide-react";
-import { createCrew, joinCrew } from "@/app/actions/crews";
+import { Users, Crown, Copy, Plus, LogIn, Swords, Check, AlertCircle, Shield, Loader2, Trophy, LogOut } from "lucide-react";
+import { createCrew, joinCrew, leaveCrew } from "@/app/actions/crews";
 import { createClient } from "@/lib/supabase/client";
 import { fuzzCoords } from "@/lib/geo";
 import { copyToClipboard } from "@/lib/browser";
 import { useT } from "@/components/LanguageProvider";
+import LeaveCrewSection from "./LeaveCrewSection";
 
 type Member = {
   id: string;
@@ -72,6 +73,14 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
   const [challengePosting, setChallengePosting] = useState(false);
   const [challengeError, setChallengeError] = useState<string | null>(null);
   const [recentBattles, setRecentBattles] = useState<RecentCrewMatch[]>([]);
+  const [leaving, setLeaving] = useState(false);
+  const [mounted, setmounted] = useState(false);
+  
+
+  useEffect(() => 
+  {
+    setmounted(true);
+  }, []);
 
   useEffect(() => {
     if (!crew) return;
@@ -98,6 +107,8 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
     }
     setShowChallenge(true);
   };
+
+  
 
   const handleChallenge = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -162,6 +173,25 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
     router.refresh();
   };
 
+  const handleLeave = async () =>
+  {
+    if (!crew) return;
+    const confirmLeave = window.confirm(t.crews.confirmLeave);
+    if (!confirmLeave) return;
+
+    setLeaving(true);
+    setError(null);
+    const result = await leaveCrew(crew.id);
+    setLeaving(false);
+
+    if (result.error) {
+      alert(result.error);
+    } else {
+      router.refresh();
+    }
+  };
+
+  const isCaptain = crew?.captain_id === currentUserId;
   const inputClass = "w-full h-14 bg-transparent border border-[#14110F] px-4 text-[#14110F] placeholder:text-[#6B5D42] focus:outline-none text-sm font-medium";
 
   if (!crew) {
@@ -281,7 +311,7 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
             <p className="text-violet-200 text-xs font-bold mb-1">{t.crews.role}</p>
             <p className="font-bold flex items-center gap-2">
               <Shield size={14} />
-              {crew.captain_id === currentUserId ? t.crews.captain : t.crews.member}
+              {isCaptain ? t.crews.captain : t.crews.member}
             </p>
           </div>
         </div>
@@ -373,6 +403,15 @@ export default function CrewsClient({ crew, members, totalWins, currentUserId }:
           </div>
         ))}
       </div>
+
+      {/* Leave Crew*/}
+      <LeaveCrewSection
+        isCaptain={isCaptain}
+        membersCount={members.length}
+        leaving={leaving}
+        handleLeave={handleLeave}
+        t={t}
+      />
 
       {/* Challenge modal */}
       {showChallenge && (
