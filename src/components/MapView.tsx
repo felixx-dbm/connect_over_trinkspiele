@@ -20,45 +20,45 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "/leaflet/marker-shadow.png",
 });
 
-const challengeIcon = new L.DivIcon({
-  html: `<div style="width:36px;height:36px;background:#14110F;border-radius:50%;border:2px solid #8C7A5B;display:flex;align-items:center;justify-content:center">
+// Helper to generate clean custom DivIcons with standardized styling
+const createCustomIcon = (htmlContent: string, size: number = 36): L.DivIcon => {
+  return new L.DivIcon({
+    html: htmlContent,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
+    className: "custom-map-marker",
+  });
+};
+
+const challengeIcon = createCustomIcon(
+  `<div class="flex items-center justify-center w-9 h-9 rounded-full border-2 border-[#8C7A5B] bg-[#14110F]">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FAF8F3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"></polyline><line x1="13" x2="19" y1="6" y2="12"></line><line x1="6" x2="13" y1="13" y2="19"></line><line x1="16" x2="20" y1="17" y2="21"></line><line x1="4" x2="8" y1="3" y2="7"></line>
     </svg>
-  </div>`,
-  iconSize: [36, 36],
-  iconAnchor: [18, 18],
-  className: "",
-});
+  </div>`
+);
 
-const ownChallengeIcon = new L.DivIcon({
-  html: `<div class="own-match-pulse" style="width:42px;height:42px;background:#8C7A5B;border-radius:50%;border:3px solid #FAF8F3;display:flex;align-items:center;justify-content:center;">
+const ownChallengeIcon = createCustomIcon(
+  `<div class="own-match-pulse flex items-center justify-center w-[42px] h-[42px] rounded-full border-3 border-[#FAF8F3] bg-[#8C7A5B]">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FAF8F3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"></polyline><line x1="13" x2="19" y1="6" y2="12"></line><line x1="6" x2="13" y1="13" y2="19"></line><line x1="16" x2="20" y1="17" y2="21"></line><line x1="4" x2="8" y1="3" y2="7"></line>
     </svg>
   </div>`,
-  iconSize: [42, 42],
-  iconAnchor: [21, 21],
-  className: "",
-});
+  42
+);
 
-const crewChallengeIcon = new L.DivIcon({
-  html: `<div style="width:36px;height:36px;background:#8C7A5B;border-radius:4px;border:2px solid #14110F;display:flex;align-items:center;justify-content:center">
+const crewChallengeIcon = createCustomIcon(
+  `<div class="flex items-center justify-center w-9 h-9 rounded border-2 border-[#14110F] bg-[#8C7A5B]">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FAF8F3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
     </svg>
-  </div>`,
-  iconSize: [36, 36],
-  iconAnchor: [18, 18],
-  className: "",
-});
+  </div>`
+);
 
-const userIcon = new L.DivIcon({
-  html: `<div style="width:20px;height:20px;background:#14110F;border-radius:50%;border:3px solid #FAF8F3;box-shadow:0 0 0 8px rgba(20,17,15,0.12)"></div>`,
-  iconSize: [20, 20],
-  iconAnchor: [10, 10],
-  className: "",
-});
+const userIcon = createCustomIcon(
+  `<div class="w-5 h-5 rounded-full border-3 border-[#FAF8F3] bg-[#14110F] shadow-[0_0_0_8px_rgba(20,17,15,0.12)]"></div>`,
+  20
+);
 
 type NearbyMatch = {
   id: string;
