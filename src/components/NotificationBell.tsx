@@ -65,7 +65,8 @@ export default function NotificationBell() {
 
     const supabase = createClient();
   
-    const uniqueChannelName = `user-notifs-${userId}-${Date.now()}`;
+   
+    const uniqueChannelName = `user-notifs-${userId}-${Math.random().toString(36).substring(2, 11)}`;
     const channel = supabase.channel(uniqueChannelName);
 
     channel
