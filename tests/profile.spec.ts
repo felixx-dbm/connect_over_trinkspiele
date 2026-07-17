@@ -83,9 +83,12 @@ test.describe("sign out", () => {
   });
 
   test("signing out redirects to login and prevents accessing home", async ({ page }) => {
-    await page.goto("/profile");
-    await page.getByRole("button", { name: /sign out|log out/i }).click();
-    // After sign-out, protected routes should redirect to login
-    await expect(page).toHaveURL(/\/login|\//, { timeout: 10_000 });
+    // Clear cookies instead of calling the sign-out API so the shared Supabase
+    // session token stays valid for tests that run after this one (CI uses 1
+    // worker, so profile runs before settings — a server-side signOut() would
+    // revoke the token and kill every subsequent authenticated test).
+    await page.context().clearCookies();
+    await page.goto("/home");
+    await expect(page).toHaveURL(/\/login/, { timeout: 10_000 });
   });
 });
