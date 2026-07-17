@@ -16,7 +16,16 @@ function LoginForm() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
-  const [error, setError] = useState<string | null>(null);
+
+  const oauthErrorParam = searchParams.get("error");
+  const oauthErrorMessage = oauthErrorParam === "email_conflict"
+    ? "Diese E-Mail ist bereits mit einem Passwort-Account registriert. Bitte melde dich mit E-Mail & Passwort an."
+    : oauthErrorParam === "access_denied"
+    ? "Google-Anmeldung wurde abgebrochen."
+    : oauthErrorParam
+    ? "Google-Anmeldung fehlgeschlagen. Bitte versuche es erneut."
+    : null;
+  const [error, setError] = useState<string | null>(oauthErrorMessage);
   const [loading, setLoading] = useState(false);
   const [oauthLoading, setOauthLoading] = useState(false);
 

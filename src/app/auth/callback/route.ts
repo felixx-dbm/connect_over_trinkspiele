@@ -8,14 +8,18 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code");
   const next = safeRedirect(searchParams.get("next"));
 
+  // Supabase sends ?error= instead of ?code= when OAuth fails on their end
+  const oauthError = searchParams.get("error");
+  if (oauthError) {
+    return NextResponse.redirect(`${origin}/login?error=${oauthError}`);
+  }
+
   if (code) {
     const type = searchParams.get("type");
     const redirectUrl =
       type === "recovery" ? `${origin}/reset-password` : `${origin}${next}`;
 
-    // Build the response first so Supabase can write Set-Cookie headers onto it.
-    // Using createClient() here would set cookies on Next.js's internal store,
-    // which is NOT transferred to a new NextResponse — leaving the browser cookieless.
+    // Build response first so Supabase writes Set-Cookie headers directly onto it.
     const response = NextResponse.redirect(redirectUrl);
 
     const supabase = createServerClient(
@@ -33,17 +37,14 @@ export async function GET(request: NextRequest) {
       }
     );
 
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-    console.log("[auth/callback] exchange result:", {
-      error: error?.message ?? null,
-      hasSession: !!data?.session,
-      userId: data?.session?.user?.id ?? null,
-      cookieCount: response.cookies.getAll().length,
-      cookieNames: response.cookies.getAll().map((c) => c.name),
-      redirectUrl,
-    });
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) return response;
+
     console.error("[auth/callback] exchangeCodeForSession failed:", error.message);
+    const errorCode = error.message.toLowerCase().includes("already")
+      ? "email_conflict"
+      : "oauth_failed";
+    return NextResponse.redirect(`${origin}/login?error=${errorCode}`);
   }
 
   return NextResponse.redirect(`${origin}/login?error=oauth_failed`);

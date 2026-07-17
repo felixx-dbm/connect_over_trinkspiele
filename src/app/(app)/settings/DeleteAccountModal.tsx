@@ -43,11 +43,11 @@ export default function DeleteAccountModal({ onClose }: { onClose: () => void })
 
   return (
     <div
-      className="fixed inset-0 z-[500] flex items-end justify-center bg-[#14110F]/50 backdrop-blur-sm"
+      className="fixed inset-0 z-[10000] flex items-end justify-center bg-[#14110F]/50 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg bg-[#FAF8F3] border-t border-rose-700 p-6 pb-10 animate-slide-up"
+        className="w-full max-w-lg bg-[#FAF8F3] border-t border-rose-700 p-6 pb-[max(2.5rem,env(safe-area-inset-bottom))] animate-slide-up"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-5">
