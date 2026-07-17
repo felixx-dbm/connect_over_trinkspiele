@@ -33,12 +33,9 @@ export default async function globalSetup() {
   try {
     await page.goto(`${baseURL}/login`);
 
-    // Wait for networkidle so the production JS bundle has fully executed and
-    // React has hydrated the form before we interact with it.
-    // Without this, clicking submit in a prod build can fire a native HTML
-    // form GET before the onSubmit handler is attached.
-    await page.waitForLoadState("networkidle");
-
+    // fill() waits for the element to be visible and interactive — no extra
+    // waitForLoadState needed. (networkidle never fires in Next.js 16 because
+    // of persistent prefetch/SSE connections.)
     await page.locator('input[name="email"]').fill(email);
     await page.locator('input[name="password"]').fill(password);
     await page.locator('button[type="submit"]').click();
