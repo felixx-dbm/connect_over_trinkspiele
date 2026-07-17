@@ -11,7 +11,9 @@ export async function GET(request: NextRequest) {
   // Supabase sends ?error= instead of ?code= when OAuth fails on their end
   const oauthError = searchParams.get("error");
   if (oauthError) {
-    return NextResponse.redirect(`${origin}/login?error=${oauthError}`);
+    const desc = searchParams.get("error_description") ?? searchParams.get("error_code") ?? "";
+    const msg = desc ? `${oauthError}: ${desc}` : oauthError;
+    return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(msg)}`);
   }
 
   if (code) {

@@ -23,7 +23,7 @@ function LoginForm() {
     : oauthErrorParam === "access_denied"
     ? "Google-Anmeldung wurde abgebrochen."
     : oauthErrorParam
-    ? "Google-Anmeldung fehlgeschlagen. Bitte versuche es erneut."
+    ? `Google-Anmeldung fehlgeschlagen (${oauthErrorParam}). Bitte versuche es erneut.`
     : null;
   const [error, setError] = useState<string | null>(oauthErrorMessage);
   const [loading, setLoading] = useState(false);
