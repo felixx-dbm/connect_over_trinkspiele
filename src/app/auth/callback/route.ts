@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createServerClient } from "@supabase/ssr";
 import { safeRedirect } from "@/lib/redirect";
 
 export async function GET(request: NextRequest) {
@@ -9,15 +9,32 @@ export async function GET(request: NextRequest) {
   const next = safeRedirect(searchParams.get("next"));
 
   if (code) {
-    const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
-      const type = searchParams.get("type");
-      if (type === "recovery") {
-        return NextResponse.redirect(`${origin}/reset-password`);
+    const type = searchParams.get("type");
+    const redirectUrl =
+      type === "recovery" ? `${origin}/reset-password` : `${origin}${next}`;
+
+    // Build the response first so Supabase can write Set-Cookie headers onto it.
+    // Using createClient() here would set cookies on Next.js's internal store,
+    // which is NOT transferred to a new NextResponse — leaving the browser cookieless.
+    const response = NextResponse.redirect(redirectUrl);
+
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll: () => request.cookies.getAll(),
+          setAll: (cookiesToSet) => {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              response.cookies.set(name, value, options)
+            );
+          },
+        },
       }
-      return NextResponse.redirect(`${origin}${next}`);
-    }
+    );
+
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error) return response;
   }
 
   return NextResponse.redirect(`${origin}/login?error=oauth_failed`);
