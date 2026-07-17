@@ -33,7 +33,15 @@ export async function GET(request: NextRequest) {
       }
     );
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    console.log("[auth/callback] exchange result:", {
+      error: error?.message ?? null,
+      hasSession: !!data?.session,
+      userId: data?.session?.user?.id ?? null,
+      cookieCount: response.cookies.getAll().length,
+      cookieNames: response.cookies.getAll().map((c) => c.name),
+      redirectUrl,
+    });
     if (!error) return response;
     console.error("[auth/callback] exchangeCodeForSession failed:", error.message);
   }
