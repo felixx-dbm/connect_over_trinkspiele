@@ -20,20 +20,39 @@ export default async function globalSetup() {
   const browser = await chromium.launch();
   const page    = await browser.newPage();
 
+  // Log Supabase errors and browser console errors to help diagnose CI failures
+  page.on("response", (res) => {
+    if (res.url().includes("supabase") && res.status() >= 400) {
+      console.error(`   [supabase] ${res.status()} ${res.url()}`);
+    }
+  });
+  page.on("console", (msg) => {
+    if (msg.type() === "error") console.error(`   [browser] ${msg.text()}`);
+  });
+
   try {
     await page.goto(`${baseURL}/login`);
+
+    // Wait for networkidle so the production JS bundle has fully executed and
+    // React has hydrated the form before we interact with it.
+    // Without this, clicking submit in a prod build can fire a native HTML
+    // form GET before the onSubmit handler is attached.
+    await page.waitForLoadState("networkidle");
+
     await page.locator('input[name="email"]').fill(email);
     await page.locator('input[name="password"]').fill(password);
-    await page.getByRole("button", { name: /sign in/i }).click();
+    await page.locator('button[type="submit"]').click();
 
     // 45 s gives Supabase room on CI even without sleeping.
-    // If this times out the screenshot below will show what's on screen
-    // (wrong credentials → error message, misconfigured secrets → blank page, etc.).
     await page.waitForURL("**/home", { timeout: 45_000 });
 
     await page.evaluate(() => localStorage.setItem("onboarding_v1_done", "1"));
     await page.context().storageState({ path: STORAGE_STATE });
   } catch (err) {
+    // Capture any visible error message on the login page before saving screenshot
+    const loginError = await page.locator("text=/network error|invalid|not confirmed|incorrect/i").first().textContent().catch(() => null);
+    if (loginError) console.error(`   Login page error: "${loginError.trim()}"`);
+
     fs.mkdirSync("test-results", { recursive: true });
     await page.screenshot({ path: "test-results/global-setup-failure.png", fullPage: true });
     console.error("\n🔴 Global setup failed. Screenshot saved to test-results/global-setup-failure.png");
