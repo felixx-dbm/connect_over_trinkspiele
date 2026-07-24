@@ -82,11 +82,7 @@ export default function NotificationBell() {
           setNotifs((prev) => [payload.new as Notification, ...prev]);
         }
       )
-      .subscribe((status) => {
-        if (status === "SUBSCRIBED") {
-          console.log(`Successfully subscribed to channel: ${uniqueChannelName}`);
-        }
-      });
+      .subscribe();
 
     return () => {
       supabase.removeChannel(channel);

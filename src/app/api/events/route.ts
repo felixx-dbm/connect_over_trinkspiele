@@ -1,3 +1,7 @@
+/**
+ * POST /api/events — create a new public event.
+ * GET  /api/events — list upcoming events, optionally filtered by city.
+ */
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";

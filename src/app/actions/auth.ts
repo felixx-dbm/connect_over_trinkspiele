@@ -1,5 +1,10 @@
 "use server";
 
+/**
+ * Server actions for authentication — sign-up, login, logout, password reset.
+ * All auth state changes use window.location.href redirects (not router.push)
+ * so the browser picks up the new session cookie before re-rendering.
+ */
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { validatePassword } from "@/lib/validate";

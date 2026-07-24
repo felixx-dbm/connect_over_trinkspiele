@@ -1,5 +1,9 @@
 "use server";
 
+/**
+ * Server actions for profile management — update username/city, delete account.
+ * Mutations revalidate /profile so the page re-fetches fresh data after changes.
+ */
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 

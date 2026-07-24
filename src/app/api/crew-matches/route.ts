@@ -1,3 +1,8 @@
+/**
+ * POST /api/crew-matches — start a crew-vs-crew battle.
+ * GET  /api/crew-matches — fetch open crew battles near the caller's coordinates.
+ * Coordinates are fuzzed before storage to protect user location privacy.
+ */
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";

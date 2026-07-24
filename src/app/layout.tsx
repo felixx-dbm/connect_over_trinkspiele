@@ -7,8 +7,6 @@ import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import type { Locale } from "@/lib/i18n";
 
 import "./globals.css";
-//check
-
 
 
 const fraunces = Fraunces({
