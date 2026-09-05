@@ -2,18 +2,13 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { checkRateLimit } from "@/lib/ratelimit";
+import { securityHeaders } from "@/lib/security-headers";
 
 const APP_ROUTES = ["/home", "/map", "/leaderboard", "/crews", "/matches", "/profile", "/settings", "/events", "/crew-matches", "/challenge"];
 const AUTH_ROUTES = ["/login", "/register"];
 
-const SECURITY_HEADERS: Record<string, string> = {
-  "X-Frame-Options": "DENY",
-  "X-Content-Type-Options": "nosniff",
-  "X-XSS-Protection": "1; mode=block",
-  "Referrer-Policy": "strict-origin-when-cross-origin",
-  "Permissions-Policy": "geolocation=(self), camera=(), microphone=()",
-  "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
-};
+// Shared with next.config.ts so the two sets can't drift apart.
+const SECURITY_HEADERS = securityHeaders(process.env.NODE_ENV !== "production");
 
 function applySecurityHeaders(response: NextResponse): NextResponse {
   Object.entries(SECURITY_HEADERS).forEach(([k, v]) => response.headers.set(k, v));
@@ -29,12 +24,29 @@ function redirectWithCookies(to: URL, cookieSource: NextResponse): NextResponse 
   return applySecurityHeaders(response);
 }
 
+/**
+ * Resolve the client IP for rate limiting.
+ *
+ * x-forwarded-for's FIRST entry is whatever the client sent — anyone can put a
+ * random value there and get a fresh bucket every request, which defeated the
+ * brute-force limit on /login entirely. Prefer the headers the platform sets
+ * itself, and fall back to the LAST x-forwarded-for entry (appended by the
+ * closest proxy) rather than the first.
+ */
 function getClientIp(request: NextRequest): string {
-  return (
-    request.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
-    request.headers.get("x-real-ip") ??
-    "unknown"
-  );
+  const vercelIp = request.headers.get("x-vercel-forwarded-for");
+  if (vercelIp) return vercelIp.trim();
+
+  const realIp = request.headers.get("x-real-ip");
+  if (realIp) return realIp.trim();
+
+  const forwarded = request.headers.get("x-forwarded-for");
+  if (forwarded) {
+    const hops = forwarded.split(",").map((h) => h.trim()).filter(Boolean);
+    if (hops.length > 0) return hops[hops.length - 1];
+  }
+
+  return "unknown";
 }
 
 export async function proxy(request: NextRequest) {
@@ -51,17 +63,21 @@ export async function proxy(request: NextRequest) {
     const windowMs = 60_000;
 
     if (!checkRateLimit(ip, bucket, limit, windowMs)) {
-      return new NextResponse(JSON.stringify({ error: "Too many requests" }), {
-        status: 429,
-        headers: { "Content-Type": "application/json", "Retry-After": "60" },
-      });
+      return applySecurityHeaders(
+        new NextResponse(JSON.stringify({ error: "Too many requests" }), {
+          status: 429,
+          headers: { "Content-Type": "application/json", "Retry-After": "60" },
+        })
+      );
     }
   }
 
   // Stricter limit on auth pages to slow brute-force / credential stuffing
   if (pathname === "/login" || pathname === "/register") {
     if (!checkRateLimit(ip, "auth", 10, 60_000)) {
-      return new NextResponse("Too many requests", { status: 429 });
+      return applySecurityHeaders(
+        new NextResponse("Too many requests", { status: 429, headers: { "Retry-After": "60" } })
+      );
     }
   }
 

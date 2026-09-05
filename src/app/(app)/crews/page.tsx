@@ -8,10 +8,13 @@ export default async function CrewsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  // !inner + the deleted_at filter keeps archived crews from resurfacing as the
+  // user's current crew.
   const { data: membership } = await supabase
     .from("crew_members")
-    .select("role, crews(id, name, city, invite_code, captain_id, crew_wins)")
+    .select("role, crews!inner(id, name, city, invite_code, captain_id, crew_wins, deleted_at)")
     .eq("user_id", user.id)
+    .is("crews.deleted_at", null)
     .maybeSingle();
 
   const crew = membership?.crews as unknown as {

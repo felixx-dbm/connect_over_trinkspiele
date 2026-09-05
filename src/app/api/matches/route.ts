@@ -6,7 +6,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { isUUID } from "@/lib/validate";
+import { isUUID, isValidLat, isValidLng } from "@/lib/validate";
 import { fuzzCoords } from "@/lib/geo";
 
 export async function POST(request: NextRequest) {
@@ -27,6 +27,30 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid direct_opponent_id" }, { status: 400 });
   }
 
+  // A direct challenge must respect the target's privacy setting — the challenge
+  // page checks this too, but that check is client-side only.
+  if (direct_opponent_id) {
+    if (direct_opponent_id === user.id) {
+      return NextResponse.json({ error: "You cannot challenge yourself" }, { status: 400 });
+    }
+
+    const { data: target } = await supabase
+      .from("users")
+      .select("id, allow_direct_challenges")
+      .eq("id", direct_opponent_id)
+      .maybeSingle();
+
+    if (!target) {
+      return NextResponse.json({ error: "Player not found" }, { status: 404 });
+    }
+    if (target.allow_direct_challenges === false) {
+      return NextResponse.json(
+        { error: "This player is not accepting direct challenges" },
+        { status: 403 }
+      );
+    }
+  }
+
   // Fetch team_size for this game type
   const { data: gameType } = await supabase.from("game_types").select("team_size").eq("id", game_type_id).single();
   const teamSize = gameType?.team_size ?? 1;
@@ -40,9 +64,13 @@ export async function POST(request: NextRequest) {
     .maybeSingle();
   const eventId = activeMembership?.event_id ?? null;
 
-  // Fuzz coordinates if provided
+  // Fuzz coordinates if provided. Range-check first: a bare typeof check lets
+  // NaN/Infinity/out-of-range values through into the WKT string.
   let locationWkt: string | null = null;
   if (typeof lat === "number" && typeof lng === "number") {
+    if (!isValidLat(lat) || !isValidLng(lng)) {
+      return NextResponse.json({ error: "lat and lng must be valid coordinates" }, { status: 400 });
+    }
     const fuzzy = fuzzCoords(lat, lng);
     locationWkt = `POINT(${fuzzy.lng} ${fuzzy.lat})`;
   }

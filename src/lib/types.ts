@@ -42,6 +42,12 @@ export type CrewMatchRow = {
   challenger_crew_id: string;
   opponent_crew_id: string | null;
   winner_crew_id: string | null;
+  // Dual-confirmation result state (migration 022): each crew records the crew
+  // it says won; the battle completes only once both have reported.
+  challenger_claim: string | null;
+  opponent_claim: string | null;
+  disputed: boolean;
+  first_result_at: string | null;
   join_code: string;
   created_by: string;
   accepted_by: string | null;

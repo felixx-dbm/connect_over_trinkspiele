@@ -17,8 +17,11 @@ export default function ForgotPasswordPage() {
     setLoading(true);
     setError(null);
     const supabase = createClient();
+    // Must land on /auth/callback so the recovery code is exchanged for a session
+    // server-side; the callback then forwards to /reset-password. There is no
+    // /auth/reset-password route — pointing here directly 404s every reset link.
     const { error: err } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: `${window.location.origin}/auth/reset-password`,
+      redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent("/reset-password")}`,
     });
     setLoading(false);
     if (err) { setError(err.message); return; }

@@ -41,13 +41,30 @@ export async function POST(
     return NextResponse.json({ error: "Cannot join the opposing team of your own challenge" }, { status: 400 });
   }
 
-  // Cancel any open/active match the user owns as challenger before joining this one
+  // Retire the user's own *unaccepted* challenges before joining this one. An
+  // active match is left alone — cancelling it would end their current
+  // opponent's game without warning — and blocks the join instead.
   if (match.challenger_id !== user.id) {
+    const { data: activeOwn } = await adminClient
+      .from("matches")
+      .select("id")
+      .eq("challenger_id", user.id)
+      .eq("status", "active")
+      .limit(1)
+      .maybeSingle();
+
+    if (activeOwn) {
+      return NextResponse.json(
+        { error: "Finish or cancel your current match before joining another." },
+        { status: 409 }
+      );
+    }
+
     await adminClient
       .from("matches")
       .update({ status: "cancelled" })
       .eq("challenger_id", user.id)
-      .in("status", ["open", "active"]);
+      .eq("status", "open");
   }
 
   const { error } = await supabase
@@ -61,9 +78,10 @@ export async function POST(
     return NextResponse.json({ error: "Failed to join" }, { status: 500 });
   }
 
-  // When first opponent joins, set opponent_id on the match (keeps backward compat)
+  // When first opponent joins, set opponent_id on the match (keeps backward compat).
+  // Service-role write: authenticated has no UPDATE on matches (migration 021).
   if (team === "opponent") {
-    await supabase
+    await adminClient
       .from("matches")
       .update({ opponent_id: user.id })
       .eq("id", matchId)

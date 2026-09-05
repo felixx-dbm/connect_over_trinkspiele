@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Eye, EyeOff, Lock, CheckCircle, Loader2, AlertCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { validatePassword } from "@/lib/validate";
 
 function ResetForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [showPw, setShowPw] = useState(false);
@@ -15,19 +16,51 @@ function ResetForm() {
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionReady, setSessionReady] = useState(false);
+  const [linkExpired, setLinkExpired] = useState(false);
 
   useEffect(() => {
-    // Supabase sends the token as a hash fragment; the client SDK picks it up automatically
     const supabase = createClient();
-    supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") setSessionReady(true);
+
+    // The code-exchange flow lands here with the recovery session cookie already
+    // set by /auth/callback, so PASSWORD_RECOVERY never fires — and in the hash
+    // flow it can fire before this listener attaches. Check for a live session
+    // first, then keep the listener as a fallback.
+    let cancelled = false;
+    let ready = false;
+
+    const markReady = () => {
+      if (cancelled) return;
+      ready = true;
+      setSessionReady(true);
+    };
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) markReady();
     });
-  }, [searchParams]);
+
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" || session) markReady();
+    });
+
+    // No session after a grace period means the link was bad or already used.
+    const timer = setTimeout(() => {
+      if (!cancelled && !ready) setLinkExpired(true);
+    }, 5000);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+      sub.subscription.unsubscribe();
+    };
+    // Subscribe once on mount — the recovery session arrives via cookie or hash,
+    // neither of which is a React dependency.
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirm) { setError("Passwords don't match"); return; }
-    if (password.length < 8) { setError("Password must be at least 8 characters"); return; }
+    const pwError = validatePassword(password);
+    if (pwError) { setError(pwError); return; }
     setLoading(true);
     setError(null);
     const supabase = createClient();
@@ -39,6 +72,20 @@ function ResetForm() {
   };
 
   if (!sessionReady) {
+    if (linkExpired) {
+      return (
+        <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
+          <AlertCircle size={32} className="text-rose-700" />
+          <p className="font-bold">This reset link is no longer valid</p>
+          <p className="text-[#4A3F2C] text-sm font-medium">
+            Reset links expire after a short while and can only be used once.
+          </p>
+          <Link href="/forgot-password" className="text-amber-700 hover:text-amber-800 text-sm font-bold">
+            Request a new link
+          </Link>
+        </div>
+      );
+    }
     return (
       <div className="flex flex-col items-center justify-center gap-4 py-20">
         <Loader2 size={32} className="text-[#14110F] animate-spin" />
@@ -66,7 +113,7 @@ function ResetForm() {
         <input
           type={showPw ? "text" : "password"}
           required
-          placeholder="New password (8+ chars)"
+          placeholder="New password (8+ chars, A-Z, 0-9, symbol)"
           value={password}
           onChange={(e) => { setPassword(e.target.value); setError(null); }}
           className="w-full h-14 bg-transparent border-b border-[#14110F] pl-7 pr-12 text-[#14110F] placeholder:text-[#6B5D42] focus:outline-none focus:border-b-2 transition-all text-sm font-medium"

@@ -36,11 +36,13 @@ export default async function LeaderboardPage() {
           .from("crews")
           .select("id, name, city, crew_wins")
           .eq("city", city)
+          .is("deleted_at", null)
           .order("crew_wins", { ascending: false })
           .limit(20)
       : supabase
           .from("crews")
           .select("id, name, city, crew_wins")
+          .is("deleted_at", null)
           .order("crew_wins", { ascending: false })
           .limit(20),
   ]);

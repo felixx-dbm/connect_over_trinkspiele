@@ -33,27 +33,33 @@ export async function POST(
     return NextResponse.json({ error: "winner_crew_id must be a participating crew" }, { status: 400 });
   }
 
-  // Verify caller is a participant
-  const { data: participant } = await supabase
-    .from("crew_match_participants")
-    .select("id")
-    .eq("crew_match_id", matchId)
-    .eq("user_id", user.id)
-    .single();
-  if (!participant) return NextResponse.json({ error: "Not a participant" }, { status: 403 });
-
-  // Call SECURITY DEFINER function via adminClient (service_role)
-  const { error } = await adminClient.rpc("submit_crew_match_result", {
+  // The function resolves the caller's crew from crew_match_participants and
+  // records that crew's claim. The match completes only once BOTH crews report
+  // (migration 022) — a single participant can no longer name the winner.
+  const { data, error } = await adminClient.rpc("submit_crew_match_result", {
     p_crew_match_id: matchId,
+    p_user_id: user.id,
     p_winner_crew_id: winner_crew_id,
   });
 
   if (error) {
+    if (error.message.includes("not_participant")) {
+      return NextResponse.json({ error: "Not a participant" }, { status: 403 });
+    }
+    if (error.message.includes("already_submitted")) {
+      return NextResponse.json({ error: "Your crew already submitted a result" }, { status: 409 });
+    }
+    if (error.message.includes("crew_match_not_active")) {
+      return NextResponse.json({ error: "Match is not active" }, { status: 409 });
+    }
     if (error.message.includes("crew_match_not_updatable")) {
       return NextResponse.json({ error: "Result already submitted" }, { status: 409 });
+    }
+    if (error.message.includes("invalid_winner_crew")) {
+      return NextResponse.json({ error: "winner_crew_id must be a participating crew" }, { status: 400 });
     }
     return NextResponse.json({ error: "Failed to submit result" }, { status: 500 });
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ status: data }); // 'waiting' | 'completed' | 'disputed'
 }

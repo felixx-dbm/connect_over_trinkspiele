@@ -7,8 +7,18 @@ import { signUp } from "@/app/actions/auth";
 import { validatePassword, passwordStrength } from "@/lib/validate";
 import { useT } from "@/components/LanguageProvider";
 
+// Mirrors the calendar-accurate check in the signUp server action.
 function getAge(dob: string): number {
-  return Math.floor((Date.now() - new Date(dob).getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+  const birth = new Date(dob);
+  if (Number.isNaN(birth.getTime())) return -1;
+
+  const now = new Date();
+  let age = now.getUTCFullYear() - birth.getUTCFullYear();
+  const monthDiff = now.getUTCMonth() - birth.getUTCMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && now.getUTCDate() < birth.getUTCDate())) {
+    age -= 1;
+  }
+  return age;
 }
 
 const STRENGTH_COLORS = ["", "bg-rose-400", "bg-orange-400", "bg-amber-400", "bg-emerald-500"] as const;

@@ -120,7 +120,9 @@ export default function NotificationBell() {
       setNotifs((prev) => prev.map((x) => x.id === n.id ? { ...x, read: true } : x));
     }
     setOpen(false);
-    if (n.url) router.push(n.url);
+    // Defence in depth: notification rows are DB-backed, so only ever follow an
+    // in-app path. "//evil.com" and "https://…" are rejected outright.
+    if (n.url && /^\/(?!\/)/.test(n.url)) router.push(n.url);
   };
 
   const timeAgo = (iso: string) => {

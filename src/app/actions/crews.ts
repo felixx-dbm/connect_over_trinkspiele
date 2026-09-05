@@ -10,14 +10,17 @@ export async function createCrew(name: string, city: string): Promise<{ error: s
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated." };
 
-  // One crew per user — check if already in one
-  const { data: existing } = await supabase
+  // One crew per user. The embedded filter needs an !inner join on crews —
+  // without it PostgREST errors, the error is swallowed, and the guard never
+  // fires. Surface the failure rather than letting a user join a second crew.
+  const { data: existing, error: existingError } = await supabase
     .from("crew_members")
-    .select("crew_id")
+    .select("crew_id, crews!inner(deleted_at)")
     .eq("user_id", user.id)
     .is("crews.deleted_at", null)
     .maybeSingle();
 
+  if (existingError) return { error: "Could not verify your crew membership. Try again." };
   if (existing) return { error: "You are already in a crew." };
 
   const { data: crew, error: crewError } = await supabase
@@ -48,18 +51,21 @@ export async function joinCrew(inviteCode: string): Promise<{ error: string | nu
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated." };
 
-  const { data: existing } = await supabase
+  const { data: existing, error: existingError } = await supabase
     .from("crew_members")
-    .select("crew_id")
+    .select("crew_id, crews!inner(deleted_at)")
     .eq("user_id", user.id)
+    .is("crews.deleted_at", null)
     .maybeSingle();
 
+  if (existingError) return { error: "Could not verify your crew membership. Try again." };
   if (existing) return { error: "You are already in a crew." };
 
   const { data: crew } = await supabase
     .from("crews")
     .select("id")
     .eq("invite_code", inviteCode.trim().toUpperCase())
+    .is("deleted_at", null)
     .maybeSingle();
 
   if (!crew) return { error: "Invalid invite code." };
@@ -100,41 +106,42 @@ export async function leaveCrew(crewId: string): Promise<{ error: string | null 
     return { error: "You are not a member of this crew." };
   }
 
-  // 2. Wenn der User der Captain ist
+  // 2. Captain leaving
   if (userMember.role === "captain") {
-  if (isOnlyMember) {
-    // 1. Crew-Mitgliedschaft aufheben
+    if (!isOnlyMember) {
+      return {
+        error: "As captain, you cannot leave the crew. Assign a new captain or delete the crew.",
+      };
+    }
+
+    // Archive the crew BEFORE dropping the membership. The old order deleted the
+    // membership first, so a failed archive left a crew with no members at all —
+    // and the archive always failed, because crews.deleted_at did not exist
+    // until migration 022.
+    const { error: softDeleteError } = await supabase
+      .from("crews")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("id", crewId);
+
+    if (softDeleteError) {
+      return { error: `Failed to archive crew: ${softDeleteError.message}` };
+    }
+
     const { error: deleteMemberError } = await supabase
       .from("crew_members")
       .delete()
       .eq("crew_id", crewId)
       .eq("user_id", user.id);
 
-    if (deleteMemberError) return { error: deleteMemberError.message };
-
-    // Crew wird als gelöscht markiert
-    const { error: softDeleteError } = await supabase
-      .from("crews")
-      .update({ deleted_at: new Date().toISOString() }) // Zeitstempel setzen
-      .eq("id", crewId);
-
-    if (softDeleteError) {
-      // Rollback, falls das Archivieren fehlschlägt
-      await supabase
-        .from("crew_members")
-        .insert({ crew_id: crewId, user_id: user.id, role: "captain" });
-        
-      return { error: `Failed to archive crew: ${softDeleteError.message}` };
+    if (deleteMemberError) {
+      // Put the crew back so the captain isn't left in an archived crew.
+      await supabase.from("crews").update({ deleted_at: null }).eq("id", crewId);
+      return { error: deleteMemberError.message };
     }
-    
+
     revalidatePath("/crews");
     return { error: null };
-  } else {
-    return { 
-      error: "As captain, you cannot leave the crew. Assign a new captain or delete the crew." 
-    };
   }
-}
 
   // 3. Normales Mitglied verlässt die Crew
   const { error } = await supabase

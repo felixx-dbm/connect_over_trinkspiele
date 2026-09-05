@@ -34,6 +34,8 @@ export default function CrewMatchPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [resultStatus, setResultStatus] = useState<"idle" | "waiting" | "completed" | "disputed">("idle");
+  const autoResolveTriggered = useRef(false);
   const [cancelling, setCancelling] = useState(false);
   const [cancelConfirm, setCancelConfirm] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
@@ -54,7 +56,7 @@ export default function CrewMatchPage() {
     const supabase = createClient();
     const { data } = await supabase
       .from("crew_matches")
-      .select("id, game_type_id, status, challenger_crew_id, opponent_crew_id, winner_crew_id, join_code, created_by, accepted_by, created_at, completed_at, game_types(name), challenger_crew:challenger_crew_id(name), opponent_crew:opponent_crew_id(name)")
+      .select("id, game_type_id, status, challenger_crew_id, opponent_crew_id, winner_crew_id, challenger_claim, opponent_claim, disputed, first_result_at, join_code, created_by, accepted_by, created_at, completed_at, game_types(name), challenger_crew:challenger_crew_id(name), opponent_crew:opponent_crew_id(name)")
       .eq("id", id)
       .single();
     if (data) setMatch(data as unknown as CrewMatchRow);
@@ -84,7 +86,7 @@ export default function CrewMatchPage() {
       const supabase = createClient();
       const { data } = await supabase
         .from("crew_matches")
-        .select("status, winner_crew_id, opponent_crew_id")
+        .select("status, winner_crew_id, opponent_crew_id, challenger_claim, opponent_claim, first_result_at")
         .eq("id", id)
         .single();
       if (data) {
@@ -135,8 +137,16 @@ export default function CrewMatchPage() {
     });
     setSubmitting(false);
     if (res.ok) {
-      setSubmitted(true);
-      setMatch((prev) => prev ? { ...prev, status: "completed", winner_crew_id: selectedWinner } : prev);
+      const data = await res.json() as { status?: "waiting" | "completed" | "disputed" };
+      if (data.status === "waiting") {
+        // Our crew has reported; the other crew still has to confirm.
+        setResultStatus("waiting");
+        await fetchMatch();
+      } else {
+        setResultStatus(data.status ?? "completed");
+        setSubmitted(true);
+        setMatch((prev) => prev ? { ...prev, status: "completed", winner_crew_id: selectedWinner } : prev);
+      }
     } else if (res.status === 409) {
       await fetchMatch();
     } else {
@@ -144,6 +154,26 @@ export default function CrewMatchPage() {
       setSubmitError(data.error ?? "Failed to submit result");
     }
   };
+
+  // Trigger auto-resolve once the 10-minute window since the first crew report
+  // has elapsed, so a silent crew can't strand the battle.
+  useEffect(() => {
+    if (!match?.first_result_at || match.status !== "active" || autoResolveTriggered.current) return;
+
+    const autoAt = new Date(match.first_result_at).getTime() + 10 * 60 * 1000;
+    const delay = autoAt - Date.now();
+
+    const fire = () => {
+      autoResolveTriggered.current = true;
+      fetch(`/api/crew-matches/${id}/auto-resolve`, { method: "POST" })
+        .then(() => fetchMatch())
+        .catch(() => { autoResolveTriggered.current = false; });
+    };
+
+    if (delay <= 0) { fire(); return; }
+    const timer = setTimeout(fire, delay);
+    return () => clearTimeout(timer);
+  }, [match?.first_result_at, match?.status, id, fetchMatch]);
 
   const handleCancel = async () => {
     if (!cancelConfirm) { setCancelConfirm(true); return; }
@@ -188,6 +218,9 @@ export default function CrewMatchPage() {
   const challengerParticipants = participants.filter((p) => p.crew_id === match.challenger_crew_id);
   const opponentParticipants = participants.filter((p) => p.crew_id === match.opponent_crew_id);
   const isWinner = match.winner_crew_id !== null && match.winner_crew_id === userCrewId;
+  // Dual confirmation: hide the form once our own crew has reported.
+  const myClaim = isInChallengerCrew ? match.challenger_claim : match.opponent_claim;
+  const iAlreadyReported = myClaim !== null || resultStatus === "waiting";
   const winnerName = match.winner_crew_id === match.challenger_crew_id ? challengerName : opponentName;
   const statusStyle = STATUS_STYLE[match.status] ?? STATUS_STYLE.open;
   const statusLabel = t.crewMatches.status[match.status] ?? match.status;
@@ -415,8 +448,9 @@ export default function CrewMatchPage() {
         </div>
       )}
 
-      {/* Submit result — shown to participants once match is active */}
-      {match.status === "active" && isParticipant && (
+      {/* Submit result — shown to participants once match is active, until their
+          own crew has reported. The other crew must confirm before it counts. */}
+      {match.status === "active" && isParticipant && !iAlreadyReported && (
         <div>
           <p className="eyebrow mb-2">{t.crewMatches.submitResult}</p>
           <p className="text-[#6B5D42] text-xs font-medium mb-3">{t.matches.submitHint}</p>
@@ -454,6 +488,15 @@ export default function CrewMatchPage() {
             {submitting ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle size={18} />}
             {submitting ? t.crewMatches.submitting : t.crewMatches.submit}
           </button>
+        </div>
+      )}
+
+      {/* Our crew reported — the other crew still has to confirm */}
+      {match.status === "active" && isParticipant && iAlreadyReported && (
+        <div className="border border-[#E3DCCB] p-5 text-center">
+          <Loader2 size={20} className="animate-spin text-[#6B5D42] mx-auto mb-3" />
+          <p className="font-bold mb-1">{t.matches.waitingConfirmation}</p>
+          <p className="text-[#6B5D42] text-xs font-medium">{t.matches.waitingConfirmationHint}</p>
         </div>
       )}
     </div>

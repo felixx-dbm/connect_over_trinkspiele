@@ -26,15 +26,35 @@ export async function POST(
   if (match.status !== "open") return NextResponse.json({ error: "Match is not open" }, { status: 409 });
   if (match.challenger_id === user.id) return NextResponse.json({ error: "Cannot accept your own match" }, { status: 400 });
 
-  // Cancel any open/active match the user owns as challenger before joining this one
+  // Retire the user's own *unaccepted* challenges before joining this one.
+  // Previously this also cancelled their ACTIVE matches, silently killing a game
+  // their current opponent was mid-way through. An active match now blocks the
+  // accept instead, with an error the player can act on.
+  const { data: activeOwn } = await adminClient
+    .from("matches")
+    .select("id")
+    .eq("challenger_id", user.id)
+    .eq("status", "active")
+    .limit(1)
+    .maybeSingle();
+
+  if (activeOwn) {
+    return NextResponse.json(
+      { error: "Finish or cancel your current match before accepting another." },
+      { status: 409 }
+    );
+  }
+
   await adminClient
     .from("matches")
     .update({ status: "cancelled" })
     .eq("challenger_id", user.id)
-    .in("status", ["open", "active"]);
+    .eq("status", "open");
 
+  // Service-role write: authenticated has no UPDATE on matches (migration 021), so
+  // status/winner_id can't be forged alongside the accept.
   // .is("opponent_id", null) prevents IDOR overwrite; count=0 means another player beat us to it
-  const { data: updated, error } = await supabase
+  const { data: updated, error } = await adminClient
     .from("matches")
     .update({ opponent_id: user.id, status: "active" })
     .eq("id", matchId)

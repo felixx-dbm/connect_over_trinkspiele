@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { adminClient } from "@/lib/supabase/admin";
 import { isUUID } from "@/lib/validate";
 
 export async function POST(
@@ -38,8 +39,10 @@ export async function POST(
     return NextResponse.json({ error: "Cannot accept your own crew's challenge" }, { status: 400 });
   }
 
-  // Race-safe UPDATE — mirrors the solo match accept pattern
-  const { data: updated, error } = await supabase
+  // Race-safe UPDATE — mirrors the solo match accept pattern.
+  // Service-role write: authenticated has no UPDATE on crew_matches (migration 021),
+  // so winner_crew_id/status can't be forged alongside the accept.
+  const { data: updated, error } = await adminClient
     .from("crew_matches")
     .update({ opponent_crew_id: crewId, status: "active", accepted_by: user.id })
     .eq("id", matchId)
